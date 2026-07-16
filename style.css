@@ -11,6 +11,12 @@
     --shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.15);
     --border-radius: 8px;
     --transition: all 0.3s ease;
+    
+    /* Couleurs de fond pour les sections */
+    --bg-why: #F0F7FF;
+    --bg-particuliers: #FFFFFF;
+    --bg-commercants: #F8F9FA;
+    --bg-collectivites: #E6F2FF;
 }
 
 /* ============================================
@@ -161,7 +167,7 @@ body {
 .section-title {
     text-align: center;
     color: var(--primary-color);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 24px;
 }
@@ -193,6 +199,23 @@ body {
 .section-cta {
     text-align: center;
     margin-top: 48px;
+}
+
+/* Couleurs de fond pour chaque section */
+.section-why {
+    background-color: var(--bg-why);
+}
+
+.section-particuliers {
+    background-color: var(--bg-particuliers);
+}
+
+.section-commercants {
+    background-color: var(--bg-commercants);
+}
+
+.section-collectivites {
+    background-color: var(--bg-collectivites);
 }
 
 /* ============================================
@@ -238,14 +261,14 @@ body {
 }
 
 .hero h1 {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 24px;
     color: var(--primary-color);
 }
 
 .hero-subtitle {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin-bottom: 32px;
     line-height: 1.6;
 }
@@ -355,10 +378,6 @@ body {
 /* ============================================
    COLLECTIVITES
    ============================================ */
-.collectivites-section {
-    background-color: var(--light-gray);
-}
-
 .piliers {
     display: grid;
     grid-template-columns: 1fr;
@@ -401,27 +420,12 @@ body {
     text-align: center;
 }
 
-.benefices h3 {
-    color: var(--primary-color);
-    font-size: 1.5rem;
-    margin-bottom: 24px;
-}
-
-.benefices ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.benefices li {
+.benefices-text {
+    font-size: 1.2rem;
     color: var(--dark-gray);
-    padding: 12px;
-    background-color: var(--white);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 /* ============================================
@@ -520,7 +524,7 @@ body {
     }
     
     .hero h1 {
-        font-size: 4rem;
+        font-size: 3.5rem;
     }
     
     .hero-subtitle {
@@ -542,17 +546,6 @@ body {
     .piliers {
         grid-template-columns: repeat(3, 1fr);
     }
-    
-    .benefices ul {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .benefices li {
-        flex: 1;
-        min-width: 200px;
-    }
 }
 
 @media (min-width: 1024px) {
@@ -561,7 +554,7 @@ body {
     }
     
     .hero h1 {
-        font-size: 4.5rem;
+        font-size: 4rem;
     }
 }
 
