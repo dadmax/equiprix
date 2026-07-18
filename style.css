@@ -314,7 +314,7 @@ body {
 }
 
 /* ============================================
-   STEPS (Particuliers & Commerçants)
+   STEPS (Particuliers & Commerants)
    ============================================ */
 .steps {
     display: grid;
@@ -370,9 +370,17 @@ body {
     width: 100%;
     max-width: 800px;
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
     margin: 24px auto;
     display: block;
+}
+
+/* Conteneur pour aligner les images par le bas */
+.maquette-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 300px;
 }
 
 /* ============================================
@@ -546,6 +554,21 @@ body {
     .piliers {
         grid-template-columns: repeat(3, 1fr);
     }
+    
+    /* Alignement des images par le bas sur desktop */
+    .step,
+    .commercants-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .maquette-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -561,7 +584,7 @@ body {
 /* ============================================
    UTILITAIRES
    ============================================ */
-/* Masquer le sidebar par défaut sur desktop */
+/* Masquer le sidebar par dfaut sur desktop */
 @media (min-width: 768px) {
     .nav-sidebar {
         display: none;
