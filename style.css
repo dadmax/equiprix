@@ -248,7 +248,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+    /* Modification 1: gradient plus sombre pour meilleure lisibilite */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
     z-index: -1;
 }
 
@@ -314,7 +315,7 @@ body {
 }
 
 /* ============================================
-   STEPS (Particuliers & Commerçants)
+   STEPS (Particuliers & Commercants)
    ============================================ */
 .steps {
     display: grid;
@@ -370,9 +371,20 @@ body {
     width: 100%;
     max-width: 800px;
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
+    /* Modification 2: suppression de l'ombre */
+    box-shadow: none;
     margin: 24px auto;
     display: block;
+}
+
+/* Conteneur pour aligner les images par le bas */
+.maquette-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 300px;
+    width: 100%;
 }
 
 /* ============================================
@@ -546,6 +558,22 @@ body {
     .piliers {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    /* Modification 3: Alignement des images par le bas sur desktop */
+    .step,
+    .commercants-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .maquette-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -561,7 +589,7 @@ body {
 /* ============================================
    UTILITAIRES
    ============================================ */
-/* Masquer le sidebar par défaut sur desktop */
+/* Masquer le sidebar par defaut sur desktop */
 @media (min-width: 768px) {
     .nav-sidebar {
         display: none;
