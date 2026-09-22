@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculez votre niveau de vie en 2 minutes : revenu, composition du foyer, position dans la population de votre département et catégorie de réduction equiprix.">
+    <title>Simulateur de niveau de vie — equiprix</title>
+
+    <!-- Favicon (identique au site) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>:%29</text></svg>">
+
+    <!-- Google Fonts: Inter (cohérence avec le site) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS : style global du site + styles du simulateur -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/simulateur.css">
+</head>
+<body>
+    <!-- Barre de navigation (cohérente avec le site) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../" class="logo">
+                <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+            </a>
+
+            <!-- Liens desktop -->
+            <div class="nav-links">
+                <a href="../">Accueil</a>
+                <a href="../#particuliers">Particuliers</a>
+                <a href="../#commercants">Commerçants</a>
+                <a href="../#collectivites">Collectivités</a>
+            </div>
+
+            <!-- Menu hamburger mobile -->
+            <button class="hamburger" aria-label="Menu">☰</button>
+        </div>
+
+        <!-- Sidebar mobile -->
+        <div class="nav-sidebar">
+            <a href="../">Accueil</a>
+            <a href="../#particuliers">Particuliers</a>
+            <a href="../#commercants">Commerçants</a>
+            <a href="../#collectivites">Collectivités</a>
+        </div>
+    </nav>
+
+    <!-- Introduction du simulateur -->
+    <header class="sim-hero">
+        <div class="sim-container">
+            <h1 class="sim-title">Quel est votre niveau de vie&nbsp;?</h1>
+            <p class="sim-subtitle">
+                Indiquez votre département, le revenu annuel net de votre foyer et sa composition&nbsp;:
+                le simulateur calcule votre niveau de vie, vous situe dans la population
+                et vous attribue votre catégorie de réduction equiprix.
+            </p>
+        </div>
+    </header>
+
+    <!-- Simulateur : section 1 (saisie) + section 2 (résultat) -->
+    <main>
+        <div class="sim-container sim-layout" id="simulateur">
+
+            <!-- Section 1 : Vos informations -->
+            <section class="sim-card" aria-labelledby="titre-infos">
+                <h2 class="sim-card-title" id="titre-infos">Vos informations</h2>
+
+                <!-- 1. Département -->
+                <div class="sim-field">
+                    <label class="sim-label" for="departement">Département <span class="sim-required" aria-hidden="true">*</span></label>
+                    <select id="departement" class="sim-select" aria-describedby="aide-departement">
+                        <option value="" selected>Sélectionnez votre département</option>
+                    </select>
+                    <p class="sim-help" id="aide-departement">
+                        Utilisé pour vous comparer à la population de votre département.
+                    </p>
+                </div>
+
+                <!-- 2. Revenu annuel net du foyer -->
+                <div class="sim-field">
+                    <label class="sim-label" for="revenu">Revenu annuel net du foyer <span class="sim-required" aria-hidden="true">*</span></label>
+                    <div class="sim-revenu-composite">
+                        <input type="text" inputmode="numeric" id="revenu" class="sim-input sim-input-revenu"
+                               value="0" aria-describedby="aide-revenu" autocomplete="off">
+                        <span class="sim-input-suffix" aria-hidden="true">€ / an</span>
+                    </div>
+                    <input type="range" id="revenu-slider" class="sim-slider" min="0" max="200000" step="500"
+                           value="0" aria-label="Revenu annuel net du foyer (curseur)">
+                    <p class="sim-help" id="aide-revenu">
+                        Tous les revenus du foyer&nbsp;: salaires, prestations sociales, pensions, retraites,
+                        revenus du capital. Déduisez tous les impôts (prélèvement à la source et impôt
+                        sur le revenu payés cette année).
+                    </p>
+                </div>
+
+                <!-- 3. Composition du foyer -->
+                <fieldset class="sim-fieldset">
+                    <legend class="sim-label">Composition du foyer</legend>
+
+                    <div class="sim-compteur">
+                        <span class="sim-compteur-label" id="label-adultes">Personnes de 14 ans ou plus (vous compris)</span>
+                        <div class="sim-compteur-controles" role="group" aria-labelledby="label-adultes">
+                            <button type="button" class="sim-compteur-btn" id="adultes-moins" data-cible="adultes" data-sens="-1" aria-label="Retirer une personne de 14 ans ou plus">−</button>
+                            <input type="text" inputmode="numeric" id="adultes" class="sim-input sim-compteur-input"
+                                   value="1" min="1" max="12" aria-describedby="label-adultes">
+                            <button type="button" class="sim-compteur-btn" id="adultes-plus" data-cible="adultes" data-sens="1" aria-label="Ajouter une personne de 14 ans ou plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="sim-compteur">
+                        <span class="sim-compteur-label" id="label-enfants">Enfants de 13 ans ou moins</span>
+                        <div class="sim-compteur-controles" role="group" aria-labelledby="label-enfants">
+                            <button type="button" class="sim-compteur-btn" id="enfants-moins" data-cible="enfants" data-sens="-1" aria-label="Retirer un enfant de 13 ans ou moins">−</button>
+                            <input type="text" inputmode="numeric" id="enfants" class="sim-input sim-compteur-input"
+                                   value="0" min="0" max="10" aria-describedby="label-enfants">
+                            <button type="button" class="sim-compteur-btn" id="enfants-plus" data-cible="enfants" data-sens="1" aria-label="Ajouter un enfant de 13 ans ou moins">+</button>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- 4. Ligne de calcul intermédiaire -->
+                <p class="sim-uc-line" id="ligne-uc">Unités de consommation&nbsp;: <output id="uc-valeur" for="adultes enfants">1,0</output></p>
+            </section>
+
+            <!-- Section 2 : Votre résultat -->
+            <section class="sim-card" aria-labelledby="titre-resultat">
+                <h2 class="sim-card-title" id="titre-resultat">Votre niveau de vie</h2>
+
+                <!-- État vide (revenu non renseigné) -->
+                <div class="sim-empty" id="etat-vide">
+                    <p class="sim-empty-icone" aria-hidden="true">🧮</p>
+                    <p class="sim-empty-texte">Renseignez le revenu annuel net de votre foyer pour découvrir votre niveau de vie.</p>
+                </div>
+
+                <!-- Résultats (masqués tant que le revenu est à 0) -->
+                <div class="sim-resultats" id="resultats" hidden>
+                    <!-- 1. Chiffre principal -->
+                    <p class="sim-niveau-vie-label">Votre niveau de vie</p>
+                    <p class="sim-niveau-vie-valeur"><span id="niveau-vie">0</span>&nbsp;€ par an</p>
+                    <p class="sim-niveau-vie-note">soit l’équivalent de ce dont disposerait un adulte seul vivant avec le même revenu</p>
+
+                    <!-- 2. Position dans la population -->
+                    <div class="sim-position">
+                        <div class="sim-segmented" role="tablist" aria-label="Population de référence">
+                            <button type="button" class="sim-segment" id="seg-france" role="tab" aria-selected="true">France</button>
+                            <button type="button" class="sim-segment" id="seg-dep" role="tab" aria-selected="false" disabled>Sélectionnez un département</button>
+                        </div>
+
+                        <p class="sim-percentile-label" id="libelle-percentile" aria-live="polite"></p>
+
+                        <!-- Jauge de distribution (10 tranches de 10 % de hauteur) -->
+                        <div class="sim-jauge-wrap">
+                            <div class="sim-jauge" id="jauge" role="img" aria-label="Jauge de distribution des niveaux de vie"></div>
+                            <div class="sim-jauge-marker" id="jauge-marker" aria-hidden="true"></div>
+                        </div>
+                        <div class="sim-jauge-echelle" id="jauge-echelle" aria-hidden="true">
+                            <span id="echelle-d1">D1</span>
+                            <span id="echelle-med">médiane</span>
+                            <span id="echelle-d9">D9</span>
+                        </div>
+                        <p class="sim-jauge-legendes" aria-hidden="true">
+                            <span class="sim-legende sim-legende-rouge">10&nbsp;% les plus bas</span>
+                            <span class="sim-legende sim-legende-orange">25&nbsp;% les plus bas</span>
+                            <span class="sim-legende sim-legende-jaune">50&nbsp;% les plus bas</span>
+                            <span class="sim-legende sim-legende-verte">top 50&nbsp;%</span>
+                        </p>
+                    </div>
+
+                    <!-- 3. Catégorie equiprix -->
+                    <p class="sim-categorie-label">Catégorie equiprix</p>
+                    <p class="sim-categorie-badge" id="badge-categorie">—</p>
+                </div>
+
+                <!-- Message d’erreur de chargement des données -->
+                <p class="sim-erreur" id="erreur-data" hidden>
+                    Les données de référence n’ont pas pu être chargées. Vérifiez votre connexion
+                    puis rechargez la page.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Section 3 : Comprendre le calcul (accordéon) -->
+    <section class="sim-section" aria-labelledby="titre-comprendre">
+        <div class="sim-container">
+            <h2 class="section-title" id="titre-comprendre">Comprendre le calcul</h2>
+
+            <div class="sim-accordion">
+                <h3 class="sim-accordion-titre">
+                    <button type="button" class="sim-accordion-bouton" id="acc-btn" aria-expanded="true" aria-controls="acc-contenu">
+                        <span>Les unités de consommation, le niveau de vie et le revenu disponible</span>
+                        <span class="sim-accordion-fleche" aria-hidden="true">▾</span>
+                    </button>
+                </h3>
+                <div class="sim-accordion-contenu" id="acc-contenu" role="region" aria-labelledby="acc-btn">
+                    <div class="sim-expli-bloc">
+                        <h4>Les unités de consommation</h4>
+                        <p>
+                            Pour comparer des ménages de tailles différentes, on ne compare pas les revenus bruts&nbsp;:
+                            on divise le revenu par le nombre d’<strong>unités de consommation</strong> (échelle OCDE)&nbsp;— 1&nbsp;UC
+                            pour le premier adulte, 0,5 pour chaque autre personne de 14&nbsp;ans ou plus, 0,3 pour chaque
+                            enfant de moins de 14&nbsp;ans.
+                        </p>
+                        <p>
+                            Exemple&nbsp;: un couple avec deux enfants de moins de 14&nbsp;ans représente 2,1&nbsp;UC
+                            (1&nbsp;+&nbsp;0,5&nbsp;+&nbsp;0,3&nbsp;+&nbsp;0,3). Un foyer de 42&nbsp;000&nbsp;€ par an a donc
+                            le même niveau de vie qu’un adulte seul avec 20&nbsp;000&nbsp;€.
+                        </p>
+                    </div>
+                    <div class="sim-expli-bloc">
+                        <h4>Le niveau de vie et comment l’interpréter</h4>
+                        <p>
+                            Le niveau de vie est le revenu disponible du ménage divisé par ses unités de consommation.
+                            C’est l’indicateur utilisé par l’Insee et Eurostat (revenu disponible équivalent) pour
+                            mesurer les inégalités et la pauvreté&nbsp;: le seuil de pauvreté est fixé à 60&nbsp;% du
+                            niveau de vie médian.
+                        </p>
+                        <p>
+                            Le niveau de vie est identique pour toutes les personnes d’un même ménage&nbsp;: un enfant
+                            «&nbsp;a&nbsp;» le même niveau de vie que ses parents.
+                        </p>
+                    </div>
+                    <div class="sim-expli-bloc">
+                        <h4>Ce qui entre dans le revenu disponible</h4>
+                        <ul class="sim-expli-liste">
+                            <li>Salaires et traitements nets de cotisations&nbsp;;</li>
+                            <li>Revenus d’activité non salariée&nbsp;;</li>
+                            <li>Indemnités de chômage&nbsp;;</li>
+                            <li>Pensions, retraites et rentes&nbsp;;</li>
+                            <li>Prestations sociales (familiales, logement, minima sociaux)&nbsp;;</li>
+                            <li>Revenus du patrimoine.</li>
+                        </ul>
+                        <p>
+                            Moins les impôts directs&nbsp;: impôt sur le revenu, prélèvement à la source, CSG/CRDS,
+                            taxe d’habitation le cas échéant.
+                        </p>
+                        <p class="sim-expli-note">
+                            Limites&nbsp;: certains revenus du patrimoine sont imputés par l’Insee&nbsp;; les aides
+                            exceptionnelles (prime de partage de la valeur, indemnité inflation) ne sont pas toutes comptées.
+                        </p>
+                    </div>
+                    <p class="sim-source">
+                        Source&nbsp;: <a href="https://www.insee.fr/fr/statistiques/8984748" target="_blank" rel="noopener noreferrer">Insee, dispositif Filosofi 2023 (Filosofi&nbsp;2) — Niveau de vie et pauvreté des territoires</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4 : Des prix qui s'ajustent à vos revenus -->
+    <section class="sim-section sim-section-cta" aria-labelledby="titre-ajustement">
+        <div class="sim-container">
+            <h2 class="section-title" id="titre-ajustement">Des prix qui s’ajustent à vos revenus</h2>
+            <p class="section-intro">
+                La tarification solidaire existe déjà dans de nombreuses structures&nbsp;: tarifs réduits
+                dans les transports, les crèches, les clubs de sport ou les musées selon vos revenus.
+                equiprix a pour ambition d’étendre ce principe à tous les commerces de proximité&nbsp;:
+                le prix affiché s’ajuste à votre niveau de vie, sans démarche compliquée.
+            </p>
+            <p class="sim-cta-date">
+                equiprix sera disponible à partir de début 2027. En attendant, vous pouvez soutenir
+                le projet en participant à l’enquête&nbsp;:
+            </p>
+
+            <!-- Bloc dynamique « Votre catégorie » (visible quand le simulateur est complété) -->
+            <div class="sim-categorie-dyn" id="bloc-categorie-dyn" hidden>
+                <p class="sim-categorie-dyn-texte" id="texte-categorie-dyn"></p>
+            </div>
+
+            <div class="section-cta">
+                <a href="https://eu.jotform.com/form/262104582721047" class="btn-primary">Participer à l’enquête</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (cohérent avec le site) -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+                </div>
+                <p>
+                    <a href="mailto:maxime.manote@gmail.com" class="footer-link">Nous contacter</a>
+                </p>
+                <p class="copyright">© 2026 equiprix</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript : calculs métier puis application -->
+    <script src="js/calculs.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

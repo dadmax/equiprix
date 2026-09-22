@@ -1,0 +1,566 @@
+/* ============================================
+   SIMULATEUR NIVEAU DE VIE — /particuliers/
+   S'ajoute au style global du site (style.css).
+   ============================================ */
+
+/* Variables locales au simulateur */
+.sim-page {
+    --sim-cat-rouge: #D32F2F;
+    --sim-cat-orange: #EF6C00;
+    --sim-cat-jaune: #F9A825;
+    --sim-cat-vert: #2E7D32;
+    --sim-fond-clair: #F0F7FF;
+}
+
+/* ---------- CONTENEUR ---------- */
+.sim-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.sim-hero {
+    background-color: var(--bg-why, #F0F7FF);
+    padding: 48px 0 32px;
+    text-align: center;
+}
+
+.sim-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.sim-subtitle {
+    max-width: 760px;
+    margin: 0 auto;
+    color: var(--dark-gray);
+    font-size: 1.05rem;
+}
+
+/* ---------- LAYOUT 2 COLONNES (desktop) ---------- */
+.sim-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+
+.sim-card {
+    background-color: var(--white);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 32px 24px;
+}
+
+.sim-card-title {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* ---------- CHAMPS ---------- */
+.sim-field {
+    margin-bottom: 24px;
+}
+
+.sim-fieldset {
+    border: none;
+    margin: 0 0 8px;
+    padding: 0;
+}
+
+.sim-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sim-required {
+    color: var(--secondary-color);
+}
+
+.sim-select,
+.sim-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--dark-gray);
+    background-color: var(--white);
+    border: 1px solid #cfd8dc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    transition: var(--transition);
+}
+
+.sim-select:focus,
+.sim-input:focus,
+.sim-slider:focus,
+.sim-compteur-btn:focus,
+.sim-segment:focus,
+.sim-accordion-bouton:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.sim-help {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+/* Revenu : champ + suffixe + slider */
+.sim-revenu-composite {
+    display: flex;
+    align-items: stretch;
+}
+
+.sim-input-revenu {
+    text-align: right;
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+}
+
+.sim-input-suffix {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    background-color: var(--light-gray);
+    border: 1px solid #cfd8dc;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.sim-slider {
+    width: 100%;
+    margin-top: 16px;
+    accent-color: var(--primary-color);
+    height: 24px;
+}
+
+/* ---------- COMPTEURS ---------- */
+.sim-compteur {
+    margin-bottom: 20px;
+}
+
+.sim-compteur-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sim-compteur-controles {
+    display: flex;
+    align-items: stretch;
+    max-width: 180px;
+}
+
+.sim-compteur-btn {
+    flex: 0 0 44px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--primary-color);
+    background-color: var(--white);
+    border: 1px solid #cfd8dc;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sim-compteur-btn:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.sim-compteur-btn:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.sim-compteur-btn:hover:not(:disabled) {
+    background-color: var(--bg-why, #F0F7FF);
+}
+
+.sim-compteur-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.sim-compteur-input {
+    flex: 1;
+    width: 60px;
+    text-align: center;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.sim-uc-line {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 8px;
+}
+
+/* ---------- RÉSULTATS ---------- */
+.sim-empty {
+    text-align: center;
+    padding: 48px 16px;
+}
+
+.sim-empty-icone {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.sim-empty-texte {
+    color: #666;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.sim-erreur {
+    color: var(--sim-cat-rouge, #D32F2F);
+    font-weight: 600;
+    padding: 16px;
+    background-color: #FDECEA;
+    border-radius: 6px;
+}
+
+.sim-niveau-vie-label {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.sim-niveau-vie-valeur {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.sim-niveau-vie-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 32px;
+}
+
+/* Segmented button France / département */
+.sim-position {
+    margin-bottom: 24px;
+}
+
+.sim-segmented {
+    display: flex;
+    border: 1px solid #cfd8dc;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.sim-segment {
+    flex: 1;
+    padding: 10px 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    background-color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sim-segment + .sim-segment {
+    border-left: 1px solid #cfd8dc;
+}
+
+.sim-segment[aria-selected="true"] {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.sim-segment:disabled {
+    color: #999;
+    background-color: var(--light-gray);
+    cursor: not-allowed;
+}
+
+.sim-percentile-label {
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* ---------- JAUGE DE DISTRIBUTION ---------- */
+/* Chaque tranche de 10 % de la population occupe exactement 10 % de la hauteur. */
+.sim-jauge-wrap {
+    position: relative;
+}
+
+.sim-jauge {
+    display: flex;
+    flex-direction: column-reverse;  /* percentile 0 en bas */
+    height: 220px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sim-tranche {
+    flex: 1 1 10%;  /* 10 tranches de 10 % de hauteur */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.sim-tranche + .sim-tranche {
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.sim-tranche-rouge   { background-color: #F6C6C6; }
+.sim-tranche-orange  { background-color: #FBD9B0; }
+.sim-tranche-jaune   { background-color: #FBE9A9; }
+.sim-tranche-verte   { background-color: #C8E6C9; }
+
+/* Borne en euros affichée sur la tranche où elle démarre */
+.sim-tranche-borne {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+/* Curseur de l'utilisateur */
+.sim-jauge-marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 3px solid var(--dark-gray);
+    pointer-events: none;
+}
+
+.sim-jauge-marker::after {
+    content: '▼';
+    position: absolute;
+    right: 8px;
+    top: -13px;
+    font-size: 0.75rem;
+    color: var(--dark-gray);
+}
+
+/* Échelle sous la jauge */
+.sim-jauge-echelle {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 6px;
+}
+
+/* Légende des catégories */
+.sim-jauge-legendes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #666;
+}
+
+.sim-legende::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: baseline;
+}
+
+.sim-legende-rouge::before  { background-color: #F6C6C6; }
+.sim-legende-orange::before { background-color: #FBD9B0; }
+.sim-legende-jaune::before  { background-color: #FBE9A9; }
+.sim-legende-verte::before  { background-color: #C8E6C9; }
+
+/* ---------- BADGE CATÉGORIE ---------- */
+.sim-categorie-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sim-categorie-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    background-color: #999;
+}
+
+.sim-categorie-badge.cat-rouge  { background-color: var(--sim-cat-rouge, #D32F2F); }
+.sim-categorie-badge.cat-orange { background-color: var(--sim-cat-orange, #EF6C00); }
+.sim-categorie-badge.cat-jaune  { background-color: var(--sim-cat-jaune, #F9A825); }
+.sim-categorie-badge.cat-vert   { background-color: var(--sim-cat-vert, #2E7D32); }
+
+/* ---------- SECTION 3 : ACCORDÉON ---------- */
+.sim-section {
+    padding: 64px 0;
+}
+
+.sim-section-comprendre {
+    background-color: var(--bg-commercants, #F8F9FA);
+}
+
+.sim-accordion-titre {
+    margin: 0;
+}
+
+.sim-accordion {
+    background-color: var(--white);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.sim-accordion-bouton {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: left;
+    cursor: pointer;
+}
+
+.sim-accordion-fleche {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.sim-accordion-bouton[aria-expanded="false"] .sim-accordion-fleche {
+    transform: rotate(-90deg);
+}
+
+.sim-accordion-contenu {
+    padding: 0 24px 24px;
+}
+
+.sim-accordion-contenu[hidden] {
+    display: none;
+}
+
+.sim-expli-bloc {
+    margin-bottom: 24px;
+}
+
+.sim-expli-bloc h4 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+}
+
+.sim-expli-bloc p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.sim-expli-liste {
+    margin: 0 0 8px 20px;
+    line-height: 1.7;
+}
+
+.sim-expli-note {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.sim-source {
+    font-size: 0.85rem;
+    color: #666;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 16px;
+}
+
+.sim-source a {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* ---------- SECTION 4 : CTA ---------- */
+.sim-section-cta {
+    background-color: var(--bg-why, #F0F7FF);
+    text-align: center;
+}
+
+.sim-cta-date {
+    max-width: 700px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+}
+
+/* Bloc dynamique « Votre catégorie » */
+.sim-categorie-dyn {
+    max-width: 700px;
+    margin: 0 auto 24px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+.sim-categorie-dyn-texte {
+    margin: 0;
+}
+
+.sim-categorie-dyn.cat-rouge  { background-color: #FDECEA; border-left: 5px solid var(--sim-cat-rouge, #D32F2F); }
+.sim-categorie-dyn.cat-orange { background-color: #FFF1E0; border-left: 5px solid var(--sim-cat-orange, #EF6C00); }
+.sim-categorie-dyn.cat-jaune  { background-color: #FEF7DD; border-left: 5px solid var(--sim-cat-jaune, #F9A825); }
+.sim-categorie-dyn.cat-vert   { background-color: #E5F3E6; border-left: 5px solid var(--sim-cat-vert, #2E7D32); }
+
+/* ---------- RESPONSIVE ---------- */
+/* Desktop : deux colonnes visibles simultanément */
+@media (min-width: 992px) {
+    .sim-layout {
+        grid-template-columns: 45fr 55fr;
+        align-items: start;
+        gap: 40px;
+    }
+
+    .sim-card {
+        padding: 32px;
+    }
+
+    .sim-jauge {
+        height: 280px;
+    }
+}
+
+/* Petits écrans : la jauge reste lisible (min 280px de large géré par la grille fluide) */
+@media (max-width: 480px) {
+    .sim-tranche {
+        font-size: 0.62rem;
+        padding: 0 4px;
+    }
+
+    .sim-niveau-vie-valeur {
+        font-size: 1.9rem;
+    }
+}

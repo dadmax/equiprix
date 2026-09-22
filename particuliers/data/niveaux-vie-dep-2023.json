@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "source": "Insee, Filosofi 2023 (dispositif Filosofi 2)",
+    "zone": "France métropolitaine et La Réunion",
+    "referentielPauvrete": "Seuil de pauvreté à 60 % de la médiane métropolitaine",
+    "note": "PROVISOIRE : ne contient que la France et un département d'exemple. Régénérer avec scripts/xlsx-to-json.py à partir du fichier Insee complet (101 départements)."
+  },
+  "france": {
+    "d1": 13200, "d2": 17010, "q1": 18710, "d3": 20300,
+    "d4": 23190, "d5": 25920, "d6": 28860, "d7": 32380,
+    "q3": 34630, "d8": 37380, "d9": 46500
+  },
+  "departements": [
+    {
+      "code": "01", "nom": "Ain",
+      "d1": 14490, "q1": 20710, "d2": 18880, "d3": 22320, "d4": 25190,
+      "d5": 27990, "d6": 31030, "d7": 34970, "d8": 40830, "d9": 53240, "q3": 37510
+    }
+  ]
+}
