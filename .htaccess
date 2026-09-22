@@ -1,4 +1,3 @@
 RewriteEngine On
-RewriteCond %{HTTPS} off [OR]
-RewriteCond %{HTTP_HOST} ^www\.equiprix\.fr [NC]
-RewriteRule (.*) https://equiprix.fr/$1 [L,R=301]
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
