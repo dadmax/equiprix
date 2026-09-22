@@ -22,29 +22,30 @@ header, du footer ou de la palette s'applique automatiquement.
 
 ## Régénération du JSON
 
-1. Télécharger le fichier Insee « Revenus et pauvreté des ménages en 2023 —
-   Tous les niveaux géographiques » (dispositif Filosofi 2) depuis
+1. Télécharger le fichier Insee Filosofi (dispositif Filosofi 2, millésime
+   2023 : `FILOSOFI_CC_2023_FR.xlsx`) depuis
    <https://www.insee.fr/fr/statistiques/8984752> et le déposer dans
    `data/source/`.
 2. Lancer la conversion :
 
    ```bash
-   python3 scripts/xlsx-to-json.py data/source/<fichier>.xlsx
-   # ou, pour un export CSV :
+   python3 scripts/xlsx-to-json.py data/source/FILOSOFI_CC_2023_FR.xlsx
+   # ou, pour un export CSV équivalent :
    python3 scripts/xlsx-to-json.py data/source/<fichier>.csv
    ```
 
    Dépendance (xlsx uniquement) : `pip install openpyxl`.
 
-Le script nettoie les particularités des fichiers Insee : lignes d'en-tête,
-espaces fines insécables (U+00AF / U+202F), virgules décimales, sauts de ligne
-parasites dans les cellules. Il attend 101 départements (métropole, 2A, 2B,
-974 La Réunion) et affiche un avertissement sinon. La ligne France (code « 1 »)
-devient la clé `france` du JSON.
+Le script reconnaît le xlsx multi-onglets Insee (onglets `FRANCE` et `DEP`),
+un xlsx mono-onglet ou un CSV. Il nettoie les particularités des fichiers
+Insee : lignes d'en-tête, espaces fines insécables (U+00AF / U+202F),
+virgules décimales, sauts de ligne parasites dans les cellules. Il attend
+97 départements (métropole y compris la Corse 2A/2B, plus La Réunion 974 —
+champ de la diffusion Filosofi 2023) et affiche un avertissement sinon.
+La ligne France métropolitaine (code `FM`) devient la clé `france` du JSON.
 
-**Données actuelles** : le JSON en dépôt ne contient que la constante France et
-un département d'exemple (Ain). Il faut le régénérer avec le fichier complet
-avant la mise en ligne.
+**Données actuelles** : le JSON en dépôt a été généré à partir de
+`data/source/FILOSOFI_CC_2023_FR.xlsx` (97 départements + France).
 
 ## Déploiement OVH (hébergement statique)
 
