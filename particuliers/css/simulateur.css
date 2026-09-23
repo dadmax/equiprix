@@ -563,16 +563,64 @@
     font-weight: 600;
 }
 
-/* ---------- SECTION 4 : CTA ---------- */
-.sim-section-cta {
+/* ---------- SECTION 4 : equiprix ajuste les prix ---------- */
+.sim-section-ajustement {
     background-color: var(--bg-why, #F0F7FF);
+    text-align: left;
+}
+
+/* Texte à gauche, maquette à droite sur écrans larges */
+.sim-ajustement-cols {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.sim-ajustement-cols .section-intro {
+    margin: 0 auto;
+    max-width: 700px;
+    line-height: 1.7;
+}
+
+.sim-ajustement-img {
+    width: 280px;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* ---------- SECTION 5 : Vous pouvez participer ---------- */
+.sim-section-participer {
+    background-color: var(--white);
     text-align: center;
 }
 
-.sim-cta-date {
+.sim-section-participer .section-intro {
     max-width: 700px;
-    margin: 0 auto 24px;
-    line-height: 1.6;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+}
+
+@media (min-width: 992px) {
+    .sim-ajustement-cols {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    .sim-ajustement-cols .section-intro {
+        margin: 0;
+        max-width: 55%;
+    }
+
+    .sim-ajustement-img {
+        width: 320px;
+        flex-shrink: 0;
+    }
 }
 
 /* ---------- RESPONSIVE ---------- */
