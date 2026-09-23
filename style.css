@@ -361,8 +361,8 @@ body {
     grid-template-columns: 1fr;
     gap: 32px;
     margin-top: 32px;
-    display: flex;
-    align-items: flex-end;
+    justify-items: center;
+    align-items: end;
 }
 
 .commercants-item {
