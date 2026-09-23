@@ -40,8 +40,7 @@ const dom = {
     jauge: $("jauge"),
     jaugeMarker: $("jauge-marker"),
     badgeCategorie: $("badge-categorie"),
-    accBtn: $("acc-btn"),
-    accContenu: $("acc-contenu"),
+
 };
 
 /* ---------- Chargement des données ---------- */
@@ -430,23 +429,16 @@ dom.segDep.addEventListener("click", () => {
     });
 });
 
-/** Accordéon « Comprendre le calcul » : ouvert par défaut sur desktop. */
-dom.accBtn.addEventListener("click", () => {
-    const ouvert = dom.accBtn.getAttribute("aria-expanded") === "true";
-    dom.accBtn.setAttribute("aria-expanded", String(!ouvert));
-    dom.accContenu.hidden = ouvert;
+/** Accordéons « Comprendre le calcul » : trois panneaux indépendants,
+ *  tous fermés par défaut, sur mobile comme sur desktop. */
+document.querySelectorAll(".sim-accordion-bouton").forEach((bouton) => {
+    bouton.addEventListener("click", () => {
+        const ouvert = bouton.getAttribute("aria-expanded") === "true";
+        bouton.setAttribute("aria-expanded", String(!ouvert));
+        const contenu = document.getElementById(bouton.getAttribute("aria-controls"));
+        if (contenu) contenu.hidden = ouvert;
+    });
 });
-
-/** Fermé par défaut sur mobile/tablette (empilement vertical). */
-function initAccordion() {
-    if (window.matchMedia("(min-width: 992px)").matches) {
-        dom.accBtn.setAttribute("aria-expanded", "true");
-        dom.accContenu.hidden = false;
-    } else {
-        dom.accBtn.setAttribute("aria-expanded", "false");
-        dom.accContenu.hidden = true;
-    }
-}
 
 /* ---------- Menu mobile (identique au site) ---------- */
 document.querySelector(".hamburger").addEventListener("click", function () {
@@ -460,6 +452,5 @@ document.querySelectorAll(".nav-sidebar a").forEach((link) => {
 });
 
 /* ---------- Démarrage ---------- */
-initAccordion();
 majBoutonsCompteurs();
 chargerDonnees();

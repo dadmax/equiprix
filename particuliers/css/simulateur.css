@@ -455,6 +455,13 @@
     margin: 0;
 }
 
+/* Les trois panneaux pédagogiques, espacés verticalement */
+.sim-accordeons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .sim-accordion {
     background-color: var(--white);
     border: 1px solid rgba(0, 0, 0, 0.08);

@@ -186,17 +186,17 @@
         <div class="sim-container">
             <h2 class="section-title" id="titre-comprendre">Comprendre le calcul</h2>
 
-            <div class="sim-accordion">
-                <h3 class="sim-accordion-titre">
-                    <button type="button" class="sim-accordion-bouton" id="acc-btn" aria-expanded="true" aria-controls="acc-contenu">
-                        <span>Les unités de consommation, le niveau de vie et le revenu disponible</span>
-                        <span class="sim-accordion-fleche" aria-hidden="true">▾</span>
-                    </button>
-                </h3>
-                <div class="sim-accordion-contenu" id="acc-contenu" role="region" aria-labelledby="acc-btn">
-                    <div class="sim-expli-bloc">
-                        <h4>Les unités de consommation</h4>
-                        <p>
+            <div class="sim-accordeons">
+                <div class="sim-accordion">
+                    <h3 class="sim-accordion-titre">
+                        <button type="button" class="sim-accordion-bouton" aria-expanded="false" aria-controls="acc-contenu-uc">
+                            <span>Les unités de consommation</span>
+                            <span class="sim-accordion-fleche" aria-hidden="true">▾</span>
+                        </button>
+                    </h3>
+                    <div class="sim-accordion-contenu" id="acc-contenu-uc" role="region" hidden>
+                        <div class="sim-expli-bloc">
+                            <p>
                             Pour comparer des ménages de tailles différentes, on ne compare pas les revenus bruts&nbsp;:
                             on divise le revenu par le nombre d’<strong>unités de consommation</strong> (échelle OCDE)&nbsp;— 1&nbsp;UC
                             pour le premier adulte, 0,5 pour chaque autre personne de 14&nbsp;ans ou plus, 0,3 pour chaque
@@ -207,9 +207,19 @@
                             (1&nbsp;+&nbsp;0,5&nbsp;+&nbsp;0,3&nbsp;+&nbsp;0,3). Un foyer de 42&nbsp;000&nbsp;€ par an a donc
                             le même niveau de vie qu’un adulte seul avec 20&nbsp;000&nbsp;€.
                         </p>
+                        </div>
                     </div>
-                    <div class="sim-expli-bloc">
-                        <h4>Le niveau de vie et comment l’interpréter</h4>
+                </div>
+
+                <div class="sim-accordion">
+                    <h3 class="sim-accordion-titre">
+                        <button type="button" class="sim-accordion-bouton" aria-expanded="false" aria-controls="acc-contenu-niveau">
+                            <span>Le niveau de vie et comment l’interpréter</span>
+                            <span class="sim-accordion-fleche" aria-hidden="true">▾</span>
+                        </button>
+                    </h3>
+                    <div class="sim-accordion-contenu" id="acc-contenu-niveau" role="region" hidden>
+                        <div class="sim-expli-bloc">
                         <p>
                             Le niveau de vie est le revenu disponible du ménage divisé par ses unités de consommation.
                             C’est l’indicateur utilisé par l’Insee et Eurostat (revenu disponible équivalent) pour
@@ -220,9 +230,19 @@
                             Le niveau de vie est identique pour toutes les personnes d’un même ménage&nbsp;: un enfant
                             «&nbsp;a&nbsp;» le même niveau de vie que ses parents.
                         </p>
+                        </div>
                     </div>
-                    <div class="sim-expli-bloc">
-                        <h4>Ce qui entre dans le revenu disponible</h4>
+                </div>
+
+                <div class="sim-accordion">
+                    <h3 class="sim-accordion-titre">
+                        <button type="button" class="sim-accordion-bouton" aria-expanded="false" aria-controls="acc-contenu-revenu">
+                            <span>Ce qui entre dans le revenu disponible</span>
+                            <span class="sim-accordion-fleche" aria-hidden="true">▾</span>
+                        </button>
+                    </h3>
+                    <div class="sim-accordion-contenu" id="acc-contenu-revenu" role="region" hidden>
+                        <div class="sim-expli-bloc">
                         <ul class="sim-expli-liste">
                             <li>Salaires et traitements nets de cotisations&nbsp;;</li>
                             <li>Revenus d’activité non salariée&nbsp;;</li>
@@ -233,18 +253,20 @@
                         </ul>
                         <p>
                             Moins les impôts directs&nbsp;: impôt sur le revenu, prélèvement à la source, CSG/CRDS,
-                            taxe d’habitation le cas échéant.
+                            taxe d’habitation le cas échéant. L’Insee ne tient pas compte de la taxe foncière.
                         </p>
                         <p class="sim-expli-note">
                             Limites&nbsp;: certains revenus du patrimoine sont imputés par l’Insee&nbsp;; les aides
                             exceptionnelles (prime de partage de la valeur, indemnité inflation) ne sont pas toutes comptées.
                         </p>
+                        </div>
                     </div>
-                    <p class="sim-source">
-                        Source&nbsp;: <a href="https://www.insee.fr/fr/statistiques/8984748" target="_blank" rel="noopener noreferrer">Insee, dispositif Filosofi 2023 (Filosofi&nbsp;2) — Niveau de vie et pauvreté des territoires</a>.
-                    </p>
                 </div>
             </div>
+
+            <p class="sim-source">
+                Source&nbsp;: <a href="https://www.insee.fr/fr/statistiques/8984748" target="_blank" rel="noopener noreferrer">Insee, dispositif Filosofi 2023 (Filosofi&nbsp;2) — Niveau de vie et pauvreté des territoires</a>.
+            </p>
         </div>
     </section>
 
