@@ -490,10 +490,31 @@ body {
     color: var(--secondary-color);
 }
 
+/* Liens principaux du footer, aérés sur une même ligne */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 40px;
+    margin-bottom: 24px;
+}
+
 .copyright {
     margin-top: 0px;
+    margin-bottom: 12px;
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
+}
+
+/* Mentions secondaires : discrètes, pas des infos essentielles */
+.footer-mentions {
+    margin: 2px 0;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ============================================
