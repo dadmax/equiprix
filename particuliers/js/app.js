@@ -17,6 +17,8 @@ const etat = {
 };
 
 const MAX_SLIDER = 100000;
+const DUREE_ANIM = 700;   // durée commune des animations (curseur, compteurs, badge)
+let categorieAffichee = null;   // clé de catégorie affichée dans le badge
 
 /* ---------- Raccourcis DOM ---------- */
 const $ = (id) => document.getElementById(id);
@@ -74,16 +76,6 @@ function remplirDepartements() {
    (en bas) au plus haut (en haut). Les déciles et quartiles sont
    matérialisés par des pointillés à la hauteur exacte de leur percentile. */
 
-/** Couleur equiprix d'une hauteur de jauge : sous D1 rouge, D1–Q1 orange,
- *  Q1–médiane jaune, au-delà vert. Les bandes suivent les bornes, pas
- *  des tranches arbitraires : la couleur change à la hauteur du percentile. */
-function couleurHauteur(percentile) {
-    if (percentile < 10) return "rouge";
-    if (percentile < 25) return "orange";
-    if (percentile < 50) return "jaune";
-    return "vert";
-}
-
 /** Construit la jauge : bandes de catégories + pointillés des bornes. */
 function construireJauge() {
     dom.jauge.innerHTML = "";
@@ -95,7 +87,7 @@ function construireJauge() {
         { de: 0, a: 10, couleur: "rouge" },
         { de: 10, a: 25, couleur: "orange" },
         { de: 25, a: 50, couleur: "jaune" },
-        { de: 50, a: 100, couleur: "vert" },
+        { de: 50, a: 100, couleur: "verte" },
     ];
     for (const seg of segments) {
         const bande = document.createElement("div");
@@ -135,7 +127,7 @@ function mettreAJourBornes(bornes) {
 
 /** Positionne le curseur avec une animation de montée/descente fluide. */
 function positionnerMarker(pourcentage) {
-    dom.jaugeMarker.style.transition = "bottom 0.4s cubic-bezier(0.22, 0.61, 0.36, 1)";
+    dom.jaugeMarker.style.transition = "bottom " + (DUREE_ANIM / 1000) + "s cubic-bezier(0.22, 0.61, 0.36, 1)";
     dom.jaugeMarker.style.bottom = Math.min(100, Math.max(0, pourcentage)) + "%";
 }
 
@@ -144,7 +136,7 @@ function positionnerMarker(pourcentage) {
 /** Libellé contextuel du positionnement, en français courant.
  *  Cas 1 : > D9 → top 10 %. Cas 2 : médiane–D9 → top X %.
  *  Cas 3 : D1–médiane → les X % les plus bas. Cas 4 : < D1 → les 10 % les plus bas. */
-function libellePercentile(resultat, bornes) {
+function libellePercentile(resultat) {
     const p = resultat.percentile;
     if (resultat.cas === "bas") {
         return "Vous êtes dans les 10 % des niveaux de vie les plus bas.";
@@ -156,6 +148,97 @@ function libellePercentile(resultat, bornes) {
         return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie.";
     }
     return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas.";
+}
+
+/* ---------- Animations (0,7 s, vanilla JS sans dépendance) ---------- */
+
+/**
+ * Anime un nombre affiché de sa valeur actuelle vers la nouvelle
+ * (compteur progressif, easing ease-out cubic). `formater` reçoit la
+ * valeur courante et renvoie le texte à afficher.
+ */
+function animerNombre(el, arrivee, formater) {
+    const depart = el._animValeur === undefined ? arrivee : el._animValeur;
+    if (depart === arrivee) {
+        el._animValeur = arrivee;
+        el.textContent = formater(arrivee);
+        return;
+    }
+    const token = (el._animToken || 0) + 1;
+    el._animToken = token;
+    const debut = performance.now();
+    const pas = (now) => {
+        if (el._animToken !== token) return;
+        const t = Math.min(1, (now - debut) / DUREE_ANIM);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el._animValeur = depart + (arrivee - depart) * eased;
+        el.textContent = formater(el._animValeur);
+        if (t < 1) requestAnimationFrame(pas);
+        else el._animValeur = arrivee;
+    };
+    requestAnimationFrame(pas);
+}
+
+/**
+ * Met à jour le libellé contextuel en animant le percentile au fil de
+ * la progression (la formulation peut basculer en cours d'animation).
+ */
+function majLibellePercentile(resultat) {
+    const el = dom.libellePercentile;
+    if (resultat.cas !== "interieur") {
+        el._animPct = null;
+        el.textContent = libellePercentile(resultat);
+        return;
+    }
+    const cible = resultat.percentile;
+    const depart = el._animPct;
+    if (depart === null || depart === undefined || depart === cible) {
+        el._animPct = cible;
+        el.textContent = libellePercentile({ percentile: cible, cas: "interieur" });
+        return;
+    }
+    const token = (el._animToken || 0) + 1;
+    el._animToken = token;
+    const debut = performance.now();
+    const pas = (now) => {
+        if (el._animToken !== token) return;
+        const t = Math.min(1, (now - debut) / DUREE_ANIM);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el._animPct = depart + (cible - depart) * eased;
+        el.textContent = libellePercentile({ percentile: el._animPct, cas: "interieur" });
+        if (t < 1) requestAnimationFrame(pas);
+        else el._animPct = cible;
+    };
+    requestAnimationFrame(pas);
+}
+
+/**
+ * Met à jour le badge de catégorie avec un fondu enchaîné : l'ancien
+ * badge part en transparence pendant que le nouveau apparaît.
+ */
+function majBadge(categorie) {
+    if (categorie.cle === categorieAffichee) return;
+    const premier = categorieAffichee === null;
+    categorieAffichee = categorie.cle;
+
+    if (!premier) {
+        const fantome = dom.badgeCategorie.cloneNode(true);
+        fantome.removeAttribute("id");
+        fantome.setAttribute("aria-hidden", "true");
+        fantome.classList.add("sim-badge-fantome");
+        dom.badgeCategorie.insertAdjacentElement("afterend", fantome);
+        requestAnimationFrame(() => fantome.classList.add("sim-badge-sortie"));
+        setTimeout(() => fantome.remove(), DUREE_ANIM);
+    }
+
+    dom.badgeCategorie.textContent = categorie.libelle;
+    dom.badgeCategorie.className = "sim-categorie-badge cat-" + categorie.cle;
+    if (!premier) {
+        dom.badgeCategorie.style.opacity = "0";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            dom.badgeCategorie.style.opacity = "1";
+        }));
+    }
 }
 
 /* ---------- Recalcul (temps réel, mises à jour ciblées) ---------- */
@@ -172,33 +255,36 @@ function recalculer() {
 
     // Unités de consommation (temps réel, même à revenu 0)
     const uc = calculerUC(etat.adultes, etat.enfants);
-    dom.ucValeur.textContent = formaterDecimal(uc);
+    animerNombre(dom.ucValeur, uc, formaterDecimal);
 
     // État vide tant que le revenu est à 0
     const complet = etat.revenu > 0;
     dom.etatVide.hidden = complet;
     dom.resultats.hidden = !complet;
-    if (!complet) return;
+    if (!complet) {
+        dom.niveauVie._animValeur = 0;
+        dom.libellePercentile._animPct = null;
+        return;
+    }
 
-    // Niveau de vie
+    // Niveau de vie (compteur progressif)
     const niveauDeVie = calculerNiveauDeVie(etat.revenu, uc);
-    dom.niveauVie.textContent = new Intl.NumberFormat("fr-FR").format(niveauDeVie);
+    const fmtEntier = new Intl.NumberFormat("fr-FR");
+    animerNombre(dom.niveauVie, niveauDeVie, (v) => fmtEntier.format(Math.round(v)));
 
     // Position dans la population de référence
     const bornes = bornesReference();
     const resultat = calculerPercentile(niveauDeVie, bornes);
-    dom.libellePercentile.textContent = libellePercentile(resultat, bornes);
+    majLibellePercentile(resultat);
     mettreAJourBornes(bornes);
     positionnerMarker(calculerPositionJauge(niveauDeVie, bornes));
     dom.jauge.setAttribute(
         "aria-label",
-        "Distribution des niveaux de vie. " + dom.libellePercentile.textContent
+        "Distribution des niveaux de vie. " + libellePercentile(resultat)
     );
 
     // Catégorie equiprix : toujours sur les bornes France entière
-    const categorie = calculerCategorie(niveauDeVie, etat.donnees.france);
-    dom.badgeCategorie.textContent = categorie.libelle;
-    dom.badgeCategorie.className = "sim-categorie-badge cat-" + categorie.cle;
+    majBadge(calculerCategorie(niveauDeVie, etat.donnees.france));
 }
 
 /* ---------- Saisie : parsing tolérant (espaces, virgule) ---------- */

@@ -7,7 +7,7 @@
 :root {
     --sim-cat-rouge: #D32F2F;
     --sim-cat-orange: #EF6C00;
-    --sim-cat-jaune: #F9A825;
+    --sim-cat-jaune: #F0B400;  /* or : jaune doré reconnaissable, texte sombre pour le contraste */
     --sim-cat-vert: #2E7D32;
 }
 
@@ -404,6 +404,7 @@
 
 .sim-categorie-badge {
     display: inline-block;
+    position: relative;
     padding: 10px 16px;
     border-radius: 15px;
     font-weight: 600;
@@ -411,11 +412,34 @@
     line-height: 1.5;
     color: var(--white);
     background-color: #999;
+    transition: opacity 0.7s ease;
 }
+
+/* Conteneur du badge : point d'ancrage du fantôme pendant le fondu */
+.sim-badge-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Ancien badge cloné pendant le fondu enchaîné (part en transparence) */
+.sim-badge-fantome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+}
+
+.sim-badge-fantome.sim-badge-sortie { opacity: 0; }
 
 .sim-categorie-badge.cat-rouge  { background-color: var(--sim-cat-rouge, #D32F2F); }
 .sim-categorie-badge.cat-orange { background-color: var(--sim-cat-orange, #EF6C00); }
-.sim-categorie-badge.cat-jaune  { background-color: var(--sim-cat-jaune, #F9A825); }
+.sim-categorie-badge.cat-jaune  {
+    background-color: var(--sim-cat-jaune, #F0B400);
+    color: #212121;
+}
 .sim-categorie-badge.cat-vert   { background-color: var(--sim-cat-vert, #2E7D32); }
 
 /* ---------- SECTION 3 : ACCORDÉON ---------- */
