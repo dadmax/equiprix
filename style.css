@@ -380,7 +380,7 @@ body {
    ============================================ */
 .maquette-image {
     width: 100%;
-    max-width: 800px;
+    max-width: 280px;
     border-radius: var(--border-radius);
     /* Modification 2: suppression de l'ombre */
     box-shadow: none;

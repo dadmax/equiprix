@@ -591,6 +591,27 @@
     box-shadow: var(--shadow);
 }
 
+@media (min-width: 992px) {
+    /* Grand écran : titre + texte à gauche, maquette (280 px max) à droite */
+    .sim-ajustement-cols {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 48px;
+    }
+
+    .sim-ajustement-cols .section-intro {
+        margin: 0;
+        max-width: none;
+        flex: 1;
+    }
+
+    .sim-ajustement-img {
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+}
+
 /* ---------- SECTION 5 : Vous pouvez participer ---------- */
 .sim-section-participer {
     background-color: var(--white);
@@ -604,24 +625,7 @@
     line-height: 1.7;
 }
 
-@media (min-width: 992px) {
-    .sim-ajustement-cols {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        text-align: left;
-    }
 
-    .sim-ajustement-cols .section-intro {
-        margin: 0;
-        max-width: 55%;
-    }
-
-    .sim-ajustement-img {
-        width: 320px;
-        flex-shrink: 0;
-    }
-}
 
 /* ---------- RESPONSIVE ---------- */
 /* Desktop : deux colonnes visibles simultanément */
