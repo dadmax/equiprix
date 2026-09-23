@@ -598,21 +598,28 @@
 }
 
 @media (min-width: 992px) {
-    /* Grand écran : titre + texte à gauche, maquette (280 px max) à droite */
+    /* Grand écran : titre + texte à gauche (largeur plafonnée pour des
+       lignes de lecture confortables), maquette à droite. La colonne
+       texte occupe toute la hauteur de la rangée et centre son contenu
+       verticalement. */
     .sim-ajustement-cols {
         flex-direction: row;
-        align-items: center;
         justify-content: space-between;
         gap: 48px;
     }
 
     .sim-ajustement-texte {
-        max-width: none;
         flex: 1;
+        max-width: 640px;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .sim-ajustement-img {
         flex-shrink: 0;
+        align-self: center;
     }
 }
 
