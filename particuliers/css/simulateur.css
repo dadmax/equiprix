@@ -4,12 +4,11 @@
    ============================================ */
 
 /* Variables locales au simulateur */
-.sim-page {
+:root {
     --sim-cat-rouge: #D32F2F;
     --sim-cat-orange: #EF6C00;
     --sim-cat-jaune: #F9A825;
     --sim-cat-vert: #2E7D32;
-    --sim-fond-clair: #F0F7FF;
 }
 
 /* ---------- CONTENEUR ---------- */
@@ -114,8 +113,15 @@
     line-height: 1.5;
 }
 
-/* Revenu : champ + suffixe + slider */
-.sim-revenu-composite {
+/* Revenu : slider au-dessus du champ (côte à côte dès que la largeur le permet) */
+.sim-revenu {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.sim-revenu-champ {
     display: flex;
     align-items: stretch;
 }
@@ -141,7 +147,6 @@
 
 .sim-slider {
     width: 100%;
-    margin-top: 16px;
     accent-color: var(--primary-color);
     height: 24px;
 }
@@ -234,11 +239,6 @@
     border-radius: 6px;
 }
 
-.sim-niveau-vie-label {
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
 .sim-niveau-vie-valeur {
     font-size: 2.4rem;
     font-weight: 700;
@@ -299,53 +299,67 @@
     margin-bottom: 16px;
 }
 
-/* ---------- JAUGE DE DISTRIBUTION ---------- */
-/* Chaque tranche de 10 % de la population occupe exactement 10 % de la hauteur. */
+/* ---------- JAUGE DE DISTRIBUTION ----------
+   La jauge représente la population : 10 % de hauteur = 10 % de la
+   population. Les bandes de couleurs marquent les catégories equiprix,
+   les pointillés matérialisent D1, Q1, médiane, Q3 et D9 à leur hauteur
+   exacte de percentile. */
 .sim-jauge-wrap {
     position: relative;
 }
 
 .sim-jauge {
-    display: flex;
-    flex-direction: column-reverse;  /* percentile 0 en bas */
-    height: 220px;
+    position: relative;
+    height: 260px;
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.sim-tranche {
-    flex: 1 1 10%;  /* 10 tranches de 10 % de hauteur */
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 8px;
-    font-size: 0.72rem;
+/* Bandes de catégories (positionnées en % de hauteur) */
+.sim-jauge-bande {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.sim-jauge-rouge  { background-color: #F6C6C6; }
+.sim-jauge-orange { background-color: #FBD9B0; }
+.sim-jauge-jaune  { background-color: #FBE9A9; }
+.sim-jauge-verte  { background-color: #C8E6C9; }
+
+/* Pointillés des déciles / quartiles, horizontalement centrés */
+.sim-jauge-repere {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 2px dashed rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.sim-jauge-repere span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
+    font-size: 0.68rem;
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.55);
+    color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 0 4px;
+    border-radius: 3px;
+    white-space: nowrap;
 }
 
-.sim-tranche + .sim-tranche {
-    border-top: 1px solid rgba(255, 255, 255, 0.35);
-}
-
-.sim-tranche-rouge   { background-color: #F6C6C6; }
-.sim-tranche-orange  { background-color: #FBD9B0; }
-.sim-tranche-jaune   { background-color: #FBE9A9; }
-.sim-tranche-verte   { background-color: #C8E6C9; }
-
-/* Borne en euros affichée sur la tranche où elle démarre */
-.sim-tranche-borne {
-    color: rgba(0, 0, 0, 0.8);
-}
-
-/* Curseur de l'utilisateur */
+/* Curseur de l'utilisateur (animé via la transition posée en JS) */
 .sim-jauge-marker {
     position: absolute;
     left: 0;
     right: 0;
     border-top: 3px solid var(--dark-gray);
     pointer-events: none;
+    z-index: 3;
 }
 
 .sim-jauge-marker::after {
@@ -355,15 +369,6 @@
     top: -13px;
     font-size: 0.75rem;
     color: var(--dark-gray);
-}
-
-/* Échelle sous la jauge */
-.sim-jauge-echelle {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: #666;
-    margin-top: 6px;
 }
 
 /* Légende des catégories */
@@ -399,10 +404,11 @@
 
 .sim-categorie-badge {
     display: inline-block;
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 0.95rem;
+    padding: 10px 16px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.5;
     color: var(--white);
     background-color: #999;
 }
@@ -516,25 +522,6 @@
     line-height: 1.6;
 }
 
-/* Bloc dynamique « Votre catégorie » */
-.sim-categorie-dyn {
-    max-width: 700px;
-    margin: 0 auto 24px;
-    padding: 16px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    line-height: 1.55;
-}
-
-.sim-categorie-dyn-texte {
-    margin: 0;
-}
-
-.sim-categorie-dyn.cat-rouge  { background-color: #FDECEA; border-left: 5px solid var(--sim-cat-rouge, #D32F2F); }
-.sim-categorie-dyn.cat-orange { background-color: #FFF1E0; border-left: 5px solid var(--sim-cat-orange, #EF6C00); }
-.sim-categorie-dyn.cat-jaune  { background-color: #FEF7DD; border-left: 5px solid var(--sim-cat-jaune, #F9A825); }
-.sim-categorie-dyn.cat-vert   { background-color: #E5F3E6; border-left: 5px solid var(--sim-cat-vert, #2E7D32); }
-
 /* ---------- RESPONSIVE ---------- */
 /* Desktop : deux colonnes visibles simultanément */
 @media (min-width: 992px) {
@@ -547,20 +534,30 @@
     .sim-card {
         padding: 32px;
     }
+}
 
-    .sim-jauge {
-        height: 280px;
+/* Revenu : slider à gauche du champ quand la largeur le permet */
+@media (min-width: 480px) {
+    .sim-revenu {
+        grid-template-columns: 1fr 180px;
     }
 }
 
-/* Petits écrans : la jauge reste lisible (min 280px de large géré par la grille fluide) */
+/* Petits écrans : textes de la jauge réduits mais lisibles */
 @media (max-width: 480px) {
-    .sim-tranche {
-        font-size: 0.62rem;
-        padding: 0 4px;
+    .sim-jauge {
+        height: 220px;
+    }
+
+    .sim-jauge-repere span {
+        font-size: 0.6rem;
     }
 
     .sim-niveau-vie-valeur {
         font-size: 1.9rem;
+    }
+
+    .sim-categorie-badge {
+        font-size: 0.85rem;
     }
 }

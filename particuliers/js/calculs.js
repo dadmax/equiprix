@@ -37,16 +37,16 @@ function bornesPercentiles(bornes) {
 }
 
 /**
- * Positionne un niveau de vie dans la distribution d'une population.
- * Interpolation linéaire entre les deux bornes qui l'encadrent.
+ * Percentile exact d'un niveau de vie par interpolation linéaire entre
+ * les deux bornes qui l'encadrent (D1, Q1, D3…D7, Q3, D8, D9).
  * @returns {{percentile: number, cas: "bas"|"haut"|"interieur"}}
  */
 function calculerPercentile(niveauDeVie, bornes) {
     if (niveauDeVie < bornes.d1) {
-        return { percentile: 10, cas: "bas" }; // « dans les 10 % les plus bas »
+        return { percentile: 10, cas: "bas" };
     }
     if (niveauDeVie >= bornes.d9) {
-        return { percentile: 90, cas: "haut" }; // « dans le top 10 % »
+        return { percentile: 90, cas: "haut" };
     }
     const couples = bornesPercentiles(bornes);
     for (let i = 0; i < couples.length - 1; i++) {
@@ -55,46 +55,61 @@ function calculerPercentile(niveauDeVie, bornes) {
         if (niveauDeVie >= bas.valeur && niveauDeVie < haut.valeur) {
             const part = (niveauDeVie - bas.valeur) / (haut.valeur - bas.valeur);
             return {
-                percentile: Math.round(bas.percentile + part * (haut.percentile - bas.percentile)),
+                percentile: bas.percentile + part * (haut.percentile - bas.percentile),
                 cas: "interieur",
             };
         }
     }
-    // Cas résiduel (niveauDeVie == D9 exactement, déjà traité par le test >=)
     return { percentile: 90, cas: "haut" };
+}
+
+/**
+ * Position géométrique du curseur sur la jauge (0 = bas, 100 = haut).
+ * Bornes étendues D0 = 0 € et D10 virtuel = MAX_JAUGE : l'utilisateur
+ * au-dessus de D9 ou sous D1 est placé entre la borne et l'extrémité,
+ * plutôt que collé en butée.
+ * @returns {number} pourcentage 0–100 (non arrondi)
+ */
+function calculerPositionJauge(niveauDeVie, bornes) {
+    const MAX_JAUGE = 100000; // D10 virtuel : max de la jauge en euros
+    if (niveauDeVie <= 0) return 0;
+    if (niveauDeVie < bornes.d1) {
+        return 10 * (niveauDeVie / bornes.d1); // entre D0 (0 €) et D1
+    }
+    if (niveauDeVie >= bornes.d9) {
+        // entre D9 et D10 virtuel, plafonné à 100 %
+        return Math.min(100, 90 + 10 * (niveauDeVie - bornes.d9) / (MAX_JAUGE - bornes.d9));
+    }
+    return calculerPercentile(niveauDeVie, bornes).percentile;
 }
 
 /**
  * Catégorie equiprix, toujours définie sur les bornes France :
  * rouge (< D1), orange (D1–Q1), jaune (Q1–médiane), verte (>= médiane).
- * @returns {{cle: string, libelle: string, sousTexte: string}}
+ * @returns {{cle: string, libelle: string}}
  */
 function calculerCategorie(niveauDeVie, bornesFrance) {
     if (niveauDeVie < bornesFrance.d1) {
         return {
             cle: "rouge",
-            libelle: "Catégorie rouge — les 10 % des niveaux de vie les plus bas",
-            sousTexte: "les 10 % des niveaux de vie les plus bas",
+            libelle: "Catégorie rouge : les 10 % des niveaux de vie les plus bas, France entière > réductions très importantes en magasin.",
         };
     }
     if (niveauDeVie < bornesFrance.q1) {
         return {
             cle: "orange",
-            libelle: "Catégorie orange — les 25 % des niveaux de vie les plus bas",
-            sousTexte: "les 25 % des niveaux de vie les plus bas",
+            libelle: "Catégorie orange : les 25 % des niveaux de vie les plus bas, France entière > réductions importantes en magasin.",
         };
     }
     if (niveauDeVie < bornesFrance.d5) {
         return {
             cle: "jaune",
-            libelle: "Catégorie jaune — les 50 % des niveaux de vie les plus bas",
-            sousTexte: "les 50 % des niveaux de vie les plus bas",
+            libelle: "Catégorie jaune : les 50 % des niveaux de vie les plus bas, France entière > réductions en magasin.",
         };
     }
     return {
         cle: "vert",
-        libelle: "Catégorie verte — top 50 % des niveaux de vie",
-        sousTexte: "top 50 % des niveaux de vie",
+        libelle: "Catégorie verte : les 50 % des niveaux de vie les plus hauts, France entière > pas de réductions.",
     };
 }
 
@@ -114,6 +129,7 @@ if (typeof module !== "undefined" && module.exports) {
         calculerUC,
         calculerNiveauDeVie,
         calculerPercentile,
+        calculerPositionJauge,
         calculerCategorie,
         bornesPercentiles,
         formaterEuros,

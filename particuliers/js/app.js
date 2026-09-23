@@ -16,7 +16,7 @@ const etat = {
     revenu: 0,              // saisi manuellement (peut dépasser le max du slider)
 };
 
-const MAX_SLIDER = 200000;
+const MAX_SLIDER = 100000;
 
 /* ---------- Raccourcis DOM ---------- */
 const $ = (id) => document.getElementById(id);
@@ -37,12 +37,7 @@ const dom = {
     libellePercentile: $("libelle-percentile"),
     jauge: $("jauge"),
     jaugeMarker: $("jauge-marker"),
-    jaugeEchelleD1: $("echelle-d1"),
-    jaugeEchelleMed: $("echelle-med"),
-    jaugeEchelleD9: $("echelle-d9"),
     badgeCategorie: $("badge-categorie"),
-    blocCategorieDyn: $("bloc-categorie-dyn"),
-    texteCategorieDyn: $("texte-categorie-dyn"),
     accBtn: $("acc-btn"),
     accContenu: $("acc-contenu"),
 };
@@ -73,106 +68,103 @@ function remplirDepartements() {
     }
 }
 
-/* ---------- Jauge ---------- */
+/* ---------- Jauge ----------
+   La jauge représente la population : chaque tranche de 10 % de hauteur
+   contient 10 % de la population, classée du niveau de vie le plus bas
+   (en bas) au plus haut (en haut). Les déciles et quartiles sont
+   matérialisés par des pointillés à la hauteur exacte de leur percentile. */
 
-/** Couleur equiprix d'une tranche selon son percentile de début.
- *  Bandes de catégories : rouge 0–D1, orange D1–Q1, jaune Q1–médiane,
- *  vert au-delà — les tranches étant en quantiles (10 % de hauteur chacune). */
-function couleurSegment(percentileDebut) {
-    if (percentileDebut < 10) return "rouge";
-    if (percentileDebut < 25) return "orange";
-    if (percentileDebut < 50) return "jaune";
+/** Couleur equiprix d'une hauteur de jauge : sous D1 rouge, D1–Q1 orange,
+ *  Q1–médiane jaune, au-delà vert. Les bandes suivent les bornes, pas
+ *  des tranches arbitraires : la couleur change à la hauteur du percentile. */
+function couleurHauteur(percentile) {
+    if (percentile < 10) return "rouge";
+    if (percentile < 25) return "orange";
+    if (percentile < 50) return "jaune";
     return "vert";
 }
 
-/** Construit les 10 tranches de la jauge (structure fixe, contenus mis à jour ensuite). */
+/** Construit la jauge : bandes de catégories + pointillés des bornes. */
 function construireJauge() {
     dom.jauge.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
-        const tranche = document.createElement("div");
-        tranche.className = "sim-tranche";
-        tranche.dataset.percentileDebut = String(i * 10);
-        const borne = document.createElement("span");
-        borne.className = "sim-tranche-borne";
-        tranche.appendChild(borne);
-        dom.jauge.appendChild(tranche);
+
+    // Bandes de couleurs : une par changement de catégorie (5 segments :
+    // 0–10 rouge, 10–25 orange, 25–50 jaune, 50–100 vert en deux bandes
+    // pour conserver des hauteurs de 10 % visibles lors des transitions)
+    const segments = [
+        { de: 0, a: 10, couleur: "rouge" },
+        { de: 10, a: 25, couleur: "orange" },
+        { de: 25, a: 50, couleur: "jaune" },
+        { de: 50, a: 100, couleur: "vert" },
+    ];
+    for (const seg of segments) {
+        const bande = document.createElement("div");
+        bande.className = "sim-jauge-bande sim-jauge-" + seg.couleur;
+        bande.style.bottom = seg.de + "%";
+        bande.style.height = (seg.a - seg.de) + "%";
+        dom.jauge.appendChild(bande);
     }
 }
 
 /**
- * Met à jour la jauge pour la population de référence choisie.
- * Chaque tranche démarre à un décile (percentile 10 × numéro de tranche),
- * affiché en euros ; la première tranche démarre à 0 €.
+ * Met à jour les pointillés des déciles/quartiles à leur hauteur exacte
+ * (percentile), avec leur valeur en euros, pour la population choisie.
  */
-function mettreAJourJauge(bornes) {
-    const tranches = dom.jauge.querySelectorAll(".sim-tranche");
-    for (const tranche of tranches) {
-        const p = Number(tranche.dataset.percentileDebut);
-        tranche.classList.remove(
-            "sim-tranche-rouge", "sim-tranche-orange", "sim-tranche-jaune", "sim-tranche-verte"
-        );
-        tranche.classList.add("sim-tranche-" + couleurSegment(p));
+function mettreAJourBornes(bornes) {
+    // Retire les anciens repères
+    dom.jauge.querySelectorAll(".sim-jauge-repere").forEach((r) => r.remove());
 
-        // Borne en euros de départ : décile correspondant (D1…D9), 0 € pour la première
-        const borne = p === 0 ? 0 : bornes["d" + (p / 10)];
-        const libelle = p === 0 ? "0 €" : formaterEuros(borne);
-        tranche.querySelector(".sim-tranche-borne").textContent = libelle;
-        tranche.title = "Population entre les percentiles " + p + " et " + (p + 10)
-            + (p === 0 ? "" : " — à partir de " + libelle);
+    const couples = [
+        { cle: "d1", percentile: 10 },
+        { cle: "q1", percentile: 25 },
+        { cle: "d5", percentile: 50, libelle: "médiane" },
+        { cle: "q3", percentile: 75 },
+        { cle: "d9", percentile: 90 },
+    ];
+    for (const c of couples) {
+        const repere = document.createElement("div");
+        repere.className = "sim-jauge-repere";
+        repere.style.bottom = c.percentile + "%";
+        repere.title = (c.libelle || c.cle.toUpperCase()) + " : " + formaterEuros(bornes[c.cle]);
+        const libelle = document.createElement("span");
+        libelle.textContent = (c.libelle || c.cle.toUpperCase()) + " " + formaterEuros(bornes[c.cle]);
+        repere.appendChild(libelle);
+        dom.jauge.appendChild(repere);
     }
-
-    // Échelle sous la jauge : D1, médiane, D9 (minimum)
-    dom.jaugeEchelleD1.textContent = "D1 : " + formaterEuros(bornes.d1);
-    dom.jaugeEchelleMed.textContent = "médiane : " + formaterEuros(bornes.d5);
-    dom.jaugeEchelleD9.textContent = "D9 : " + formaterEuros(bornes.d9);
 }
 
-/** Position du curseur (0 à 100 %) sur la hauteur de la jauge. */
-function positionnerMarker(percentile, cas) {
-    let pourcentage;
-    if (cas === "bas") pourcentage = 0;        // butée gauche (bas de la jauge)
-    else if (cas === "haut") pourcentage = 100; // butée droite (haut de la jauge)
-    else pourcentage = Math.min(100, Math.max(0, percentile));
-    dom.jaugeMarker.style.bottom = pourcentage + "%";
+/** Positionne le curseur avec une animation de montée/descente fluide. */
+function positionnerMarker(pourcentage) {
+    dom.jaugeMarker.style.transition = "bottom 0.4s cubic-bezier(0.22, 0.61, 0.36, 1)";
+    dom.jaugeMarker.style.bottom = Math.min(100, Math.max(0, pourcentage)) + "%";
 }
 
 /* ---------- Libellés ---------- */
 
-/** « 63e percentile — vous avez un niveau de vie supérieur à 63 % de la population … » */
-function libellePercentile(resultat, nomPopulation) {
+/** Libellé contextuel du positionnement, en français courant.
+ *  Cas 1 : > D9 → top 10 %. Cas 2 : médiane–D9 → top X %.
+ *  Cas 3 : D1–médiane → les X % les plus bas. Cas 4 : < D1 → les 10 % les plus bas. */
+function libellePercentile(resultat, bornes) {
+    const p = resultat.percentile;
     if (resultat.cas === "bas") {
-        return "Vous êtes dans les 10 % de niveaux de vie les plus bas (moins de 10e percentile) — population " + nomPopulation + ".";
+        return "Vous êtes dans les 10 % des niveaux de vie les plus bas.";
     }
     if (resultat.cas === "haut") {
-        return "Vous êtes dans le top 10 % (plus de 90e percentile) — population " + nomPopulation + ".";
+        return "Vous êtes dans le top 10 % des niveaux de vie.";
     }
-    return "Vous êtes au " + resultat.percentile + "e percentile — vous avez un niveau de vie supérieur à "
-        + resultat.percentile + " % de la population " + nomPopulation + ".";
-}
-
-/** Texte du bloc dynamique de la section 4, selon la catégorie. */
-function texteCategorieDynamique(categorie) {
-    const intro = "Sur la base des informations saisies, vous êtes en catégorie ";
-    switch (categorie.cle) {
-        case "vert":
-            return intro + "verte (top 50 % des niveaux de vie) : vous ne serez pas forcément éligible aux réductions equiprix.";
-        case "jaune":
-            return intro + "jaune (50 % des niveaux de vie les plus bas) : vous aurez accès à des réductions en magasin.";
-        case "orange":
-            return intro + "orange (25 % des niveaux de vie les plus bas) : vous aurez accès à des réductions importantes en magasin.";
-        case "rouge":
-            return intro + "rouge (10 % des niveaux de vie les plus bas) : vous aurez accès aux réductions les plus importantes en magasin.";
+    if (p >= 50) {
+        return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie.";
     }
-    return "";
+    return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas.";
 }
 
 /* ---------- Recalcul (temps réel, mises à jour ciblées) ---------- */
 function bornesReference() {
     if (etat.reference === "departement" && etat.departement) {
         const dep = etat.donnees.departements.find((d) => d.code === etat.departement);
-        if (dep) return { bornes: dep, nom: "du " + dep.nom };
+        if (dep) return dep;
     }
-    return { bornes: etat.donnees.france, nom: "française" };
+    return etat.donnees.france;
 }
 
 function recalculer() {
@@ -186,7 +178,6 @@ function recalculer() {
     const complet = etat.revenu > 0;
     dom.etatVide.hidden = complet;
     dom.resultats.hidden = !complet;
-    dom.blocCategorieDyn.hidden = !complet;
     if (!complet) return;
 
     // Niveau de vie
@@ -194,22 +185,20 @@ function recalculer() {
     dom.niveauVie.textContent = new Intl.NumberFormat("fr-FR").format(niveauDeVie);
 
     // Position dans la population de référence
-    const { bornes, nom } = bornesReference();
+    const bornes = bornesReference();
     const resultat = calculerPercentile(niveauDeVie, bornes);
-    dom.libellePercentile.textContent = libellePercentile(resultat, nom);
-    mettreAJourJauge(bornes);
-    positionnerMarker(resultat.percentile, resultat.cas);
+    dom.libellePercentile.textContent = libellePercentile(resultat, bornes);
+    mettreAJourBornes(bornes);
+    positionnerMarker(calculerPositionJauge(niveauDeVie, bornes));
     dom.jauge.setAttribute(
         "aria-label",
         "Distribution des niveaux de vie. " + dom.libellePercentile.textContent
     );
 
-    // Catégorie equiprix : toujours sur les bornes France
+    // Catégorie equiprix : toujours sur les bornes France entière
     const categorie = calculerCategorie(niveauDeVie, etat.donnees.france);
     dom.badgeCategorie.textContent = categorie.libelle;
     dom.badgeCategorie.className = "sim-categorie-badge cat-" + categorie.cle;
-    dom.texteCategorieDyn.textContent = texteCategorieDynamique(categorie);
-    dom.blocCategorieDyn.className = "sim-categorie-dyn cat-" + categorie.cle;
 }
 
 /* ---------- Saisie : parsing tolérant (espaces, virgule) ---------- */
