@@ -604,13 +604,16 @@
        verticalement. */
     .sim-ajustement-cols {
         flex-direction: row;
-        justify-content: space-between;
         gap: 48px;
     }
 
+    /* Marge auto : la colonne texte se centre dans l'espace libre,
+       c.-à-d. entre le bord gauche et la maquette. */
     .sim-ajustement-texte {
-        flex: 1;
-        max-width: 640px;
+        flex: 0 1 auto;
+        max-width: 340px;
+        margin-left: auto;
+        margin-right: auto;
         align-self: stretch;
         display: flex;
         flex-direction: column;
