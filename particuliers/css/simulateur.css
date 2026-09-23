@@ -96,12 +96,14 @@
     transition: var(--transition);
 }
 
-.sim-select:focus,
-.sim-input:focus,
-.sim-slider:focus,
-.sim-compteur-btn:focus,
-.sim-segment:focus,
-.sim-accordion-bouton:focus {
+/* Outline de focus visible uniquement au clavier (:focus-visible) :
+   au clic souris, pas de contour bleu pleine largeur sur les boutons. */
+.sim-select:focus-visible,
+.sim-input:focus-visible,
+.sim-slider:focus-visible,
+.sim-compteur-btn:focus-visible,
+.sim-segment:focus-visible,
+.sim-accordion-bouton:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
