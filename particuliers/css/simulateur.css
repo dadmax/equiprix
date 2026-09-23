@@ -485,6 +485,9 @@
     color: var(--primary-color);
     text-align: left;
     cursor: pointer;
+    /* Évite la sélection de texte (surlignage bleu) lors du clic */
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .sim-accordion-fleche {
@@ -496,16 +499,33 @@
     transform: rotate(-90deg);
 }
 
+/* Ouverture/fermeture fluide : la hauteur animée passe par une piste
+   grid 0fr -> 1fr, le contenu est masqué par overflow: hidden. */
 .sim-accordion-contenu {
-    padding: 0 24px 24px;
+    display: grid;
+    grid-template-rows: 0fr;
+    /* visibility retire aussi le contenu fermé des lecteurs d'écran */
+    visibility: hidden;
+    transition: grid-template-rows 0.35s ease, visibility 0.35s;
 }
 
-.sim-accordion-contenu[hidden] {
-    display: none;
+.sim-accordion-contenu.ouvert {
+    grid-template-rows: 1fr;
+    visibility: visible;
+}
+
+.sim-accordion-voile {
+    overflow: hidden;
+    min-height: 0;
+    padding: 0 24px;
+}
+
+.sim-accordion-voile .sim-expli-bloc {
+    padding-bottom: 24px;
 }
 
 .sim-expli-bloc {
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
 .sim-expli-bloc h4 {

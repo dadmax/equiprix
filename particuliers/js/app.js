@@ -436,7 +436,7 @@ document.querySelectorAll(".sim-accordion-bouton").forEach((bouton) => {
         const ouvert = bouton.getAttribute("aria-expanded") === "true";
         bouton.setAttribute("aria-expanded", String(!ouvert));
         const contenu = document.getElementById(bouton.getAttribute("aria-controls"));
-        if (contenu) contenu.hidden = ouvert;
+        if (contenu) contenu.classList.toggle("ouvert", !ouvert);
     });
 });
 
