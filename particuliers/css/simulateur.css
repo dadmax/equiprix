@@ -611,7 +611,7 @@
        c.-à-d. entre le bord gauche et la maquette. */
     .sim-ajustement-texte {
         flex: 0 1 auto;
-        max-width: 340px;
+        max-width: 585px;
         margin-left: auto;
         margin-right: auto;
         align-self: stretch;
