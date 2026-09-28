@@ -1,0 +1,497 @@
+/* ============================================================
+   commerces.css — Simulateur « Que peut m'apporter equiprix ? »
+   Styles spécifiques, dans la palette du site (style.css).
+   ============================================================ */
+
+/* ---------- En-tête de page ---------- */
+.com-hero {
+    padding: 48px 0 16px;
+    text-align: center;
+}
+.com-hero-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.com-hero-subtitle {
+    max-width: 720px;
+    margin: 0 auto 16px;
+    color: var(--dark-gray);
+}
+.com-expert-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    cursor: pointer;
+}
+.com-expert-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+.com-help-inline {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 6px 0 0;
+}
+
+/* ---------- Layout trois zones ---------- */
+.com-layout {
+    display: grid;
+    grid-template-columns: 30% 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+    padding-bottom: 48px;
+}
+.com-zone {
+    min-width: 0;
+}
+.com-titre-zone {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.com-bloc {
+    background: var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+}
+.com-titre-reductions {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 20px 0 12px;
+}
+
+/* ---------- Champs ---------- */
+.com-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+.com-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+    background: var(--white);
+}
+.com-help {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 6px;
+}
+.com-alerte {
+    color: #a35c00;
+    font-weight: 600;
+}
+.com-erreur {
+    color: #b00020;
+    font-weight: 600;
+}
+
+/* ---------- Autocomplete commune ---------- */
+.com-autocomplete {
+    position: relative;
+}
+.com-liste {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px 0;
+    z-index: 100;
+}
+.com-liste li {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.com-liste li[aria-selected="true"],
+.com-liste li:hover {
+    background: #e6f2ff;
+}
+
+/* ---------- Barres empilées ---------- */
+.com-barre-titre {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 12px 0 6px;
+}
+.com-lien {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+.com-barre {
+    position: relative;
+    display: flex;
+    height: 34px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #eee;
+}
+.com-barre-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--white);
+    min-width: 0;
+    transition: width 0.15s ease;
+}
+.com-seg-rouge  { background: #d64545; }
+.com-seg-orange { background: #e8862e; }
+.com-seg-jaune  { background: #c9a227; color: #333; }
+.com-seg-verte  { background: #3f9d55; }
+/* Contraste texte sur les couleurs de segments (AA) */
+.com-barre-segment.com-seg-jaune { color: #2b2b2b; }
+.com-barre-clientele {
+    overflow: visible;
+}
+.com-barre-clientele .com-barre-segment {
+    /* la barre clientèle garde les mêmes couleurs, poignées par-dessus */
+}
+.com-poignee {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    width: 16px;
+    margin-left: -8px;
+    cursor: ew-resize;
+    background: transparent;
+    border: none;
+    padding: 0;
+    touch-action: none;
+}
+.com-poignee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6px;
+    width: 4px;
+    border-radius: 2px;
+    background: var(--white);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4);
+}
+.com-poignee:focus-visible::after {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    outline: none;
+}
+.com-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+}
+.com-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.com-legend-pastille {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* ---------- Types de commerce ---------- */
+.com-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.com-type-carte {
+    border: 2px solid #d8d8d8;
+    border-radius: 8px;
+    background: var(--white);
+    padding: 10px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+.com-type-carte[aria-checked="true"] {
+    border-color: var(--primary-color);
+    background: #e6f2ff;
+}
+.com-type-carte:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+.com-grille-champs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+}
+.com-slider {
+    width: 100%;
+    accent-color: var(--primary-color);
+}
+
+/* ---------- Couloirs de réduction ---------- */
+.com-couloir {
+    border: 1px solid #e2e2e2;
+    border-left-width: 6px;
+    border-radius: 8px;
+    background: var(--white);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+}
+.com-couloir-rouge  { border-left-color: #d64545; }
+.com-couloir-orange { border-left-color: #e8862e; }
+.com-couloir-jaune  { border-left-color: #c9a227; }
+.com-couloir-verte  { border-left-color: #3f9d55; }
+.com-couloir-tete {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.com-couloir-nom {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.com-couloir-uplift {
+    font-size: 0.8rem;
+    color: #444;
+}
+.com-couloir-uplift .com-source {
+    font-size: 0.7rem;
+    color: #777;
+}
+.com-couloir-slider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 4px;
+}
+.com-couloir-slider output {
+    font-weight: 700;
+    min-width: 52px;
+    text-align: right;
+}
+.com-slider-rouge  { accent-color: #d64545; }
+.com-slider-orange { accent-color: #e8862e; }
+.com-slider-jaune  { accent-color: #c9a227; }
+.com-couloir-resume {
+    font-size: 0.78rem;
+    color: #555;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.com-pos { color: #2e7d32; font-weight: 600; }
+.com-neg { color: #c62828; font-weight: 600; }
+
+/* ---------- Résultats ---------- */
+.com-resultats {
+    position: sticky;
+    top: 88px;
+}
+.com-resultat-vide {
+    color: #666;
+    text-align: center;
+    padding: 12px 0;
+}
+.com-heros-montant {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4px;
+}
+.com-heros-montant.com-pos { color: #2e7d32; }
+.com-heros-montant.com-neg { color: #c62828; }
+.com-heros-pourcent {
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 16px;
+}
+.com-cascade {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-bottom: 14px;
+}
+.com-cascade-ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.88rem;
+    padding: 4px 0;
+}
+.com-cascade-total {
+    border-top: 1px solid #999;
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+}
+.com-info {
+    background: none;
+    border: none;
+    cursor: help;
+    color: var(--primary-color);
+    font-size: 0.85em;
+    padding: 0 2px;
+}
+.com-suggestion {
+    font-size: 0.85rem;
+    background: #eef6ff;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+.com-btn-optimiser {
+    opacity: 0.5;
+    cursor: not-allowed;
+    display: block;
+    margin: 0 auto 14px;
+}
+.com-btn-sauver {
+    display: block;
+    margin: 14px auto 0;
+}
+.com-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+.com-tableau-wrap {
+    overflow-x: auto;
+}
+.com-tableau {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.com-tableau th,
+.com-tableau td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    text-align: right;
+    white-space: nowrap;
+}
+.com-tableau th:first-child,
+.com-tableau td:first-child {
+    text-align: left;
+}
+
+/* ---------- Infobulle ---------- */
+.com-infobulle {
+    position: fixed;
+    z-index: 2000;
+    max-width: 340px;
+    background: var(--dark-gray);
+    color: var(--white);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-hover);
+}
+.com-infobulle[hidden] {
+    display: none;
+}
+
+/* ---------- Sources ---------- */
+.com-sources {
+    background: var(--light-gray);
+    border-top: 1px solid #e0e0e0;
+    padding: 32px 0;
+    font-size: 0.85rem;
+}
+.com-sources-titre {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.com-sources-liste {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+}
+.com-sources-liste li {
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+.com-sources-note {
+    color: #666;
+    font-style: italic;
+}
+
+/* ---------- Champs du mode expert ---------- */
+.com-panier-expert { /* paniers par catégorie, mode expert */ }
+.com-expert-bloc {
+    border-top: 1px dashed #ccc;
+    margin-top: 14px;
+    padding-top: 12px;
+}
+.com-expert-bloc .com-grille-champs {
+    margin-top: 0;
+}
+.com-expert-seule { /* cellules visibles uniquement en mode expert */ }
+
+/* ---------- Utilitaires ---------- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* ---------- Responsive mobile (< 992 px) : empilement vertical ---------- */
+@media (max-width: 991px) {
+    .com-layout {
+        grid-template-columns: 1fr;
+    }
+    .com-resultats {
+        position: static;
+    }
+    .com-types {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 480px) {
+    .com-grille-champs {
+        grid-template-columns: 1fr;
+    }
+}
