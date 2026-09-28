@@ -330,7 +330,7 @@
 .sim-jauge-jaune  { background-color: #FBE9A9; }
 .sim-jauge-verte  { background-color: #C8E6C9; }
 
-/* Pointillés des déciles / quartiles, horizontalement centrés */
+/* Pointillés des déciles / quartiles, libellés à 10px du bord gauche */
 .sim-jauge-repere {
     position: absolute;
     left: 0;
@@ -342,8 +342,7 @@
 
 .sim-jauge-repere span {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10px;
     top: -10px;
     font-size: 0.68rem;
     font-weight: 600;
@@ -352,6 +351,17 @@
     padding: 0 4px;
     border-radius: 3px;
     white-space: nowrap;
+}
+
+/* Seuils de pauvreté et de richesse : lignes pleines fines et noires,
+   libellés à 10px du bord droit pour éviter le chevauchement */
+.sim-jauge-seuil {
+    border-top: 1px solid #000;
+}
+
+.sim-jauge-seuil span {
+    left: auto;
+    right: 10px;
 }
 
 /* Curseur de l'utilisateur (animé via la transition posée en JS) */
@@ -367,7 +377,7 @@
 .sim-jauge-marker::after {
     content: '▼';
     position: absolute;
-    right: 8px;
+    right: 5px;
     top: -13px;
     font-size: 0.75rem;
     color: var(--dark-gray);

@@ -113,6 +113,16 @@ function calculerCategorie(niveauDeVie, bornesFrance) {
     };
 }
 
+/** Seuil de pauvreté (Insee) : 60 % de la médiane, arrondi à la dizaine la plus proche. */
+function calculerSeuilPauvrete(mediane) {
+    return Math.round((0.6 * mediane) / 10) * 10;
+}
+
+/** Seuil de richesse (Observatoire des inégalités) : double de la médiane. */
+function calculerSeuilRichesse(mediane) {
+    return 2 * mediane;
+}
+
 /** Format français : espaces insécables pour les milliers. */
 function formaterEuros(valeur) {
     return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(valeur) + " €";
@@ -131,6 +141,8 @@ if (typeof module !== "undefined" && module.exports) {
         calculerPercentile,
         calculerPositionJauge,
         calculerCategorie,
+        calculerSeuilPauvrete,
+        calculerSeuilRichesse,
         bornesPercentiles,
         formaterEuros,
         formaterDecimal,

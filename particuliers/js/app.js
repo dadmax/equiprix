@@ -19,6 +19,8 @@ const etat = {
 const MAX_SLIDER = 100000;
 const DUREE_ANIM = 700;   // durée commune des animations (curseur, compteurs, badge)
 let categorieAffichee = null;   // clé de catégorie affichée dans le badge
+let seuilPauvrete = 0;    // 60 % de la médiane France (constant, tous départements)
+let seuilRichesse = 0;    // 2 × médiane France (constant, tous départements)
 
 /* ---------- Raccourcis DOM ---------- */
 const $ = (id) => document.getElementById(id);
@@ -49,6 +51,8 @@ async function chargerDonnees() {
         const reponse = await fetch("data/niveaux-vie-dep-2023.json");
         if (!reponse.ok) throw new Error("HTTP " + reponse.status);
         etat.donnees = await reponse.json();
+        seuilPauvrete = calculerSeuilPauvrete(etat.donnees.france.d5);
+        seuilRichesse = calculerSeuilRichesse(etat.donnees.france.d5);
         remplirDepartements();
         construireJauge();
         recalculer();
@@ -122,6 +126,22 @@ function mettreAJourBornes(bornes) {
         repere.appendChild(libelle);
         dom.jauge.appendChild(repere);
     }
+
+    // Seuils de pauvreté et de richesse (France entière, indépendants du département)
+    const seuils = [
+        { valeur: seuilPauvrete, libelle: "seuil pauvreté" },
+        { valeur: seuilRichesse, libelle: "seuil richesse" },
+    ];
+    for (const s of seuils) {
+        const repere = document.createElement("div");
+        repere.className = "sim-jauge-repere sim-jauge-seuil";
+        repere.style.bottom = Math.min(100, Math.max(0, calculerPositionJauge(s.valeur, bornes))) + "%";
+        repere.title = s.libelle + " : " + formaterEuros(s.valeur);
+        const libelle = document.createElement("span");
+        libelle.textContent = s.libelle + " " + formaterEuros(s.valeur);
+        repere.appendChild(libelle);
+        dom.jauge.appendChild(repere);
+    }
 }
 
 /** Positionne le curseur avec une animation de montée/descente fluide. */
@@ -138,15 +158,15 @@ function positionnerMarker(pourcentage) {
 function libellePercentile(resultat) {
     const p = resultat.percentile;
     if (resultat.cas === "bas") {
-        return "Vous êtes dans les 10 % des niveaux de vie les plus bas.";
+        return "Vous êtes dans les 10 % des niveaux de vie les plus bas" + (resultat.sousPauvrete ? " et en-dessous du seuil de pauvreté" : "") + ".";
     }
     if (resultat.cas === "haut") {
-        return "Vous êtes dans le top 10 % des niveaux de vie.";
+        return "Vous êtes dans le top 10 % des niveaux de vie" + (resultat.aboveRichesse ? " et au-dessus du seuil de richesse" : "") + ".";
     }
     if (p >= 50) {
-        return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie.";
+        return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie" + (resultat.aboveRichesse ? " et au-dessus du seuil de richesse" : "") + ".";
     }
-    return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas.";
+    return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas" + (resultat.sousPauvrete ? " et en-dessous du seuil de pauvreté" : "") + ".";
 }
 
 /* ---------- Animations (0,7 s, vanilla JS sans dépendance) ---------- */
@@ -274,6 +294,8 @@ function recalculer() {
     // Position dans la population de référence
     const bornes = bornesReference();
     const resultat = calculerPercentile(niveauDeVie, bornes);
+    resultat.aboveRichesse = niveauDeVie >= seuilRichesse;
+    resultat.sousPauvrete = niveauDeVie < seuilPauvrete;
     majLibellePercentile(resultat);
     mettreAJourBornes(bornes);
     positionnerMarker(calculerPositionJauge(niveauDeVie, bornes));
