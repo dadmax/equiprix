@@ -1,10 +1,13 @@
 /* ============================================================
    app.js — Simulateur « Que peut m'apporter equiprix ? »
-   Tableau de bord mono-écran pour les commerçants. Tout le calcul
-   est local : deux fichiers JSON (base codes postaux précalculée +
-   configuration commerces/sondage), aucun envoi de données.
-   L'état complet est encodé dans les paramètres GET de l'URL
-   (history.replaceState) ; aucun localStorage.
+   Bande de saisie horizontale (commune, commerce) puis grille de
+   calcul : jauges verticales population/clientèle à gauche qui
+   débouchent sur un tableau — lignes = catégories equiprix,
+   colonnes = variables. Réductions en listes déroulantes
+   alimentées par commerces.json (matriceUplift.reductions).
+   Tout le calcul est local ; l'état complet est encodé dans les
+   paramètres GET de l'URL (history.replaceState), aucun
+   localStorage, aucun envoi de données.
    ============================================================ */
 "use strict";
 
@@ -33,7 +36,8 @@ const dom = {
     panierInput: $("panier-input"),
     couvertureRange: $("couverture-range"),
     couvertureOut: $("couverture-out"),
-    couloirs: $("couloirs"),
+    tableauCalc: $("tableau-calc"),
+    tableauTbody: document.querySelector("#tableau-calc tbody"),
     expertToggle: $("expert-toggle"),
     resultatVide: $("resultat-vide"),
     resultatsContenu: $("resultats-contenu"),
@@ -44,14 +48,16 @@ const dom = {
     fluxGainCapture: $("flux-gain-capture"),
     fluxSolde: $("flux-solde"),
     suggestion: $("suggestion"),
-    tableauTbody: document.querySelector("#tableau-categories tbody"),
+    tableauDetailTbody: document.querySelector("#tableau-categories tbody"),
     sauverBtn: $("sauver-btn"),
     sauverMessage: $("sauver-message"),
     infobulle: $("infobulle"),
+    blocExpertAncrage: $("bloc-expert-ancrage"),
 };
 
 /* ---------- État ---------- */
 const CATEGORIES = ["rouge", "orange", "jaune", "verte"];
+const LIBELLES = { rouge: "Rouge", orange: "Orange", jaune: "Jaune", verte: "Vert" };
 const CLASSES_CSS = { rouge: "com-seg-rouge", orange: "com-seg-orange", jaune: "com-seg-jaune", verte: "com-seg-verte" };
 
 let baseCP = null;        // data/codes-postaux-precalc.json
@@ -94,7 +100,7 @@ async function chargerDonnees() {
         etat.parametres = { ...config.parametres };
         construireIndexNoms();
         construireTypesCommerce();
-        construireCouloirs();
+        construireLignesCalcul();
         construireLegende();
         restaurerDepuisURL();
         brancherEvenements();
@@ -130,64 +136,73 @@ function construireTypesCommerce() {
     }
 }
 
-function construireCouloirs() {
-    dom.couloirs.innerHTML = "";
+/** Lignes du tableau de calcul : une par catégorie, avec liste déroulante
+    de réduction alimentée par matriceUplift.reductions. */
+function construireLignesCalcul() {
+    const tbody = dom.tableauTbody;
+    tbody.innerHTML = "";
+    const paliers = config.matriceUplift.reductions;
     for (const cat of CATEGORIES) {
-        const couloir = document.createElement("div");
-        couloir.className = `com-couloir com-couloir-${cat}`;
-        couloir.id = "couloir-" + cat;
+        const tr = document.createElement("tr");
+        tr.className = "com-ligne-" + cat;
+        tr.id = "ligne-" + cat;
         const estVerte = cat === "verte";
-        couloir.innerHTML = `
-            <div class="com-couloir-tete">
-                <span class="com-couloir-nom" data-couloir-nom></span>
-                <span class="com-couloir-uplift" data-couloir-uplift hidden></span>
-            </div>
-            <div class="com-couloir-slider" data-couloir-slider ${estVerte ? "hidden" : ""}>
-                <input type="range" class="com-slider com-slider-${cat}" min="0" max="50" step="1"
-                       data-categorie="${cat}" aria-label="Réduction pour la catégorie">
-                <output data-couloir-valeur>0\u202f%</output>
-            </div>
-            <div class="com-couloir-resume" data-couloir-resume></div>`;
-        dom.couloirs.appendChild(couloir);
+        tr.innerHTML = `
+            <th scope="row"><span class="com-ligne-nom">${LIBELLES[cat]}</span><span class="com-ligne-part" data-part></span></th>
+            <td data-part-clientele></td>
+            <td data-clients></td>
+            <td>${estVerte
+                ? '<span class="com-cel-vide">—</span>'
+                : `<select class="com-select" data-categorie="${cat}" aria-label="Réduction appliquée à la catégorie ${LIBELLES[cat]}"></select>`}
+            </td>
+            <td data-clients-plus></td>
+            <td data-impact></td>`;
+        tbody.appendChild(tr);
+        if (!estVerte) {
+            const select = tr.querySelector("select");
+            for (const palier of paliers) {
+                const option = document.createElement("option");
+                option.value = palier;
+                option.textContent = fmtPct(palier, 0);
+                select.appendChild(option);
+            }
+            select.value = String(etat.reductions[cat]);
+            select.addEventListener("change", () => {
+                etat.reductions[cat] = Number(select.value);
+                majURL();
+                recalculer();
+            });
+        }
     }
-    dom.couloirs.querySelectorAll("input[type=range]").forEach((slider) => {
-        slider.addEventListener("input", () => {
-            etat.reductions[slider.dataset.categorie] = Number(slider.value) / 100;
-            majURL();
-            recalculer();
-        });
-    });
 }
 
 function construireLegende() {
     dom.legende.innerHTML = "";
-    const libelles = { rouge: "Rouge", orange: "Orange", jaune: "Jaune", verte: "Vert" };
     for (const cat of CATEGORIES) {
         const item = document.createElement("span");
         item.className = "com-legend-item";
-        item.innerHTML = `<span class="com-legend-pastille ${CLASSES_CSS[cat]}"></span>${libelles[cat]}`;
+        item.innerHTML = `<span class="com-legend-pastille ${CLASSES_CSS[cat]}"></span>${LIBELLES[cat]}`;
         dom.legende.appendChild(item);
     }
 }
 
-/** Poignées de frontière de la barre clientèle (3 curseurs). */
+/** Poignées de frontière de la jauge clientèle verticale (3 curseurs). */
 function construirePoignees() {
-    dom.barreClientele.querySelectorAll(".com-poignee").forEach((p) => p.remove());
+    dom.barreClientele.querySelectorAll(".com-jaug-poignee").forEach((p) => p.remove());
     for (let i = 0; i < 3; i++) {
         const poignee = document.createElement("button");
         poignee.type = "button";
-        poignee.className = "com-poignee";
+        poignee.className = "com-jaug-poignee";
         poignee.dataset.index = i;
-        poignee.setAttribute("aria-label", `Limite ${["rouge/orange", "orange/jaune", "jaune/vert"][i]} (${Math.round(frontieresClientele()[i] * 100)} %)`);
         poignee.addEventListener("keydown", (e) => {
             const pas = e.shiftKey ? 0.05 : 0.01;
-            if (e.key === "ArrowLeft" || e.key === "ArrowDown") { deplacerPoignee(i, -pas); e.preventDefault(); }
-            if (e.key === "ArrowRight" || e.key === "ArrowUp") { deplacerPoignee(i, pas); e.preventDefault(); }
+            if (e.key === "ArrowUp" || e.key === "ArrowLeft") { deplacerPoignee(i, -pas); e.preventDefault(); }
+            if (e.key === "ArrowDown" || e.key === "ArrowRight") { deplacerPoignee(i, pas); e.preventDefault(); }
         });
         poignee.addEventListener("pointerdown", (e) => {
             const deplacer = (ev) => {
                 const rect = dom.barreClientele.getBoundingClientRect();
-                deplacerPoignee(i, 0, (ev.clientX - rect.left) / rect.width);
+                deplacerPoignee(i, 0, (ev.clientY - rect.top) / rect.height);
             };
             deplacer(e);
             const surMove = (ev) => deplacer(ev);
@@ -206,8 +221,10 @@ function construirePoignees() {
 /* ============================================================
    Clientèle : parts et frontières
    ============================================================ */
+function entreeCP() { return etat.cp ? baseCP[etat.cp] : null; }
+
 function partsClientele() {
-    if (!etat.cp || !entreeCP()) return null;
+    if (!etat.cp || !entreeCP() || !entreeCP().r) return null;
     if (etat.clientele) return etat.clientele;
     return entreeCP().r; // calquée sur la population communale
 }
@@ -225,47 +242,41 @@ function deplacerPoignee(index, delta, absolu) {
     const max = index === 2 ? 1 : f[index + 1];
     cible = Math.min(max, Math.max(min, cible));
     f[index] = cible;
-    // Reconstruction des parts depuis les frontières
-    const parts = [
-        f[0],
-        f[1] - f[0],
-        f[2] - f[1],
-        1 - f[2],
-    ];
-    etat.clientele = parts;
+    etat.clientele = [f[0], f[1] - f[0], f[2] - f[1], 1 - f[2]];
     positionnerPoignees();
-    dessinerBarres();
+    dessinerJauges();
     majURL();
     recalculer();
 }
 
 function positionnerPoignees() {
     const f = frontieresClientele();
-    dom.barreClientele.querySelectorAll(".com-poignee").forEach((p) => {
-        p.style.left = (f[Number(p.dataset.index)] * 100) + "%";
-        p.setAttribute("aria-label", `Limite ${["rouge/orange", "orange/jaune", "jaune/vert"][p.dataset.index]} (${Math.round(f[p.dataset.index] * 100)} %)`);
+    dom.barreClientele.querySelectorAll(".com-jaug-poignee").forEach((p) => {
+        const i = Number(p.dataset.index);
+        p.style.top = (f[i] * 100) + "%";
+        p.setAttribute("aria-label", `Limite ${["rouge/orange", "orange/jaune", "jaune/vert"][i]} (${Math.round(f[i] * 100)} %)`);
     });
 }
 
 /* ============================================================
-   Barres empilées
+   Jauges verticales empilées (population / clientèle)
    ============================================================ */
-function dessinerSegment(conteneur, cat, part, avecLibelle) {
+function dessinerSegment(conteneur, cat, part) {
     const seg = document.createElement("div");
-    seg.className = `com-barre-segment ${CLASSES_CSS[cat]}`;
-    seg.style.width = (part * 100) + "%";
-    if (avecLibelle && part >= 0.06) seg.textContent = fmtPct(part, 0);
+    seg.className = `com-jaug-segment ${CLASSES_CSS[cat]}`;
+    seg.style.height = (part * 100) + "%";
     conteneur.appendChild(seg);
 }
 
-function dessinerBarres() {
+function dessinerJauges() {
     const entree = entreeCP();
     dom.barrePopulation.innerHTML = "";
-    dom.barreClientele.querySelectorAll(".com-barre-segment").forEach((s) => s.remove());
+    dom.barreClientele.querySelectorAll(".com-jaug-segment").forEach((s) => s.remove());
     if (!entree || !entree.r) return;
-    for (const [i, cat] of CATEGORIES.entries()) {
-        dessinerSegment(dom.barrePopulation, cat, entree.r[i], true);
-        dessinerSegment(dom.barreClientele, cat, partsClientele()[i], true);
+    const partsCli = partsClientele();
+    for (let i = 0; i < 4; i++) {
+        dessinerSegment(dom.barrePopulation, CATEGORIES[i], entree.r[i]);
+        dessinerSegment(dom.barreClientele, CATEGORIES[i], partsCli[i]);
     }
     positionnerPoignees();
 }
@@ -273,8 +284,6 @@ function dessinerBarres() {
 /* ============================================================
    Autocomplete commune
    ============================================================ */
-function entreeCP() { return etat.cp ? baseCP[etat.cp] : null; }
-
 function filtrerCommunes(q) {
     q = q.trim().toLowerCase();
     if (!q) return [];
@@ -325,7 +334,7 @@ function selectionnerCommune(cp) {
     dom.resultatVide.hidden = dispo;
     dom.resultatsContenu.hidden = !dispo;
     construirePoignees();
-    dessinerBarres();
+    dessinerJauges();
     majURL();
     recalculer();
 }
@@ -366,14 +375,18 @@ function uplift(reduction, type) {
             t.coefPrudence * bases.reduce((s, b) => s + b[i], 0) / bases.length);
     }
     const reds = config.matriceUplift.reductions;
-    if (reduction <= reds[0]) return interpolationExtrapolation(reds, valeurs, reduction, true);
-    if (reduction >= reds[reds.length - 1]) return interpolationExtrapolation(reds, valeurs, reduction, false);
-    return interpolationExtrapolation(reds, valeurs, reduction, null);
+    if (reduction <= 0) return 0;
+    if (reduction <= reds[0]) return interpolation(reds, valeurs, reduction, "borne");
+    if (reduction >= reds[reds.length - 1]) return interpolation(reds, valeurs, reduction, "prolong");
+    return interpolation(reds, valeurs, reduction, null);
 }
 
-function interpolationExtrapolation(reds, vals, r, cote) {
-    if (cote === true) return vals[0] * (r / reds[0]);
-    if (cote === false) {
+function interpolation(reds, vals, r, mode) {
+    if (mode === "borne") {
+        // sous le premier palier : proportionnel
+        return vals[0] * (r / reds[0]);
+    }
+    if (mode === "prolong") {
         // au-delà du dernier palier : prolongation linéaire de la dernière pente
         const n = reds.length - 1;
         const pente = (vals[n] - vals[n - 1]) / (reds[n] - reds[n - 1]);
@@ -392,9 +405,7 @@ function interpolationExtrapolation(reds, vals, r, cote) {
 function revenuMoyenPondere() {
     const parts = partsClientele();
     if (!parts) return null;
-    let somme = 0;
-    for (const cat of CATEGORIES) somme += parts[CATEGORIES.indexOf(cat)] * REVENU_CATEGORIES[cat];
-    return somme;
+    return parts.reduce((s, part, i) => s + part * REVENU_CATEGORIES[CATEGORIES[i]], 0);
 }
 
 /** Panier moyen de chaque catégorie. */
@@ -415,9 +426,7 @@ function panierMoyenImplicite() {
     const parts = partsClientele();
     const paniers = paniersCategories();
     if (!parts || !paniers) return null;
-    let somme = 0;
-    for (const [i, cat] of CATEGORIES.entries()) somme += parts[i] * paniers[cat];
-    return somme;
+    return parts.reduce((s, part, i) => s + part * paniers[CATEGORIES[i]], 0);
 }
 
 /** Résultats par catégorie et agrégats. */
@@ -426,7 +435,6 @@ function calculer() {
     if (!entree || !entree.r) return null;
     const parts = partsClientele();
     const paniers = paniersCategories();
-    const revMoyen = revenuMoyenPondere();
     const p = etat.parametres;
     const parCat = {};
     let perteTotale = 0, gainEquipeTotal = 0, gainCaptureTotal = 0;
@@ -455,9 +463,8 @@ function calculer() {
                         solde: gainEquipe + gainCapture - perte };
     }
     // Catégorie verte (sans réduction) : pour information
-    const iVerte = 3;
-    parCat.verte = { part: parts[iVerte],
-                     clientsCat: etat.clients * parts[iVerte],
+    parCat.verte = { part: parts[3],
+                     clientsCat: etat.clients * parts[3],
                      panier: paniers.verte, solde: 0 };
     const impactNet = gainEquipeTotal + gainCaptureTotal - perteTotale;
     const ca = etat.clients * etat.panier;
@@ -466,7 +473,7 @@ function calculer() {
     const potentielsTotaux = entree.m * etat.couverture;
     const tauxActivation = potentielsTotaux > 0 ? etat.clients / potentielsTotaux : null;
     return { parCat, perteTotale, gainEquipeTotal, gainCaptureTotal, impactNet,
-             ca, resultat, paniers, revMoyen, parts, tauxActivation };
+             ca, resultat, paniers, parts, tauxActivation };
 }
 
 /* ============================================================
@@ -474,42 +481,34 @@ function calculer() {
    ============================================================ */
 function recalculer() {
     const res = calculer();
-    // Couloirs : valeurs, uplifts, résumés
-    for (const cat of ["rouge", "orange", "jaune", "verte"]) {
-        const couloir = $("couloir-" + cat);
-        const slider = couloir.querySelector("input[type=range]");
-        const out = couloir.querySelector("[data-couloir-valeur]");
-        const nom = couloir.querySelector("[data-couloir-nom]");
-        const upl = couloir.querySelector("[data-couloir-uplift]");
-        const resume = couloir.querySelector("[data-couloir-resume]");
-        const libelles = { rouge: "Rouge", orange: "Orange", jaune: "Jaune", verte: "Vert" };
-        nom.textContent = libelles[cat];
+    // Tableau de calcul : une ligne par catégorie
+    for (const cat of CATEGORIES) {
+        const tr = $("ligne-" + cat);
+        tr.querySelector("[data-part]").textContent = "";
         const r = res ? res.parCat[cat] : null;
-        if (cat !== "verte") {
-            const valeur = Math.round(etat.reductions[cat] * 100);
-            if (Number(slider.value) !== valeur) slider.value = valeur;
-            out.textContent = valeur + "\u202f%";
-            const t = config.typesCommerce[etat.typeCommerce];
-            const up = r && r.reduction > 0 ? uplift(r.reduction, etat.typeCommerce) : 0;
-            upl.hidden = !(r && r.reduction > 0);
-            upl.innerHTML = `+${fmtPct(up, 0)} de visites <span class="com-source">${t.source === "sondage" ? "sondage equiprix" : "estimation prudente"}</span>`;
-        }
-        if (r) {
-            const bits = [
-                `Clients de la catégorie\u00a0: ${fmtEntier(r.clientsCat)}`,
-            ];
-            if (cat !== "verte") {
-                bits.push(`Clients en plus\u00a0: +${fmtEntier(r.nouveauxClients + r.clientsEquipes * r.uplift)}`);
-                const cls = r.solde >= 0 ? "com-pos" : "com-neg";
-                bits.push(`Impact marge\u00a0: <span class="${cls}">${fmtEurosSigne(r.solde)}</span>`);
-            } else {
-                bits.push(`Panier\u00a0: ${fmtEuros(r.panier)}`);
-            }
-            resume.innerHTML = bits.join(" · ");
-            couloir.hidden = r.part <= 0; // clientèle nulle : ligne masquée
+        if (cat === "verte") {
+            tr.querySelector("[data-part]").textContent = "";
+            tr.querySelector("[data-part-clientele]").textContent = r ? fmtPct(r.part, 0) : "—";
+            tr.querySelector("[data-clients]").textContent = r ? fmtEntier(r.clientsCat) : "—";
+            tr.querySelector("[data-clients-plus]").innerHTML = '<span class="com-cel-vide">—</span>';
+            tr.querySelector("[data-impact]").innerHTML = '<span class="com-cel-vide">—</span>';
         } else {
-            resume.innerHTML = "";
+            const select = tr.querySelector("select");
+            if (select && String(etat.reductions[cat]) !== select.value) {
+                select.value = String(etat.reductions[cat]);
+            }
+            tr.querySelector("[data-part-clientele]").textContent = r ? fmtPct(r.part, 0) : "—";
+            tr.querySelector("[data-clients]").textContent = r ? fmtEntier(r.clientsCat) : "—";
+            tr.querySelector("[data-clients-plus]").textContent = r ? "+" + fmtEntier(r.nouveauxClients + r.clientsEquipes * r.uplift) : "—";
+            const cel = tr.querySelector("[data-impact]");
+            if (r) {
+                cel.innerHTML = `<span class="${r.solde >= 0 ? "com-pos" : "com-neg"}">${fmtEurosSigne(r.solde)}</span>`;
+            } else {
+                cel.textContent = "—";
+            }
         }
+        // clientèle nulle : ligne masquée
+        tr.hidden = !!r && r.part <= 0;
     }
     if (!res) return;
     // Chiffre héros
@@ -524,20 +523,33 @@ function recalculer() {
     dom.fluxSolde.className = res.impactNet >= 0 ? "com-pos" : "com-neg";
     // Suggestion
     dom.suggestion.textContent = suggestion(res);
-    // Tableau détaillé
-    dom.tableauTbody.innerHTML = "";
+    // Tableau détaillé (replié)
+    dom.tableauDetailTbody.innerHTML = "";
     for (const cat of CATEGORIES) {
         const r = res.parCat[cat];
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${cat[0].toUpperCase() + cat.slice(1)}</td>
+            <td>${LIBELLES[cat]}</td>
             <td>${fmtEntier(r.clientsCat)}</td>
             <td>${fmtEuros(r.panier)}</td>
             <td>${cat === "verte" ? "—" : fmtPct(r.reduction, 0)}</td>
             <td>${cat === "verte" ? "—" : "+" + fmtEntier(r.nouveauxClients + (r.clientsEquipes || 0) * (r.uplift || 0))}</td>
             <td class="${r.solde >= 0 ? "com-pos" : "com-neg"}">${cat === "verte" ? "—" : fmtEurosSigne(r.solde)}</td>
             ${etat.expert ? `<td>${fmtEuros(REVENU_CATEGORIES[cat])}</td>` : ""}`;
-        dom.tableauTbody.appendChild(tr);
+        dom.tableauDetailTbody.appendChild(tr);
+    }
+    // Paniers expert : recalcul des valeurs affichées
+    if (etat.expert) {
+        const paniers = paniersCategories();
+        if (paniers) for (const cat of CATEGORIES) {
+            const input = $("panier-" + cat);
+            if (input && document.activeElement !== input) input.value = Math.round(paniers[cat]);
+        }
+        const implicite = panierMoyenImplicite();
+        if ($("panier-implicite")) $("panier-implicite").textContent = implicite ? fmtEuros(implicite) : "—";
+        if ($("taux-activation-affiche") && res.tauxActivation) {
+            $("taux-activation-affiche").textContent = res.tauxActivation.toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " visites/mois";
+        }
     }
 }
 
@@ -548,7 +560,6 @@ function suggestion(res) {
         for (const cat of ["rouge", "orange", "jaune"]) {
             const r = res.parCat[cat];
             if (r.reduction <= 0) continue;
-            // essaie des réductions plus faibles par pas de 1 %
             for (let pct = Math.floor(r.reduction * 100) - 1; pct >= 0; pct--) {
                 const delta = simulerImpact({ [cat]: pct / 100 });
                 if (delta >= 0) {
@@ -558,8 +569,6 @@ function suggestion(res) {
         }
         return "Votre solde est négatif : abaissez vos réductions ou ciblez-les sur les catégories qui vous apportent le plus de visites.";
     }
-    // Solde positif : une piste d'optimisation simple
-    const parts = res.parts;
     const catMax = ["rouge", "orange", "jaune"].reduce((a, b) => res.parCat[a].part >= res.parCat[b].part ? a : b);
     return `À tester\u00a0: ajustez légèrement vos réductions à la hausse sur la catégorie ${catMax} (part la plus large de votre clientèle) pour capter davantage de visites, et vérifiez que le solde reste positif.`;
 }
@@ -620,46 +629,40 @@ function basculerExpert() {
     document.querySelectorAll(".com-expert-seule").forEach((el) => { el.hidden = !etat.expert; });
     if (etat.expert && !$("bloc-expert")) {
         const bloc = document.createElement("div");
-        bloc.className = "com-bloc com-expert-bloc";
+        bloc.className = "com-expert-bloc";
         bloc.id = "bloc-expert";
         bloc.innerHTML = `
-            <p class="com-label">Hypothèses de calcul</p>
-            <div class="com-grille-champs">
+            <p class="com-label">Hypothèses de calcul <span class="com-help-inline">taux d'activation (contrôle)\u00a0: <output id="taux-activation-affiche">—</output></span></p>
+            <div class="com-grille-expert">
                 <div class="com-champ"><label class="com-label" for="taux-capture">Taux de capture (%)</label><input type="number" id="taux-capture" class="com-input" step="0.5" value="${etat.parametres.tauxCapture * 100}"></div>
                 <div class="com-champ"><label class="com-label" for="taux-equipement">Taux d'équipement (%)</label><input type="number" id="taux-equipement" class="com-input" step="0.5" value="${etat.parametres.tauxEquipement * 100}"></div>
-                <div class="com-champ"><label class="com-label" for="taux-activation">Taux d'activation (visites/mois)</label><input type="number" id="taux-activation" class="com-input" step="0.05" value="${etat.parametres.tauxActivation}"></div>
                 <div class="com-champ"><label class="com-label" for="marge-nette">Marge nette (%)</label><input type="number" id="marge-nette" class="com-input" step="0.5" value="${etat.parametres.margeNette * 100}"></div>
             </div>
             <p class="com-label" style="margin-top:12px">Paniers par catégorie (€)</p>
-            <div class="com-grille-champs">
-                ${["rouge", "orange", "jaune", "verte"].map((cat) => `
-                    <div class="com-champ"><label class="com-label" for="panier-${cat}">${cat[0].toUpperCase() + cat.slice(1)}</label>
+            <div class="com-grille-paniers">
+                ${CATEGORIES.map((cat) => `
+                    <div class="com-champ"><label class="com-label" for="panier-${cat}">${LIBELLES[cat]}</label>
                     <input type="number" id="panier-${cat}" class="com-input com-panier-expert" data-categorie="${cat}" step="0.5"></div>`).join("")}
             </div>
             <p class="com-help">Panier moyen implicite (somme pondérée)\u00a0: <output id="panier-implicite">—</output></p>`;
-        dom.couloirs.parentElement.insertBefore(bloc, dom.couloirs);
+        dom.blocExpertAncrage.appendChild(bloc);
         bloc.querySelectorAll("input[type=number]").forEach((input) => {
             input.addEventListener("input", () => {
                 const v = parseFloat(input.value.replace(",", "."));
                 if (isNaN(v) || v < 0) return;
                 if (input.id === "taux-capture") etat.parametres.tauxCapture = v / 100;
                 if (input.id === "taux-equipement") etat.parametres.tauxEquipement = v / 100;
-                if (input.id === "taux-activation") etat.parametres.tauxActivation = v;
                 if (input.id === "marge-nette") etat.parametres.margeNette = v / 100;
                 if (input.classList.contains("com-panier-expert")) {
                     const paniers = paniersCategories();
                     if (!etat.paniersEdites) etat.paniersEdites = { ...paniers };
                     etat.paniersEdites[input.dataset.categorie] = v;
-                    const implicite = panierMoyenImplicite();
-                    $("panier-implicite").textContent = implicite ? fmtEuros(implicite) : "—";
                 }
                 recalculer();
             });
         });
         const paniers = paniersCategories();
         if (paniers) for (const cat of CATEGORIES) $("panier-" + cat).value = Math.round(paniers[cat]);
-        const implicite = panierMoyenImplicite();
-        $("panier-implicite").textContent = implicite ? fmtEuros(implicite) : "—";
     }
     majURL();
     recalculer();
@@ -677,7 +680,11 @@ function majURL() {
     params.set("panier", etat.panier);
     params.set("couv", etat.couverture);
     for (const cat of ["rouge", "orange", "jaune"]) params.set("r" + cat[0], etat.reductions[cat]);
-    if (etat.clientele) etat.clientele.forEach((v, i) => params.set("cli" + i, v.toFixed(3)));
+    // clientèle déformée : les trois frontières cumulées (limites des segments)
+    if (etat.clientele) {
+        const f = frontieresClientele();
+        f.forEach((v, i) => params.set("cli" + i, v.toFixed(3)));
+    }
     if (etat.expert) params.set("expert", "1");
     history.replaceState(null, "", location.pathname + "?" + params.toString());
 }
@@ -711,16 +718,18 @@ function restaurerDepuisURL() {
     const cli = [0, 1, 2].map((i) => parseFloat(params.get("cli" + i)));
     if (cli.every((v) => v >= 0 && v <= 1) && cli[0] > 0) {
         etat.clientele = [cli[0], cli[1] - cli[0], cli[2] - cli[1], 1 - cli[2]];
-        dessinerBarres();
+        dessinerJauges();
     }
     if (params.get("expert") === "1") {
         dom.expertToggle.checked = true;
         basculerExpert();
     }
-    // synchroniser les sliders de réduction avec l'état
-    dom.couloirs.querySelectorAll("input[type=range]").forEach((s) => {
-        s.value = Math.round(etat.reductions[s.dataset.categorie] * 100);
-        s.dispatchEvent(new Event("input"));
+    // synchroniser les listes déroulantes avec l'état
+    dom.tableauTbody.querySelectorAll("select").forEach((select) => {
+        const valeur = String(etat.reductions[select.dataset.categorie]);
+        const option = [...select.options].find((o) => Number(o.value) === etat.reductions[select.dataset.categorie]);
+        select.value = option ? option.value : select.options[0].value;
+        if (!option) etat.reductions[select.dataset.categorie] = Number(select.value);
     });
 }
 
@@ -754,7 +763,7 @@ function brancherEvenements() {
     // Réinitialisation clientèle
     dom.clienteleReset.addEventListener("click", () => {
         etat.clientele = null;
-        dessinerBarres();
+        dessinerJauges();
         majURL();
         recalculer();
     });

@@ -49,7 +49,7 @@
             <h1 class="com-hero-title">Que peut m'apporter equiprix&nbsp;?</h1>
             <p class="com-hero-subtitle">
                 Saisissez votre commune, votre commerce et les réductions que vous proposeriez&nbsp;:
-                le simulateur estime l'impact mensuel sur votre résultat. Jouez avec les curseurs pour
+                le simulateur estime l'impact mensuel sur votre résultat. Jouez avec les paramètres pour
                 trouver la combinaison qui fonctionne pour vous.
             </p>
             <label class="com-expert-toggle">
@@ -60,16 +60,16 @@
         </div>
     </header>
 
-    <main class="container com-layout" id="simulateur">
+    <main class="container" id="simulateur">
         <!-- Erreur de chargement des données (masquée par défaut) -->
         <p id="erreur-data" class="com-erreur" hidden>Impossible de charger les données. Vérifiez votre connexion puis rechargez la page.</p>
 
-        <!-- ==================== ZONE GAUCHE : commune et clientèle ==================== -->
-        <section class="com-zone com-zone-gauche" aria-labelledby="titre-commune">
-            <h2 class="com-titre-zone" id="titre-commune">Votre commune et vos clientèles</h2>
+        <!-- ==================== BANDE 1 : choix descriptifs (horizontal) ==================== -->
+        <section class="com-choix" aria-labelledby="titre-choix">
+            <h2 class="sr-only" id="titre-choix">Votre commune et votre commerce</h2>
 
-            <!-- 1. Sélection de la commune -->
-            <div class="com-bloc">
+            <!-- Commune -->
+            <div class="com-choix-bloc com-choix-commune">
                 <label class="com-label" for="commune-input">Code postal ou commune</label>
                 <div class="com-autocomplete">
                     <input type="text" id="commune-input" class="com-input" placeholder="Ex. 78700 ou Conflans"
@@ -83,119 +83,141 @@
                 </p>
             </div>
 
-            <!-- 2. Barres empilées population / clientèle -->
-            <div class="com-bloc">
-                <div class="com-barre-titre">
-                    <span>Population de votre commune</span>
-                </div>
-                <div class="com-barre" id="barre-population" aria-label="Répartition de la population communale par catégorie de niveau de vie"></div>
-                <div class="com-barre-titre">
-                    <span>Votre clientèle</span>
-                    <button type="button" id="clientele-reset" class="com-lien">réinitialiser sur la population communale</button>
-                </div>
-                <div class="com-barre com-barre-clientele" id="barre-clientele">
-                    <!-- curseurs de frontière générés en JS -->
-                </div>
-                <p class="com-help">Déplacez les poignées pour déformer votre clientèle (clientèle plus aisée&nbsp;: poussez les limites vers la gauche).</p>
-                <div class="com-legend" id="legende-categories"></div>
-            </div>
-        </section>
-
-        <!-- ==================== ZONE CENTRE : commerce et réductions ==================== -->
-        <section class="com-zone com-zone-centre" aria-labelledby="titre-commerce">
-            <h2 class="com-titre-zone" id="titre-commerce">Votre commerce</h2>
-
-            <!-- 3. Caractéristiques -->
-            <div class="com-bloc">
-                <div id="types-commerce" class="com-types" role="radiogroup" aria-label="Type de commerce"></div>
+            <!-- Type de commerce -->
+            <div class="com-choix-bloc com-choix-type">
+                <span class="com-label" id="label-type">Votre commerce</span>
+                <div id="types-commerce" class="com-types" role="radiogroup" aria-labelledby="label-type"></div>
                 <p class="com-help" id="types-note">Valeur estimée — modifiable.</p>
-                <div class="com-grille-champs">
-                    <div class="com-champ">
-                        <label class="com-label" for="marge-input">Marge commerciale (%)</label>
-                        <input type="number" id="marge-input" class="com-input" min="1" max="90" step="0.5" value="20">
-                    </div>
-                    <div class="com-champ">
-                        <label class="com-label" for="clients-input">Clients mensuels</label>
-                        <input type="number" id="clients-input" class="com-input" min="1" step="10" value="47000">
-                    </div>
-                    <div class="com-champ">
-                        <label class="com-label" for="panier-input">Panier moyen (€)</label>
-                        <input type="number" id="panier-input" class="com-input" min="1" step="0.5" value="50">
-                    </div>
-                    <div class="com-champ">
-                        <label class="com-label" for="couverture-range">Couverture géographique&nbsp;: <output id="couverture-out" for="couverture-range">100 %</output></label>
-                        <input type="range" id="couverture-range" class="com-slider" min="10" max="100" step="5" value="100">
-                        <p class="com-help">Par défaut, votre clientèle suit la répartition de la population communale.</p>
-                    </div>
-                </div>
             </div>
 
-            <!-- 4. Réductions en couloirs -->
-            <h3 class="com-titre-reductions">Vos réductions, par catégorie</h3>
-            <div id="couloirs"></div>
-        </section>
-
-        <!-- ==================== ZONE DROITE : résultats ==================== -->
-        <section class="com-zone com-zone-droite" aria-labelledby="titre-resultats">
-            <h2 class="com-titre-zone" id="titre-resultats">Vos résultats</h2>
-
-            <div class="com-bloc com-resultats">
-                <p class="com-resultat-vide" id="resultat-vide">Choisissez votre commune pour lancer la simulation.</p>
-
-                <div id="resultats-contenu" hidden>
-                    <p class="com-heros-montant" id="impact-euros">—</p>
-                    <p class="com-heros-pourcent" id="impact-pourcent">—</p>
-
-                    <!-- Décomposition en cascade -->
-                    <div class="com-cascade">
-                        <div class="com-cascade-ligne">
-                            <span>Perte de marge, clients existants <button type="button" class="com-info" data-info="perte" aria-label="Détail du calcul de la perte de marge">ⓘ</button></span>
-                            <span id="flux-perte">—</span>
-                        </div>
-                        <div class="com-cascade-ligne">
-                            <span>Gain, visites accrues des clients équipés <button type="button" class="com-info" data-info="gainEquip" aria-label="Détail du calcul du gain sur clients équipés">ⓘ</button></span>
-                            <span id="flux-gain-equipe">—</span>
-                        </div>
-                        <div class="com-cascade-ligne">
-                            <span>Gain, nouveaux clients captés <button type="button" class="com-info" data-info="gainCapture" aria-label="Détail du calcul du gain sur nouveaux clients">ⓘ</button></span>
-                            <span id="flux-gain-capture">—</span>
-                        </div>
-                        <div class="com-cascade-ligne com-cascade-total">
-                            <span>Solde net mensuel</span>
-                            <span id="flux-solde">—</span>
-                        </div>
-                    </div>
-
-                    <p class="com-suggestion" id="suggestion"></p>
-
-                    <button type="button" class="btn-primary com-btn-optimiser" disabled>Optimiser mes réductions (à venir)</button>
-
-                    <details class="com-details">
-                        <summary>Détail par catégorie</summary>
-                        <div class="com-tableau-wrap">
-                            <table class="com-tableau" id="tableau-categories">
-                                <caption class="sr-only">Détail des flux par catégorie de niveau de vie</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Catégorie</th>
-                                        <th scope="col">Clients</th>
-                                        <th scope="col">Panier</th>
-                                        <th scope="col">Réduction</th>
-                                        <th scope="col">Clients en plus</th>
-                                        <th scope="col">Impact marge</th>
-                                        <th scope="col" class="com-expert-seule" hidden>Revenu médian</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </details>
-
-                    <button type="button" class="btn-primary com-btn-sauver" id="sauver-btn">Sauver</button>
-                    <p class="com-help" id="sauver-message" role="status"></p>
+            <!-- Caractéristiques -->
+            <div class="com-choix-bloc com-choix-caracteristiques">
+                <div class="com-champ">
+                    <label class="com-label" for="marge-input">Marge (%)</label>
+                    <input type="number" id="marge-input" class="com-input" min="1" max="90" step="0.5" value="20">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="clients-input">Clients/mois</label>
+                    <input type="number" id="clients-input" class="com-input" min="1" step="10" value="47000">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="panier-input">Panier (€)</label>
+                    <input type="number" id="panier-input" class="com-input" min="1" step="0.5" value="50">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="couverture-range">Couverture&nbsp;: <output id="couverture-out" for="couverture-range">100 %</output></label>
+                    <input type="range" id="couverture-range" class="com-slider" min="10" max="100" step="5" value="100">
                 </div>
             </div>
         </section>
+
+        <!-- ==================== BANDE 2 : grille de calcul + résultats ==================== -->
+        <div class="com-corps">
+            <!-- Grille de calcul : jauges verticales + tableau par catégorie -->
+            <section class="com-calc" aria-labelledby="titre-calc">
+                <h2 class="com-titre-zone" id="titre-calc">Votre clientèle et vos réductions</h2>
+                <p class="com-help com-calc-aide">Déplacez les poignées de la jauge «&nbsp;clientèle&nbsp;» pour la déformer (clientèle plus aisée&nbsp;: poussez les limites vers le bas).</p>
+
+                <div class="com-calc-wrap">
+                    <!-- Jauges verticales -->
+                    <div class="com-jauges">
+                        <div class="com-jaugcol">
+                            <span class="com-jaug-label">Population</span>
+                            <div class="com-jaug" id="barre-population" role="img" aria-label="Répartition de la population communale par catégorie"></div>
+                        </div>
+                        <div class="com-jaugcol">
+                            <span class="com-jaug-label">Clientèle <button type="button" id="clientele-reset" class="com-lien">réinitialiser</button></span>
+                            <div class="com-jaug com-jaug-clientele" id="barre-clientele" role="img" aria-label="Répartition de votre clientèle par catégorie — poignées ajustables"></div>
+                        </div>
+                        <div class="com-legend" id="legende-categories"></div>
+                    </div>
+
+                    <!-- Transition graphique vers le tableau -->
+                    <div class="com-transi" aria-hidden="true"></div>
+
+                    <!-- Tableau : lignes = catégories, colonnes = variables -->
+                    <div class="com-tableau-calc-wrap">
+                        <table class="com-tableau-calc" id="tableau-calc">
+                            <caption class="sr-only">Paramètres et flux par catégorie de niveau de vie</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Catégorie</th>
+                                    <th scope="col">Votre clientèle</th>
+                                    <th scope="col">Clients actuels</th>
+                                    <th scope="col">Réduction appliquée</th>
+                                    <th scope="col">Clients en plus</th>
+                                    <th scope="col">Impact marge</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div id="bloc-expert-ancrage"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Résultats -->
+            <section class="com-zone-droite" aria-labelledby="titre-resultats">
+                <h2 class="com-titre-zone" id="titre-resultats">Vos résultats</h2>
+
+                <div class="com-bloc com-resultats">
+                    <p class="com-resultat-vide" id="resultat-vide">Choisissez votre commune pour lancer la simulation.</p>
+
+                    <div id="resultats-contenu" hidden>
+                        <p class="com-heros-montant" id="impact-euros">—</p>
+                        <p class="com-heros-pourcent" id="impact-pourcent">—</p>
+
+                        <!-- Décomposition en cascade -->
+                        <div class="com-cascade">
+                            <div class="com-cascade-ligne">
+                                <span>Perte de marge, clients existants <button type="button" class="com-info" data-info="perte" aria-label="Détail du calcul de la perte de marge">ⓘ</button></span>
+                                <span id="flux-perte">—</span>
+                            </div>
+                            <div class="com-cascade-ligne">
+                                <span>Gain, visites accrues des clients équipés <button type="button" class="com-info" data-info="gainEquip" aria-label="Détail du calcul du gain sur clients équipés">ⓘ</button></span>
+                                <span id="flux-gain-equipe">—</span>
+                            </div>
+                            <div class="com-cascade-ligne">
+                                <span>Gain, nouveaux clients captés <button type="button" class="com-info" data-info="gainCapture" aria-label="Détail du calcul du gain sur nouveaux clients">ⓘ</button></span>
+                                <span id="flux-gain-capture">—</span>
+                            </div>
+                            <div class="com-cascade-ligne com-cascade-total">
+                                <span>Solde net mensuel</span>
+                                <span id="flux-solde">—</span>
+                            </div>
+                        </div>
+
+                        <p class="com-suggestion" id="suggestion"></p>
+
+                        <button type="button" class="btn-primary com-btn-optimiser" disabled>Optimiser mes réductions (à venir)</button>
+
+                        <details class="com-details">
+                            <summary>Détail par catégorie</summary>
+                            <div class="com-tableau-wrap">
+                                <table class="com-tableau" id="tableau-categories">
+                                    <caption class="sr-only">Détail des flux par catégorie de niveau de vie</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Catégorie</th>
+                                            <th scope="col">Clients</th>
+                                            <th scope="col">Panier</th>
+                                            <th scope="col">Réduction</th>
+                                            <th scope="col">Clients en plus</th>
+                                            <th scope="col">Impact marge</th>
+                                            <th scope="col" class="com-expert-seule" hidden>Revenu médian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </details>
+
+                        <button type="button" class="btn-primary com-btn-sauver" id="sauver-btn">Sauver</button>
+                        <p class="com-help" id="sauver-message" role="status"></p>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <!-- Sources -->
