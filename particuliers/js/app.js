@@ -207,6 +207,10 @@ function animerNombre(el, arrivee, formater) {
  */
 function majLibellePercentile(resultat) {
     const el = dom.libellePercentile;
+    // Invalide toute animation en cours : sans cela, une frame restante d'une
+    // mise à jour précédente peut écraser le libellé définitif (drag rapide).
+    const token = (el._animToken || 0) + 1;
+    el._animToken = token;
     if (resultat.cas !== "interieur") {
         el._animPct = null;
         el.textContent = libellePercentile(resultat);
@@ -220,8 +224,6 @@ function majLibellePercentile(resultat) {
         el.textContent = libellePercentile({ percentile: cible, cas: "interieur", ...seuils });
         return;
     }
-    const token = (el._animToken || 0) + 1;
-    el._animToken = token;
     const debut = performance.now();
     const pas = (now) => {
         if (el._animToken !== token) return;
