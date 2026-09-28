@@ -351,14 +351,13 @@
     padding: 0 4px;
     border-radius: 3px;
     white-space: nowrap;
+    z-index: 4;
 }
 
 /* Seuils de pauvreté et de richesse : lignes pointillées fines et noires,
-   au-dessus des repères des déciles/quartiles,
    libellés à 15px du bord droit pour laisser voir le triangle du marqueur */
 .sim-jauge-seuil {
     border-top: 1px dashed #000;
-    z-index: 2;
 }
 
 .sim-jauge-seuil span {
