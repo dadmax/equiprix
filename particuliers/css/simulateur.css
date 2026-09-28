@@ -330,14 +330,15 @@
 .sim-jauge-jaune  { background-color: #FBE9A9; }
 .sim-jauge-verte  { background-color: #C8E6C9; }
 
-/* Pointillés des déciles / quartiles, libellés à 10px du bord gauche */
+/* Pointillés des déciles / quartiles, libellés à 10px du bord gauche.
+   Pas de z-index ici : il créerait un contexte d'empilement qui empêcherait
+   le span de passer au-dessus des lignes des autres repères. */
 .sim-jauge-repere {
     position: absolute;
     left: 0;
     right: 0;
     border-top: 2px dashed rgba(0, 0, 0, 0.45);
     pointer-events: none;
-    z-index: 1;
 }
 
 .sim-jauge-repere span {
