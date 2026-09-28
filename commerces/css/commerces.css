@@ -1,0 +1,604 @@
+/* ============================================================
+   commerces.css — Simulateur « Que peut m'apporter equiprix ? »
+   Styles spécifiques, dans la palette du site (style.css).
+   Structure : bande de saisie horizontale en haut, puis grille de
+   calcul (jauges verticales + tableau par catégorie) et résultats.
+   ============================================================ */
+
+/* ---------- En-tête de page ---------- */
+.com-hero {
+    padding: 40px 0 12px;
+    text-align: center;
+}
+.com-hero-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.com-hero-subtitle {
+    max-width: 720px;
+    margin: 0 auto 16px;
+    color: var(--dark-gray);
+}
+.com-expert-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    cursor: pointer;
+}
+.com-expert-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+.com-help-inline {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 6px 0 0;
+}
+
+/* ---------- Blocs et champs ---------- */
+.com-titre-zone {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.com-bloc {
+    background: var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+.com-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+.com-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+    background: var(--white);
+}
+.com-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 0.85rem;
+    background: var(--white);
+    cursor: pointer;
+}
+.com-help {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 6px;
+}
+.com-alerte {
+    color: #a35c00;
+    font-weight: 600;
+}
+.com-erreur {
+    color: #b00020;
+    font-weight: 600;
+}
+.com-lien {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 0.72rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 6px;
+}
+
+/* ============================================================
+   BANDE 1 : choix descriptifs (étalés horizontalement)
+   ============================================================ */
+.com-choix {
+    display: grid;
+    grid-template-columns: minmax(210px, 260px) minmax(280px, 1fr) minmax(360px, 1.2fr);
+    gap: 20px;
+    align-items: start;
+    background: var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+}
+.com-choix-bloc {
+    min-width: 0;
+}
+.com-choix-caracteristiques {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    align-items: end;
+}
+.com-choix-caracteristiques .com-champ {
+    min-width: 0;
+}
+.com-choix-caracteristiques .com-label {
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+.com-choix-caracteristiques .com-input {
+    padding: 6px 8px;
+}
+.com-slider {
+    width: 100%;
+    accent-color: var(--primary-color);
+    margin-top: 8px;
+}
+
+/* Autocomplete commune */
+.com-autocomplete {
+    position: relative;
+}
+.com-liste {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px 0;
+    z-index: 300;
+}
+.com-liste li {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.com-liste li[aria-selected="true"],
+.com-liste li:hover {
+    background: #e6f2ff;
+}
+
+/* Types de commerce */
+.com-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.com-type-carte {
+    border: 2px solid #d8d8d8;
+    border-radius: 8px;
+    background: var(--white);
+    padding: 8px 14px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+.com-type-carte[aria-checked="true"] {
+    border-color: var(--primary-color);
+    background: #e6f2ff;
+}
+.com-type-carte:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   BANDE 2 : grille de calcul (jauges verticales + tableau)
+   ============================================================ */
+.com-corps {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 48px;
+}
+.com-calc-aide {
+    margin-bottom: 10px;
+}
+
+.com-calc-wrap {
+    display: grid;
+    grid-template-columns: auto 34px minmax(0, 1fr);
+    gap: 0 4px;
+    align-items: stretch;
+}
+
+/* ---------- Jauges verticales ---------- */
+.com-jauges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.com-jaug-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    text-align: center;
+    margin-bottom: 4px;
+}
+.com-jaug {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 46px;
+    height: 232px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f4f4f4;
+}
+.com-jaug-segment {
+    width: 100%;
+    min-height: 0;
+    transition: height 0.15s ease;
+}
+.com-seg-rouge  { background: #d64545; }
+.com-seg-orange { background: #e8862e; }
+.com-seg-jaune  { background: #c9a227; }
+.com-seg-verte  { background: #3f9d55; }
+.com-jaug-clientele {
+    overflow: visible; /* place aux poignées */
+}
+.com-jaug-poignee {
+    position: absolute;
+    left: -5px;
+    right: -5px;
+    height: 16px;
+    margin-top: -8px;
+    cursor: ns-resize;
+    background: transparent;
+    border: none;
+    padding: 0;
+    touch-action: none;
+    z-index: 5;
+}
+.com-jaug-poignee::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--white);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4);
+}
+.com-jaug-poignee:focus-visible::after {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    outline: none;
+}
+.com-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 2px 0;
+    margin-top: 8px;
+    font-size: 0.7rem;
+}
+.com-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.4;
+}
+.com-legend-pastille {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    display: inline-block;
+    flex: none;
+}
+
+/* ---------- Transition graphique jauges -> lignes ---------- */
+.com-transi {
+    position: relative;
+}
+/* flèches partant de chaque jauge vers la ligne correspondante du tableau */
+.com-transi::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent var(--transi-y, 24px),
+            #d0d0d0 var(--transi-y, 24px),
+            #d0d0d0 calc(var(--transi-y, 24px) + 1px)
+        );
+    -webkit-mask-image: linear-gradient(to right, #000 30%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 30%, transparent 100%);
+}
+.com-transi::after {
+    content: "→";
+    position: absolute;
+    right: -2px;
+    top: calc(var(--transi-y, 24px) - 7px);
+    color: #d0d0d0;
+    font-size: 13px;
+}
+
+/* ---------- Tableau de calcul : lignes = catégories, colonnes = variables ---------- */
+.com-tableau-calc-wrap {
+    min-width: 0;
+}
+.com-tableau-calc {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+.com-tableau-calc th,
+.com-tableau-calc td {
+    padding: 10px 10px;
+    text-align: right;
+    border-bottom: 1px solid #e8e8e8;
+    white-space: nowrap;
+}
+.com-tableau-calc thead th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    background: var(--light-gray);
+    text-align: right;
+    padding: 8px 10px;
+}
+.com-tableau-calc th:first-child,
+.com-tableau-calc td:first-child {
+    text-align: left;
+}
+/* Ligne de catégorie : liseré gauche aux couleurs equiprix */
+.com-ligne-rouge  { border-left: 6px solid #d64545; }
+.com-ligne-orange { border-left: 6px solid #e8862e; }
+.com-ligne-jaune  { border-left: 6px solid #c9a227; }
+.com-ligne-verte  { border-left: 6px solid #3f9d55; }
+.com-ligne-nom {
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+.com-ligne-part {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #777;
+}
+.com-cel-vide {
+    color: #aaa;
+}
+.com-pos { color: #2e7d32; font-weight: 600; }
+.com-neg { color: #c62828; font-weight: 600; }
+.com-cel-info {
+    white-space: normal;
+    max-width: 120px;
+}
+
+/* ============================================================
+   Résultats (colonne droite)
+   ============================================================ */
+.com-resultats {
+    position: sticky;
+    top: 88px;
+}
+.com-resultat-vide {
+    color: #666;
+    text-align: center;
+    padding: 12px 0;
+}
+.com-heros-montant {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4px;
+}
+.com-heros-montant.com-pos { color: #2e7d32; }
+.com-heros-montant.com-neg { color: #c62828; }
+.com-heros-pourcent {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 14px;
+}
+.com-cascade {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-bottom: 14px;
+}
+.com-cascade-ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.85rem;
+    padding: 4px 0;
+}
+.com-cascade-total {
+    border-top: 1px solid #999;
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+}
+.com-info {
+    background: none;
+    border: none;
+    cursor: help;
+    color: var(--primary-color);
+    font-size: 0.85em;
+    padding: 0 2px;
+}
+.com-suggestion {
+    font-size: 0.85rem;
+    background: #eef6ff;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+.com-btn-optimiser {
+    opacity: 0.5;
+    cursor: not-allowed;
+    display: block;
+    margin: 0 auto 14px;
+}
+.com-btn-sauver {
+    display: block;
+    margin: 14px auto 0;
+}
+.com-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+.com-tableau-wrap {
+    overflow-x: auto;
+}
+.com-tableau {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.com-tableau th,
+.com-tableau td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    text-align: right;
+    white-space: nowrap;
+}
+.com-tableau th:first-child,
+.com-tableau td:first-child {
+    text-align: left;
+}
+
+/* ---------- Infobulle ---------- */
+.com-infobulle {
+    position: fixed;
+    z-index: 2000;
+    max-width: 340px;
+    background: var(--dark-gray);
+    color: var(--white);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-hover);
+}
+.com-infobulle[hidden] {
+    display: none;
+}
+
+/* ---------- Mode expert : hypothèses + paniers ---------- */
+.com-expert-bloc {
+    background: var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
+    margin-top: 14px;
+    box-shadow: var(--shadow);
+}
+.com-expert-bloc .com-grille-expert {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 14px;
+    margin-top: 8px;
+}
+.com-expert-bloc .com-grille-paniers {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 14px;
+    margin-top: 8px;
+}
+
+/* ---------- Sources ---------- */
+.com-sources {
+    background: var(--light-gray);
+    border-top: 1px solid #e0e0e0;
+    padding: 32px 0;
+    font-size: 0.85rem;
+}
+.com-sources-titre {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.com-sources-liste {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+}
+.com-sources-liste li {
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+.com-sources-note {
+    color: #666;
+    font-style: italic;
+}
+
+/* ---------- Utilitaires ---------- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 991px) {
+    .com-choix {
+        grid-template-columns: 1fr 1fr;
+    }
+    .com-choix-caracteristiques {
+        grid-column: 1 / -1;
+    }
+    .com-corps {
+        grid-template-columns: 1fr;
+    }
+    .com-resultats {
+        position: static;
+    }
+    /* Grille de calcul : les colonnes du tableau défilent horizontalement */
+    .com-tableau-calc-wrap {
+        overflow-x: auto;
+    }
+}
+@media (max-width: 600px) {
+    .com-choix {
+        grid-template-columns: 1fr;
+    }
+    .com-choix-caracteristiques {
+        grid-template-columns: 1fr 1fr;
+    }
+    .com-jaug {
+        width: 38px;
+        height: 190px;
+    }
+    .com-transi {
+        display: none;
+    }
+    .com-calc-wrap {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+}

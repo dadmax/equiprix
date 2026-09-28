@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulateur pour les commerces : estimez l'impact d'équiprix sur votre chiffre d'affaires et votre marge — clients supplémentaires, perte de marge, solde net mensuel.">
+    <meta property="og:image" content="https://equiprix.fr/images/OG_equiprix_adapter_les_tarifs_pour_les_commerces.jpg" />
+    <title>Simulateur equiprix pour les commerces</title>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="9e775384-e8e4-40e0-8134-9203e52e551f"></script>
+    <!-- Favicon (identique au site) -->
+    <link rel="shortcut icon" type="image/png" href="../images/favico-equiprix-32px.png" />
+    <!-- Google Fonts: Inter (cohérence avec le site) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS : style global du site + styles du simulateur -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/commerces.css">
+</head>
+<body>
+    <!-- Barre de navigation (cohérente avec le site) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../" class="logo">
+                <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+            </a>
+            <!-- Liens desktop -->
+            <div class="nav-links">
+                <a href="../">Accueil</a>
+                <a href="/particuliers/">Particuliers</a>
+                <a href="/commerces/">Commerces</a>
+                <a href="../#collectivites">Collectivités</a>
+            </div>
+            <!-- Menu hamburger mobile -->
+            <button class="hamburger" aria-label="Menu">☰</button>
+        </div>
+        <!-- Sidebar mobile -->
+        <div class="nav-sidebar">
+            <a href="../">Accueil</a>
+            <a href="/particuliers/">Particuliers</a>
+            <a href="/commerces/">Commerces</a>
+            <a href="../#collectivites">Collectivités</a>
+        </div>
+    </nav>
+
+    <!-- Introduction -->
+    <header class="com-hero">
+        <div class="container">
+            <h1 class="com-hero-title">Que peut m'apporter equiprix&nbsp;?</h1>
+            <p class="com-hero-subtitle">
+                Saisissez votre commune, votre commerce et les réductions que vous proposeriez&nbsp;:
+                le simulateur estime l'impact mensuel sur votre résultat. Jouez avec les paramètres pour
+                trouver la combinaison qui fonctionne pour vous.
+            </p>
+            <label class="com-expert-toggle">
+                <input type="checkbox" id="expert-toggle" aria-describedby="aide-expert">
+                <span>Mode expert</span>
+            </label>
+            <p class="com-help-inline" id="aide-expert">Affiche les hypothèses de calcul et permet d'ajuster les paniers par catégorie.</p>
+        </div>
+    </header>
+
+    <main class="container" id="simulateur">
+        <!-- Erreur de chargement des données (masquée par défaut) -->
+        <p id="erreur-data" class="com-erreur" hidden>Impossible de charger les données. Vérifiez votre connexion puis rechargez la page.</p>
+
+        <!-- ==================== BANDE 1 : choix descriptifs (horizontal) ==================== -->
+        <section class="com-choix" aria-labelledby="titre-choix">
+            <h2 class="sr-only" id="titre-choix">Votre commune et votre commerce</h2>
+
+            <!-- Commune -->
+            <div class="com-choix-bloc com-choix-commune">
+                <label class="com-label" for="commune-input">Code postal ou commune</label>
+                <div class="com-autocomplete">
+                    <input type="text" id="commune-input" class="com-input" placeholder="Ex. 78700 ou Conflans"
+                           autocomplete="off" role="combobox" aria-expanded="false"
+                           aria-controls="commune-liste" aria-autocomplete="list">
+                    <ul id="commune-liste" class="com-liste" role="listbox" hidden></ul>
+                </div>
+                <p class="com-help" id="commune-info"></p>
+                <p class="com-help com-alerte" id="commune-alerte" hidden>
+                    Données indisponibles pour cette commune. Essayez une commune limitrophe.
+                </p>
+            </div>
+
+            <!-- Type de commerce -->
+            <div class="com-choix-bloc com-choix-type">
+                <span class="com-label" id="label-type">Votre commerce</span>
+                <div id="types-commerce" class="com-types" role="radiogroup" aria-labelledby="label-type"></div>
+                <p class="com-help" id="types-note">Valeur estimée — modifiable.</p>
+            </div>
+
+            <!-- Caractéristiques -->
+            <div class="com-choix-bloc com-choix-caracteristiques">
+                <div class="com-champ">
+                    <label class="com-label" for="marge-input">Marge (%)</label>
+                    <input type="number" id="marge-input" class="com-input" min="1" max="90" step="0.5" value="20">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="clients-input">Clients/mois</label>
+                    <input type="number" id="clients-input" class="com-input" min="1" step="10" value="47000">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="panier-input">Panier (€)</label>
+                    <input type="number" id="panier-input" class="com-input" min="1" step="0.5" value="50">
+                </div>
+                <div class="com-champ">
+                    <label class="com-label" for="couverture-range">Couverture&nbsp;: <output id="couverture-out" for="couverture-range">100 %</output></label>
+                    <input type="range" id="couverture-range" class="com-slider" min="10" max="100" step="5" value="100">
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== BANDE 2 : grille de calcul + résultats ==================== -->
+        <div class="com-corps">
+            <!-- Grille de calcul : jauges verticales + tableau par catégorie -->
+            <section class="com-calc" aria-labelledby="titre-calc">
+                <h2 class="com-titre-zone" id="titre-calc">Votre clientèle et vos réductions</h2>
+                <p class="com-help com-calc-aide">Déplacez les poignées de la jauge «&nbsp;clientèle&nbsp;» pour la déformer (clientèle plus aisée&nbsp;: poussez les limites vers le bas).</p>
+
+                <div class="com-calc-wrap">
+                    <!-- Jauges verticales -->
+                    <div class="com-jauges">
+                        <div class="com-jaugcol">
+                            <span class="com-jaug-label">Population</span>
+                            <div class="com-jaug" id="barre-population" role="img" aria-label="Répartition de la population communale par catégorie"></div>
+                        </div>
+                        <div class="com-jaugcol">
+                            <span class="com-jaug-label">Clientèle <button type="button" id="clientele-reset" class="com-lien">réinitialiser</button></span>
+                            <div class="com-jaug com-jaug-clientele" id="barre-clientele" role="img" aria-label="Répartition de votre clientèle par catégorie — poignées ajustables"></div>
+                        </div>
+                        <div class="com-legend" id="legende-categories"></div>
+                    </div>
+
+                    <!-- Transition graphique vers le tableau -->
+                    <div class="com-transi" aria-hidden="true"></div>
+
+                    <!-- Tableau : lignes = catégories, colonnes = variables -->
+                    <div class="com-tableau-calc-wrap">
+                        <table class="com-tableau-calc" id="tableau-calc">
+                            <caption class="sr-only">Paramètres et flux par catégorie de niveau de vie</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Catégorie</th>
+                                    <th scope="col">Votre clientèle</th>
+                                    <th scope="col">Clients actuels</th>
+                                    <th scope="col">Réduction appliquée</th>
+                                    <th scope="col">Clients en plus</th>
+                                    <th scope="col">Impact marge</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div id="bloc-expert-ancrage"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Résultats -->
+            <section class="com-zone-droite" aria-labelledby="titre-resultats">
+                <h2 class="com-titre-zone" id="titre-resultats">Vos résultats</h2>
+
+                <div class="com-bloc com-resultats">
+                    <p class="com-resultat-vide" id="resultat-vide">Choisissez votre commune pour lancer la simulation.</p>
+
+                    <div id="resultats-contenu" hidden>
+                        <p class="com-heros-montant" id="impact-euros">—</p>
+                        <p class="com-heros-pourcent" id="impact-pourcent">—</p>
+
+                        <!-- Décomposition en cascade -->
+                        <div class="com-cascade">
+                            <div class="com-cascade-ligne">
+                                <span>Perte de marge, clients existants <button type="button" class="com-info" data-info="perte" aria-label="Détail du calcul de la perte de marge">ⓘ</button></span>
+                                <span id="flux-perte">—</span>
+                            </div>
+                            <div class="com-cascade-ligne">
+                                <span>Gain, visites accrues des clients équipés <button type="button" class="com-info" data-info="gainEquip" aria-label="Détail du calcul du gain sur clients équipés">ⓘ</button></span>
+                                <span id="flux-gain-equipe">—</span>
+                            </div>
+                            <div class="com-cascade-ligne">
+                                <span>Gain, nouveaux clients captés <button type="button" class="com-info" data-info="gainCapture" aria-label="Détail du calcul du gain sur nouveaux clients">ⓘ</button></span>
+                                <span id="flux-gain-capture">—</span>
+                            </div>
+                            <div class="com-cascade-ligne com-cascade-total">
+                                <span>Solde net mensuel</span>
+                                <span id="flux-solde">—</span>
+                            </div>
+                        </div>
+
+                        <p class="com-suggestion" id="suggestion"></p>
+
+                        <button type="button" class="btn-primary com-btn-optimiser" disabled>Optimiser mes réductions (à venir)</button>
+
+                        <details class="com-details">
+                            <summary>Détail par catégorie</summary>
+                            <div class="com-tableau-wrap">
+                                <table class="com-tableau" id="tableau-categories">
+                                    <caption class="sr-only">Détail des flux par catégorie de niveau de vie</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Catégorie</th>
+                                            <th scope="col">Clients</th>
+                                            <th scope="col">Panier</th>
+                                            <th scope="col">Réduction</th>
+                                            <th scope="col">Clients en plus</th>
+                                            <th scope="col">Impact marge</th>
+                                            <th scope="col" class="com-expert-seule" hidden>Revenu médian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </details>
+
+                        <button type="button" class="btn-primary com-btn-sauver" id="sauver-btn">Sauver</button>
+                        <p class="com-help" id="sauver-message" role="status"></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Sources -->
+    <section class="com-sources">
+        <div class="container">
+            <h2 class="com-sources-titre">Sources</h2>
+            <ul class="com-sources-liste">
+                <li>Répartition des populations communales par niveau de vie&nbsp;: Filosofi 2021 (publication 2024) — <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation" target="_blank" rel="noopener noreferrer">https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation</a></li>
+                <li>Revenu disponible des diverses catégories&nbsp;: Filosofi 2023 (publication 2026) — <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation" target="_blank" rel="noopener noreferrer">https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation</a></li>
+            </ul>
+            <p class="com-sources-note">Résultats estimatifs à visée pédagogique, basés sur les hypothèses affichées en mode expert.</p>
+        </div>
+    </section>
+
+    <!-- Footer (cohérent avec le site) -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+                </div>
+                <div class="footer-links">
+                    <a href="mailto:maxime@equiprix.fr" class="footer-link">Nous contacter</a>
+                    <a href="https://www.figma.com/proto/oElbUH0pVMuD44kOiHNxs9/Proto-equiprix?node-id=0-1&t=BwuTNyHQGHvzS19R-1" class="footer-link">Accès démo</a>
+                </div>
+                <p class="copyright">&reg; 2026 equiprix</p>
+                <p class="footer-mentions">equiprix est en cours de constitution et sera une structure à but non lucratif.</p>
+                <p class="footer-mentions">Illustrations libres de droit glanées sur flaticon.com — Merci à bqlqn, smashicons, Magnific &amp; monkik !</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Infobulle de formule (une seule, repositionnée) -->
+    <div id="infobulle" class="com-infobulle" role="tooltip" hidden></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

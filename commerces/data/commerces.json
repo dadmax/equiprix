@@ -1,0 +1,20 @@
+{
+  "typesCommerce": {
+    "supermarche":    { "nom": "Supermarché",       "source": "sondage",     "margeDefaut": 0.20, "clientsDefaut": 47000, "panierDefaut": 50 },
+    "barRestaurant":  { "nom": "Bar / restaurant",   "source": "sondage",     "margeDefaut": 0.50, "clientsDefaut": 8000, "panierDefaut": 50 },
+    "commerceBouche": { "nom": "Commerce de bouche", "source": "sondage",     "margeDefaut": 0.30, "clientsDefaut": 8000, "panierDefaut": 50 },
+    "autre":          { "nom": "Autre commerce",      "source": "estimation", "coefPrudence": 0.75, "base": ["barRestaurant", "commerceBouche"], "margeDefaut": 0.30, "clientsDefaut": 4000, "panierDefaut": 30 }
+  },
+  "matriceUplift": {
+    "reductions": [0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30],
+    "supermarche":    [0, 0.03, 0.3276, 0.4933, 0.70, 0.85, 1.00],
+    "barRestaurant":  [0, 0.1429, 0.4310, 0.60, 0.70, 0.80, 1.00],
+    "commerceBouche": [0, 0.09, 0.30, 0.45, 0.55, 0.65, 1.00]
+  },
+  "parametres": {
+    "tauxCapture": 0.05,
+    "tauxEquipement": 0.075,
+    "tauxActivation": 4.05,
+    "margeNette": 0.03
+  }
+}
