@@ -157,16 +157,19 @@ function positionnerMarker(pourcentage) {
  *  Cas 3 : D1–médiane → les X % les plus bas. Cas 4 : < D1 → les 10 % les plus bas. */
 function libellePercentile(resultat) {
     const p = resultat.percentile;
+    const suffixeSeuil =
+        resultat.aboveRichesse ? " et au-dessus du seuil de richesse" :
+        resultat.sousPauvrete ? " et en-dessous du seuil de pauvreté" : "";
     if (resultat.cas === "bas") {
-        return "Vous êtes dans les 10 % des niveaux de vie les plus bas" + (resultat.sousPauvrete ? " et en-dessous du seuil de pauvreté" : "") + ".";
+        return "Vous êtes dans les 10 % des niveaux de vie les plus bas" + suffixeSeuil + ".";
     }
     if (resultat.cas === "haut") {
-        return "Vous êtes dans le top 10 % des niveaux de vie" + (resultat.aboveRichesse ? " et au-dessus du seuil de richesse" : "") + ".";
+        return "Vous êtes dans le top 10 % des niveaux de vie" + suffixeSeuil + ".";
     }
     if (p >= 50) {
-        return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie" + (resultat.aboveRichesse ? " et au-dessus du seuil de richesse" : "") + ".";
+        return "Vous êtes dans le top " + (100 - Math.round(p)) + " % des niveaux de vie" + suffixeSeuil + ".";
     }
-    return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas" + (resultat.sousPauvrete ? " et en-dessous du seuil de pauvreté" : "") + ".";
+    return "Vous êtes dans les " + Math.round(p) + " % des niveaux de vie les plus bas" + suffixeSeuil + ".";
 }
 
 /* ---------- Animations (0,7 s, vanilla JS sans dépendance) ---------- */
@@ -210,10 +213,11 @@ function majLibellePercentile(resultat) {
         return;
     }
     const cible = resultat.percentile;
+    const seuils = { aboveRichesse: resultat.aboveRichesse, sousPauvrete: resultat.sousPauvrete };
     const depart = el._animPct;
     if (depart === null || depart === undefined || depart === cible) {
         el._animPct = cible;
-        el.textContent = libellePercentile({ percentile: cible, cas: "interieur" });
+        el.textContent = libellePercentile({ percentile: cible, cas: "interieur", ...seuils });
         return;
     }
     const token = (el._animToken || 0) + 1;
@@ -224,7 +228,7 @@ function majLibellePercentile(resultat) {
         const t = Math.min(1, (now - debut) / DUREE_ANIM);
         const eased = 1 - Math.pow(1 - t, 3);
         el._animPct = depart + (cible - depart) * eased;
-        el.textContent = libellePercentile({ percentile: el._animPct, cas: "interieur" });
+        el.textContent = libellePercentile({ percentile: el._animPct, cas: "interieur", ...seuils });
         if (t < 1) requestAnimationFrame(pas);
         else el._animPct = cible;
     };
