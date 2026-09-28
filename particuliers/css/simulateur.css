@@ -337,7 +337,7 @@
     right: 0;
     border-top: 2px dashed rgba(0, 0, 0, 0.45);
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
 }
 
 .sim-jauge-repere span {
@@ -354,11 +354,11 @@
 }
 
 /* Seuils de pauvreté et de richesse : lignes pointillées fines et noires,
-   derrière les repères des déciles/quartiles,
+   au-dessus des repères des déciles/quartiles,
    libellés à 15px du bord droit pour laisser voir le triangle du marqueur */
 .sim-jauge-seuil {
     border-top: 1px dashed #000;
-    z-index: 1;
+    z-index: 2;
 }
 
 .sim-jauge-seuil span {
