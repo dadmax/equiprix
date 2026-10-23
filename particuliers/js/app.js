@@ -76,21 +76,20 @@ function remplirDepartements() {
 /* ---------- Jauge ----------
    La jauge représente la population : chaque tranche de 10 % de hauteur
    contient 10 % de la population, classée du niveau de vie le plus bas
-   (en bas) au plus haut (en haut). Les déciles et quartiles sont
+   (en bas) au plus haut (en haut). Les déciles sont
    matérialisés par des pointillés à la hauteur exacte de leur percentile. */
 
 /** Construit la jauge : bandes de catégories + pointillés des bornes. */
 function construireJauge() {
     dom.jauge.innerHTML = "";
 
-    // Bandes de couleurs : une par changement de catégorie (5 segments :
-    // 0–10 rouge, 10–25 orange, 25–50 jaune, 50–100 vert en deux bandes
-    // pour conserver des hauteurs de 10 % visibles lors des transitions)
+    // Bandes de couleurs : une par catégorie (rouge 0–20, orange 20–40,
+    // jaune 40–60 autour de la médiane, verte 60–100)
     const segments = [
-        { de: 0, a: 10, couleur: "rouge" },
-        { de: 10, a: 25, couleur: "orange" },
-        { de: 25, a: 50, couleur: "jaune" },
-        { de: 50, a: 100, couleur: "verte" },
+        { de: 0, a: 20, couleur: "rouge" },
+        { de: 20, a: 40, couleur: "orange" },
+        { de: 40, a: 60, couleur: "jaune" },
+        { de: 60, a: 100, couleur: "verte" },
     ];
     for (const seg of segments) {
         const bande = document.createElement("div");
@@ -102,7 +101,7 @@ function construireJauge() {
 }
 
 /**
- * Met à jour les pointillés des déciles/quartiles à leur hauteur exacte
+ * Met à jour les pointillés des déciles à leur hauteur exacte
  * (percentile), avec leur valeur en euros, pour la population choisie.
  */
 function mettreAJourBornes(bornes) {
@@ -111,9 +110,10 @@ function mettreAJourBornes(bornes) {
 
     const couples = [
         { cle: "d1", percentile: 10 },
-        { cle: "q1", percentile: 25 },
+        { cle: "d2", percentile: 20 },
+        { cle: "d4", percentile: 40 },
         { cle: "d5", percentile: 50, libelle: "médiane" },
-        { cle: "q3", percentile: 75 },
+        { cle: "d6", percentile: 60 },
         { cle: "d9", percentile: 90 },
     ];
     for (const c of couples) {

@@ -303,9 +303,10 @@
 
 /* ---------- JAUGE DE DISTRIBUTION ----------
    La jauge représente la population : 10 % de hauteur = 10 % de la
-   population. Les bandes de couleurs marquent les catégories equiprix,
-   les pointillés matérialisent D1, Q1, médiane, Q3 et D9 à leur hauteur
-   exacte de percentile. */
+   population. Les bandes de couleurs marquent les catégories equiprix
+   (rouge 0–20 %, orange 20–40 %, jaune 40–60 % autour de la médiane,
+   verte 60–100 %), les pointillés matérialisent les déciles à leur
+   hauteur exacte de percentile. */
 .sim-jauge-wrap {
     position: relative;
 }
@@ -330,7 +331,7 @@
 .sim-jauge-jaune  { background-color: #FBE9A9; }
 .sim-jauge-verte  { background-color: #C8E6C9; }
 
-/* Pointillés des déciles / quartiles, libellés à 10px du bord gauche.
+/* Pointillés des déciles, libellés à 10px du bord gauche.
    Pas de z-index ici : il créerait un contexte d'empilement qui empêcherait
    le span de passer au-dessus des lignes des autres repères. */
 .sim-jauge-repere {

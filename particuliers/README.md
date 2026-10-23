@@ -80,4 +80,8 @@ sert automatiquement `particuliers/index.html`).
 - **Percentile** : interpolation linéaire entre les bornes D1, Q1, D3…D7, Q3,
   D8, D9 de la population choisie (France ou département).
 - **Catégorie equiprix** (rouge / orange / jaune / verte) : toujours calculée
-  sur les bornes France, indépendamment du segment de la jauge.
+  sur les bornes France, indépendamment du segment de la jauge. Découpage :
+  rouge < D2 (20 % les plus bas), orange D2–D4 (20–40 % les plus bas),
+  jaune D4–D6 (40–60 % les plus bas, autour de la médiane),
+  verte >= D6 (40 % les plus hauts). Q1 et Q3 restent dans le JSON sans
+  être utilisés par le simulateur.

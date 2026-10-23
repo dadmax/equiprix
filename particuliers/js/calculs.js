@@ -85,31 +85,32 @@ function calculerPositionJauge(niveauDeVie, bornes) {
 
 /**
  * Catégorie equiprix, toujours définie sur les bornes France :
- * rouge (< D1), orange (D1–Q1), jaune (Q1–médiane), verte (>= médiane).
+ * rouge (< D2), orange (D2–D4), jaune (D4–D6, autour de la médiane),
+ * verte (>= D6).
  * @returns {{cle: string, libelle: string}}
  */
 function calculerCategorie(niveauDeVie, bornesFrance) {
-    if (niveauDeVie < bornesFrance.d1) {
+    if (niveauDeVie < bornesFrance.d2) {
         return {
             cle: "rouge",
-            libelle: "Catégorie rouge : les 10 % des niveaux de vie les plus bas, France entière > réductions très importantes en magasin.",
+            libelle: "Catégorie rouge : les 20 % des niveaux de vie les plus bas, France entière > réductions très importantes en magasin.",
         };
     }
-    if (niveauDeVie < bornesFrance.q1) {
+    if (niveauDeVie < bornesFrance.d4) {
         return {
             cle: "orange",
-            libelle: "Catégorie orange : les 25 % des niveaux de vie les plus bas, France entière > réductions importantes en magasin.",
+            libelle: "Catégorie orange : les 20 à 40 % des niveaux de vie les plus bas, France entière > réductions importantes en magasin.",
         };
     }
-    if (niveauDeVie < bornesFrance.d5) {
+    if (niveauDeVie < bornesFrance.d6) {
         return {
             cle: "jaune",
-            libelle: "Catégorie jaune : les 50 % des niveaux de vie les plus bas, France entière > réductions en magasin.",
+            libelle: "Catégorie jaune : les 40 à 60 % des niveaux de vie les plus bas, autour de la médiane, France entière > réductions possibles selon le type de commerce et votre localisation.",
         };
     }
     return {
         cle: "vert",
-        libelle: "Catégorie verte : les 50 % des niveaux de vie les plus hauts, France entière > pas de réductions.",
+        libelle: "Catégorie verte : les 40 % des niveaux de vie les plus hauts, France entière > pas de réductions.",
     };
 }
 
