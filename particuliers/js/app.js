@@ -109,12 +109,10 @@ function mettreAJourBornes(bornes) {
     dom.jauge.querySelectorAll(".sim-jauge-repere").forEach((r) => r.remove());
 
     const couples = [
-        { cle: "d1", percentile: 10 },
-        { cle: "d2", percentile: 20 },
-        { cle: "d4", percentile: 40 },
+        { cle: "d2", percentile: 20, libelle: "20 % les plus bas" },
+        { cle: "d4", percentile: 40, libelle: "40 % les plus bas" },
         { cle: "d5", percentile: 50, libelle: "médiane" },
-        { cle: "d6", percentile: 60 },
-        { cle: "d9", percentile: 90 },
+        { cle: "d6", percentile: 60, libelle: "top 40 %" },
     ];
     for (const c of couples) {
         const repere = document.createElement("div");
@@ -238,32 +236,15 @@ function majLibellePercentile(resultat) {
 }
 
 /**
- * Met à jour le badge de catégorie avec un fondu enchaîné : l'ancien
- * badge part en transparence pendant que le nouveau apparaît.
+ * Met à jour le badge de catégorie : switch immédiat (au départ de
+ * l'animation de la jauge), sans fondu enchaîné ni superposition de
+ * l'ancienne et de la nouvelle étiquette.
  */
 function majBadge(categorie) {
     if (categorie.cle === categorieAffichee) return;
-    const premier = categorieAffichee === null;
     categorieAffichee = categorie.cle;
-
-    if (!premier) {
-        const fantome = dom.badgeCategorie.cloneNode(true);
-        fantome.removeAttribute("id");
-        fantome.setAttribute("aria-hidden", "true");
-        fantome.classList.add("sim-badge-fantome");
-        dom.badgeCategorie.insertAdjacentElement("afterend", fantome);
-        requestAnimationFrame(() => fantome.classList.add("sim-badge-sortie"));
-        setTimeout(() => fantome.remove(), DUREE_ANIM);
-    }
-
     dom.badgeCategorie.textContent = categorie.libelle;
     dom.badgeCategorie.className = "sim-categorie-badge cat-" + categorie.cle;
-    if (!premier) {
-        dom.badgeCategorie.style.opacity = "0";
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            dom.badgeCategorie.style.opacity = "1";
-        }));
-    }
 }
 
 /* ---------- Recalcul (temps réel, mises à jour ciblées) ---------- */

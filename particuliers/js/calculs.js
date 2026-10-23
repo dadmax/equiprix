@@ -105,7 +105,7 @@ function calculerCategorie(niveauDeVie, bornesFrance) {
     if (niveauDeVie < bornesFrance.d6) {
         return {
             cle: "jaune",
-            libelle: "Catégorie jaune : les 40 à 60 % des niveaux de vie les plus bas, autour de la médiane, France entière > réductions possibles selon le type de commerce et votre localisation.",
+            libelle: "Catégorie jaune : autour de la médiane, France entière > réductions possibles selon le type de commerce et votre localisation.",
         };
     }
     return {
