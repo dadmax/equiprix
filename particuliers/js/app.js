@@ -109,10 +109,10 @@ function mettreAJourBornes(bornes) {
     dom.jauge.querySelectorAll(".sim-jauge-repere").forEach((r) => r.remove());
 
     const couples = [
-        { cle: "d2", percentile: 20, libelle: "20 % les plus bas" },
-        { cle: "d4", percentile: 40, libelle: "40 % les plus bas" },
+        { cle: "d2", percentile: 20, libelle: "20% les + bas" },
+        { cle: "d4", percentile: 40, libelle: "40% les + bas" },
         { cle: "d5", percentile: 50, libelle: "médiane" },
-        { cle: "d6", percentile: 60, libelle: "top 40 %" },
+        { cle: "d6", percentile: 60, libelle: "Top 40%" },
     ];
     for (const c of couples) {
         const repere = document.createElement("div");
