@@ -42,7 +42,8 @@ palette sont ceux du site. Le lien « Commerces » du header pointe vers
    ```
 
 2. Télécharger la base data.gouv.fr « Codes postaux » (ressource
-   `codes-postaux-full.json`) dans `data/source/codes-postaux.json`.
+   `codes-postaux-full.json`, ~65 Mo — non versionnée, voir
+   `data/source/.gitignore`) dans `data/source/codes-postaux.json`.
 3. Lancer la génération :
 
    ```bash
