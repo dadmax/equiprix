@@ -1,0 +1,738 @@
+/* ============================================================
+   commerces.css — Simulateur commerçants (equiprix.fr/commerces)
+   S'ajoute au style global ../style.css (palette, header, footer).
+   ============================================================ */
+
+/* Couleurs des catégories equiprix */
+:root {
+    --cat-rouge: #D32F2F;
+    --cat-orange: #F57C00;
+    --cat-jaune: #F9A825;
+    --cat-verte: #388E3C;
+    --cat-rouge-fond: #FDECEA;
+    --cat-orange-fond: #FFF3E0;
+    --cat-jaune-fond: #FFF8E1;
+    --cat-verte-fond: #E8F5E9;
+    --resultat-positif: #2E7D32;
+    --resultat-negatif: #C62828;
+}
+
+/* ---------- Structure générale ---------- */
+.sim-hero {
+    background-color: var(--bg-why);
+    padding: 48px 0 32px;
+    text-align: center;
+}
+
+.sim-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.sim-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.sim-subtitle {
+    color: var(--dark-gray);
+    font-size: 1.05rem;
+    max-width: 760px;
+    margin: 0 auto 16px;
+}
+
+/* Tableau de bord : 3 zones côte à côte sur desktop */
+.sim-dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-top: 24px;
+    padding-bottom: 48px;
+    align-items: start;
+}
+
+@media (min-width: 992px) {
+    .sim-dashboard {
+        grid-template-columns: 30% 35% 35%;
+    }
+}
+
+.sim-zone {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+}
+
+@media (min-width: 992px) {
+    .sim-zone-resultats {
+        position: sticky;
+        top: 88px;
+    }
+}
+
+.sim-zone-titre {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.sim-sous-titre {
+    color: var(--dark-gray);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 20px 0 12px;
+}
+
+/* ---------- Champs de formulaire ---------- */
+.sim-field {
+    margin-bottom: 16px;
+}
+
+.sim-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--dark-gray);
+}
+
+.sim-input,
+.sim-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D0D5DD;
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--dark-gray);
+    background-color: var(--white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sim-input:focus,
+.sim-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.15);
+}
+
+.sim-help {
+    font-size: 0.8rem;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.sim-fieldset {
+    border: 1px solid #EAECF0;
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.sim-fieldset .sim-label,
+.sim-fieldset legend.sim-label {
+    padding: 0 6px;
+    margin-bottom: 10px;
+}
+
+.sim-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.sim-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 576px) {
+    .sim-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .sim-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ---------- Autocomplétion code postal ---------- */
+.sim-autocomplete {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    border: 1px solid #D0D5DD;
+    border-radius: var(--border-radius);
+    background: var(--white);
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    z-index: 100;
+}
+
+.sim-autocomplete li {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.sim-autocomplete li:hover,
+.sim-autocomplete li[aria-selected="true"] {
+    background-color: var(--bg-why);
+}
+
+.sim-autocomplete .cp-code {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.sim-cp-nom {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-top: 8px;
+}
+
+.sim-cp-detail {
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+/* ---------- Barre empilée population ---------- */
+.sim-stacked-bar {
+    display: flex;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 16px 0 8px;
+}
+
+.sim-seg {
+    transition: width 0.3s ease;
+}
+
+.sim-seg-rouge { background-color: var(--cat-rouge); }
+.sim-seg-orange { background-color: var(--cat-orange); }
+.sim-seg-jaune { background-color: var(--cat-jaune); }
+.sim-seg-verte { background-color: var(--cat-verte); }
+
+.sim-legend {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 0.85rem;
+}
+
+.sim-legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sim-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-dot-rouge { background-color: var(--cat-rouge); }
+.sim-dot-orange { background-color: var(--cat-orange); }
+.sim-dot-jaune { background-color: var(--cat-jaune); }
+.sim-dot-verte { background-color: var(--cat-verte); }
+
+.sim-menages {
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+.sim-warning {
+    background-color: var(--cat-jaune-fond);
+    border-left: 4px solid var(--cat-jaune);
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 12px;
+}
+
+/* ---------- Cartes type de commerce ---------- */
+.sim-cartes-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.sim-carte-type {
+    border: 2px solid #EAECF0;
+    border-radius: var(--border-radius);
+    background: var(--white);
+    padding: 12px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.sim-carte-type:hover {
+    border-color: var(--primary-color);
+}
+
+.sim-carte-type[aria-checked="true"] {
+    border-color: var(--primary-color);
+    background-color: var(--bg-why);
+    color: var(--primary-color);
+}
+
+/* ---------- Radios profil clientèle ---------- */
+.sim-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sim-radio-profil {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid #EAECF0;
+    border-radius: var(--border-radius);
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sim-radio-profil:hover {
+    border-color: var(--primary-color);
+}
+
+.sim-radio-profil input {
+    accent-color: var(--primary-color);
+}
+
+.sim-radio-profil:has(input:checked) {
+    border-color: var(--primary-color);
+    background-color: var(--bg-why);
+}
+
+/* ---------- Jauge attractivité ---------- */
+.sim-slider {
+    width: 100%;
+    accent-color: var(--primary-color);
+}
+
+.sim-jauge-reperes {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.sim-attractivite-nom {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+/* ---------- Couloirs réductions ---------- */
+.sim-couloirs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sim-couloir {
+    border-radius: var(--border-radius);
+    padding: 16px;
+    border-left: 6px solid;
+}
+
+.sim-couloir-rouge {
+    background-color: var(--cat-rouge-fond);
+    border-left-color: var(--cat-rouge);
+}
+
+.sim-couloir-orange {
+    background-color: var(--cat-orange-fond);
+    border-left-color: var(--cat-orange);
+}
+
+.sim-couloir-jaune {
+    background-color: var(--cat-jaune-fond);
+    border-left-color: var(--cat-jaune);
+}
+
+.sim-couloir-verte {
+    background-color: var(--cat-verte-fond);
+    border-left-color: var(--cat-verte);
+}
+
+.sim-couloir-titre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.sim-couloir-plage {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: #667085;
+}
+
+.sim-couloir-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-couloir-rouge .sim-couloir-dot { background-color: var(--cat-rouge); }
+.sim-couloir-orange .sim-couloir-dot { background-color: var(--cat-orange); }
+.sim-couloir-jaune .sim-couloir-dot { background-color: var(--cat-jaune); }
+.sim-couloir-verte .sim-couloir-dot { background-color: var(--cat-verte); }
+
+.sim-uplift {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 8px 0;
+}
+
+.sim-couloir-infos {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px 16px;
+    margin: 10px 0 0;
+    font-size: 0.85rem;
+}
+
+@media (min-width: 576px) {
+    .sim-couloir-infos {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.sim-couloir-infos > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    padding: 3px 0;
+}
+
+.sim-couloir-infos dt {
+    color: #667085;
+}
+
+.sim-couloir-infos dd {
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ---------- Résultats ---------- */
+.sim-hero-resultat {
+    text-align: center;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
+    background-color: var(--light-gray);
+    transition: background-color 0.3s ease;
+}
+
+.sim-hero-resultat.positif {
+    background-color: var(--cat-verte-fond);
+}
+
+.sim-hero-resultat.negatif {
+    background-color: var(--cat-rouge-fond);
+}
+
+.sim-hero-resultat.neutre {
+    background-color: var(--light-gray);
+}
+
+.sim-hero-chiffre {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-gray);
+}
+
+.sim-hero-resultat.positif .sim-hero-chiffre { color: var(--resultat-positif); }
+.sim-hero-resultat.negatif .sim-hero-chiffre { color: var(--resultat-negatif); }
+
+.sim-hero-ratio {
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.sim-hero-resultat.positif .sim-hero-ratio { color: var(--resultat-positif); }
+.sim-hero-resultat.negatif .sim-hero-ratio { color: var(--resultat-negatif); }
+
+.sim-hero-ref {
+    font-size: 0.85rem;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.sim-recap {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+}
+
+.sim-recap li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #EAECF0;
+    font-size: 0.95rem;
+}
+
+.sim-recap li > span:first-child {
+    flex: 1;
+}
+
+.sim-recap-valeur {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sim-recap li:nth-child(2) .sim-recap-valeur,
+.sim-recap li:nth-child(3) .sim-recap-valeur {
+    color: var(--resultat-negatif);
+}
+
+.sim-recap li:first-child .sim-recap-valeur {
+    color: var(--resultat-positif);
+}
+
+/* Pastille ⓘ */
+.sim-info-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-info-btn:hover,
+.sim-info-btn:focus-visible {
+    background-color: var(--bg-why);
+}
+
+/* Infobulle */
+.sim-tooltip {
+    position: absolute;
+    max-width: 320px;
+    background-color: var(--dark-gray);
+    color: var(--white);
+    padding: 10px 14px;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    z-index: 200;
+    pointer-events: none;
+    box-shadow: var(--shadow-hover);
+}
+
+/* Tableau détail par catégorie */
+.sim-detail-categories {
+    margin-bottom: 16px;
+}
+
+.sim-detail-categories summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.sim-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.sim-table th,
+.sim-table td {
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid #EAECF0;
+}
+
+.sim-table th:first-child,
+.sim-table td:first-child {
+    text-align: left;
+}
+
+.sim-table thead th {
+    color: #667085;
+    font-weight: 600;
+}
+
+.sim-table .cat-nom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+/* Suggestion */
+.sim-suggestion {
+    background-color: var(--bg-collectivites);
+    border-radius: var(--border-radius);
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+/* Actions */
+.sim-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sim-btn-secondaire {
+    background-color: #EAECF0;
+    color: #667085;
+    cursor: not-allowed;
+}
+
+.sim-btn-secondaire:hover {
+    background-color: #EAECF0;
+    transform: none;
+    box-shadow: none;
+}
+
+.sim-sauvegarde-ok {
+    color: var(--resultat-positif);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+/* ---------- Mode expert ---------- */
+.sim-toggle-expert {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.sim-toggle-expert input {
+    accent-color: var(--primary-color);
+}
+
+.sim-expert-only {
+    display: none;
+    margin-top: 16px;
+}
+
+body.mode-expert .sim-expert-only {
+    display: block;
+}
+
+body.mode-expert .sim-detail-categories {
+    display: block;
+}
+
+body:not(.mode-expert) .sim-detail-categories {
+    display: none;
+}
+
+.sim-expert-sous {
+    margin-top: 12px;
+}
+
+.sim-expert-sous summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+.sim-revenus {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+    font-size: 0.85rem;
+    margin: 8px 0 0;
+}
+
+.sim-revenus > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ---------- Sources ---------- */
+.sim-section {
+    padding: 32px 0 48px;
+    background-color: var(--bg-commercants);
+}
+
+.sim-sources {
+    max-width: 800px;
+    margin: 0 auto 16px;
+    padding-left: 20px;
+    text-align: center;
+    list-style: none;
+}
+
+.sim-sources li {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.sim-sources a {
+    color: var(--primary-color);
+}
+
+.sim-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #667085;
+    font-style: italic;
+}
+
+/* ---------- Accessibilité : focus visible ---------- */
+.sim-carte-type:focus-visible,
+.sim-radio-profil:focus-within,
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ---------- Utilitaires ---------- */
+[hidden] {
+    display: none !important;
+}

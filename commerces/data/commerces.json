@@ -1,0 +1,109 @@
+{
+  "bornesCategories": {
+    "rougeMax": 13200,
+    "orangeMax": 19960,
+    "jauneMax": 26080,
+    "source": "Filosofi 2021, France métropolitaine (D2, D4, D6)"
+  },
+  "revenusCategories": {
+    "rouge": 13200,
+    "orange": 20300,
+    "jaune": 25920,
+    "verte": 37380,
+    "source": "Filosofi 2023 : D1, D3, médiane, D8 (France métropolitaine)"
+  },
+  "profilsClientele": [
+    {
+      "id": "commune",
+      "nom": "Comme la population de la commune",
+      "coeffRouge": 1,
+      "coeffOrange": 1,
+      "coeffJaune": 1
+    },
+    {
+      "id": "unPeuAisee",
+      "nom": "Un peu plus aisée que la moyenne",
+      "coeffRouge": 0.5,
+      "coeffOrange": 0.75,
+      "coeffJaune": 0.75
+    },
+    {
+      "id": "essentiellementAisee",
+      "nom": "Essentiellement aisée",
+      "coeffRouge": 0.25,
+      "coeffOrange": 0.4,
+      "coeffJaune": 0.5
+    }
+  ],
+  "attractivite": [
+    {
+      "id": "tresFaible",
+      "nom": "Très faible — j'attire très peu mes clients potentiels, concurrence énorme",
+      "facteur": 20
+    },
+    {
+      "id": "faible",
+      "nom": "Faible — j'attire une part faible des clients potentiels, forte concurrence",
+      "facteur": 12
+    },
+    {
+      "id": "moyenne",
+      "nom": "Moyenne — j'attire une part des clients potentiels, concurrence moyenne",
+      "facteur": 8
+    },
+    {
+      "id": "forte",
+      "nom": "Forte — j'attire la majorité des clients potentiels, peu de concurrence",
+      "facteur": 5
+    },
+    {
+      "id": "tresForte",
+      "nom": "Très forte — j'attire déjà tous mes clients potentiels, concurrence inexistante",
+      "facteur": 2
+    }
+  ],
+  "typesCommerce": {
+    "supermarche": {
+      "nom": "Supermarché",
+      "source": "sondage",
+      "margeDefaut": 0.20,
+      "passagesDefaut": 8000,
+      "panierDefaut": 50
+    },
+    "barRestaurant": {
+      "nom": "Bar / restaurant",
+      "source": "sondage",
+      "margeDefaut": 0.50,
+      "passagesDefaut": 8000,
+      "panierDefaut": 50
+    },
+    "commerceBouche": {
+      "nom": "Commerce de bouche",
+      "source": "sondage",
+      "margeDefaut": 0.30,
+      "passagesDefaut": 1000,
+      "panierDefaut": 30
+    },
+    "autre": {
+      "nom": "Autre commerce",
+      "source": "estimation",
+      "coefPrudence": 0.75,
+      "base": ["barRestaurant", "commerceBouche"],
+      "margeDefaut": 0.30,
+      "passagesDefaut": 1000,
+      "panierDefaut": 30
+    }
+  },
+  "matriceUplift": {
+    "reductions": [0, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50],
+    "supermarche":    [0, 0.1536, 0.20,   0.3276, 0.4933, 0.60,   0.65,   0.70,   0.75, 0.80],
+    "barRestaurant":  [0, 0.03,   0.05,   0.1414, 0.16,   0.1828, 0.20,   0.30,   0.35, 0.40],
+    "commerceBouche": [0, 0.1429, 0.20,   0.30,   0.4310, 0.50,   0.55,   0.60,   0.65, 0.70]
+  },
+  "parametres": {
+    "tauxCapture": 0.10,
+    "fraisServiceParPassage": 0.50,
+    "capFraisServiceMensuel": 100,
+    "margeNetteDefaut": 0.03
+  }
+}

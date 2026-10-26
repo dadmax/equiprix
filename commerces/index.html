@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulez l'impact d'equiprix sur votre commerce : clients supplémentaires, marge, réductions par niveau de vie. Estimez votre solde net mensuel en quelques clics.">
+    <meta property="og:image" content="https://equiprix.fr/images/OG_equiprix_adapter_les_tarifs_pour_les_commerces.jpg" />
+    <title>Simulateur equiprix pour les commerces</title>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="9e775384-e8e4-40e0-8134-9203e52e551f"></script>
+    <link rel="shortcut icon" type="image/png" href="../images/favico-equiprix-32px.png" />
+
+    <!-- Google Fonts: Inter (cohérence avec le site) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS : style global du site + styles du simulateur -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/commerces.css">
+</head>
+<body>
+    <!-- Barre de navigation (cohérente avec le site) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../" class="logo">
+                <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+            </a>
+
+            <!-- Liens desktop -->
+            <div class="nav-links">
+                <a href="../">Accueil</a>
+                <a href="/particuliers/">Particuliers</a>
+                <a href="/commerces/">Commerces</a>
+                <a href="../#collectivites">Collectivités</a>
+            </div>
+
+            <!-- Menu hamburger mobile -->
+            <button class="hamburger" aria-label="Menu">☰</button>
+        </div>
+
+        <!-- Sidebar mobile -->
+        <div class="nav-sidebar">
+            <a href="../">Accueil</a>
+            <a href="/particuliers/">Particuliers</a>
+            <a href="/commerces/">Commerces</a>
+            <a href="../#collectivites">Collectivités</a>
+        </div>
+    </nav>
+
+    <!-- Introduction du simulateur -->
+    <header class="sim-hero">
+        <div class="sim-container">
+            <h1 class="sim-title">Que peut m'apporter equiprix&nbsp;?</h1>
+            <p class="sim-subtitle">
+                Renseignez votre commune, votre commerce et les réductions que vous proposeriez&nbsp;:
+                le simulateur estime l'impact mensuel sur votre marge. Ajustez les paramètres
+                pour trouver votre meilleure combinaison.
+            </p>
+            <label class="sim-toggle-expert">
+                <input type="checkbox" id="toggle-expert">
+                <span>Mode expert</span>
+            </label>
+        </div>
+    </header>
+
+    <!-- Tableau de bord : 3 zones (commune / commerce / résultats) -->
+    <main>
+        <div class="sim-container sim-dashboard" id="simulateur">
+
+            <!-- Zone gauche : Votre commune -->
+            <section class="sim-zone sim-zone-commune" aria-labelledby="titre-commune">
+                <h2 class="sim-zone-titre" id="titre-commune">Votre commune</h2>
+
+                <div class="sim-field">
+                    <label class="sim-label" for="cp-input">Code postal ou nom de commune</label>
+                    <input type="text" id="cp-input" class="sim-input" autocomplete="off"
+                           placeholder="Ex. 78700 ou Conflans" aria-describedby="cp-aide"
+                           aria-expanded="false" role="combobox" aria-controls="cp-liste">
+                    <ul id="cp-liste" class="sim-autocomplete" role="listbox" hidden></ul>
+                    <p class="sim-help" id="cp-aide">Tapez au moins 2 caractères pour chercher.</p>
+                </div>
+
+                <div id="cp-selectionne" hidden>
+                    <p class="sim-cp-nom" id="cp-nom"></p>
+                    <p class="sim-cp-detail" id="cp-detail"></p>
+                </div>
+
+                <div id="cp-infos" hidden>
+                    <div class="sim-stacked-bar" id="barre-population" role="img"
+                         aria-label="Répartition de la population par niveau de vie">
+                        <div class="sim-seg sim-seg-rouge" data-cat="rouge"></div>
+                        <div class="sim-seg sim-seg-orange" data-cat="orange"></div>
+                        <div class="sim-seg sim-seg-jaune" data-cat="jaune"></div>
+                        <div class="sim-seg sim-seg-verte" data-cat="verte"></div>
+                    </div>
+                    <ul class="sim-legend" id="legende-population">
+                        <li><span class="sim-dot sim-dot-rouge" aria-hidden="true"></span><span id="leg-rouge"></span></li>
+                        <li><span class="sim-dot sim-dot-orange" aria-hidden="true"></span><span id="leg-orange"></span></li>
+                        <li><span class="sim-dot sim-dot-jaune" aria-hidden="true"></span><span id="leg-jaune"></span></li>
+                        <li><span class="sim-dot sim-dot-verte" aria-hidden="true"></span><span id="leg-verte"></span></li>
+                    </ul>
+                    <p class="sim-menages" id="cp-menages"></p>
+                </div>
+
+                <p class="sim-warning" id="cp-indisponible" hidden>
+                    Données indisponibles pour ce secteur. Essayez un code postal voisin&nbsp;:
+                    on considère la population dans la moyenne française.
+                </p>
+            </section>
+
+            <!-- Zone centre : Votre commerce et vos réductions -->
+            <section class="sim-zone sim-zone-commerce" aria-labelledby="titre-commerce">
+                <h2 class="sim-zone-titre" id="titre-commerce">Votre commerce et vos réductions</h2>
+
+                <!-- Bloc Votre commerce -->
+                <fieldset class="sim-fieldset">
+                    <legend class="sim-label">Votre commerce</legend>
+                    <div class="sim-cartes-type" id="cartes-type" role="radiogroup" aria-label="Type de commerce"></div>
+
+                    <div class="sim-grid-3">
+                        <div class="sim-field">
+                            <label class="sim-label" for="marge">Marge commerciale (%)</label>
+                            <input type="number" id="marge" class="sim-input" min="0" max="100" step="0.5" inputmode="decimal">
+                        </div>
+                        <div class="sim-field">
+                            <label class="sim-label" for="passages">Passages / mois</label>
+                            <input type="number" id="passages" class="sim-input" min="0" step="1" inputmode="numeric">
+                        </div>
+                        <div class="sim-field">
+                            <label class="sim-label" for="panier">Panier moyen HT (€)</label>
+                            <input type="number" id="panier" class="sim-input" min="0" step="0.5" inputmode="decimal">
+                        </div>
+                    </div>
+                    <p class="sim-help" id="estimation-note" hidden>Valeur estimée — modifiable.</p>
+                </fieldset>
+
+                <!-- Profil de clientèle -->
+                <fieldset class="sim-fieldset">
+                    <legend class="sim-label">Votre clientèle</legend>
+                    <div class="sim-radio-group" id="profils" role="radiogroup" aria-label="Profil de clientèle"></div>
+                </fieldset>
+
+                <!-- Attractivité -->
+                <fieldset class="sim-fieldset">
+                    <legend class="sim-label">Pénétration de votre commerce</legend>
+                    <input type="range" id="attractivite" class="sim-slider" min="0" max="4" step="1" value="2"
+                           aria-label="Pénétration de votre commerce (curseur)">
+                    <div class="sim-jauge-reperes" id="attractivite-reperes" aria-hidden="true"></div>
+                    <p class="sim-attractivite-nom" id="attractivite-nom"></p>
+                    <p class="sim-help" id="attractivite-facteur"></p>
+                </fieldset>
+
+                <!-- Vos réductions : couloirs par catégorie -->
+                <h3 class="sim-sous-titre">Vos réductions equiprix</h3>
+                <div class="sim-couloirs" id="couloirs">
+                    <div class="sim-couloir sim-couloir-rouge" data-cat="rouge">
+                        <div class="sim-couloir-titre">
+                            <span class="sim-couloir-dot" aria-hidden="true"></span>
+                            <span>Rouge <span class="sim-couloir-plage">20&nbsp;% les plus bas</span></span>
+                        </div>
+                        <label class="sim-label" for="red-rouge">Réduction appliquée</label>
+                        <select id="red-rouge" class="sim-select sim-select-red"></select>
+                        <p class="sim-uplift" id="uplift-rouge"></p>
+                        <dl class="sim-couloir-infos">
+                            <div><dt>Part de votre clientèle</dt><dd id="info-part-rouge">—</dd></div>
+                            <div><dt>Passages mensuels réels</dt><dd id="info-passages-rouge">—</dd></div>
+                            <div><dt>Potentiel de passage / mois</dt><dd id="info-potentiel-rouge">—</dd></div>
+                            <div><dt>Panier moyen</dt><dd id="info-panier-rouge">—</dd></div>
+                            <div><dt>Passages en plus / mois</dt><dd id="info-clients-rouge">—</dd></div>
+                        </dl>
+                    </div>
+                    <div class="sim-couloir sim-couloir-orange" data-cat="orange">
+                        <div class="sim-couloir-titre">
+                            <span class="sim-couloir-dot" aria-hidden="true"></span>
+                            <span>Orange <span class="sim-couloir-plage">20 à 40&nbsp;% les plus bas</span></span>
+                        </div>
+                        <label class="sim-label" for="red-orange">Réduction appliquée</label>
+                        <select id="red-orange" class="sim-select sim-select-orange"></select>
+                        <p class="sim-uplift" id="uplift-orange"></p>
+                        <dl class="sim-couloir-infos">
+                            <div><dt>Part de votre clientèle</dt><dd id="info-part-orange">—</dd></div>
+                            <div><dt>Passages mensuels réels</dt><dd id="info-passages-orange">—</dd></div>
+                            <div><dt>Potentiel de passage / mois</dt><dd id="info-potentiel-orange">—</dd></div>
+                            <div><dt>Panier moyen</dt><dd id="info-panier-orange">—</dd></div>
+                            <div><dt>Passages en plus / mois</dt><dd id="info-clients-orange">—</dd></div>
+                        </dl>
+                    </div>
+                    <div class="sim-couloir sim-couloir-jaune" data-cat="jaune">
+                        <div class="sim-couloir-titre">
+                            <span class="sim-couloir-dot" aria-hidden="true"></span>
+                            <span>Jaune <span class="sim-couloir-plage">autour de la médiane</span></span>
+                        </div>
+                        <label class="sim-label" for="red-jaune">Réduction appliquée</label>
+                        <select id="red-jaune" class="sim-select sim-select-jaune"></select>
+                        <p class="sim-uplift" id="uplift-jaune"></p>
+                        <dl class="sim-couloir-infos">
+                            <div><dt>Part de votre clientèle</dt><dd id="info-part-jaune">—</dd></div>
+                            <div><dt>Passages mensuels réels</dt><dd id="info-passages-jaune">—</dd></div>
+                            <div><dt>Potentiel de passage / mois</dt><dd id="info-potentiel-jaune">—</dd></div>
+                            <div><dt>Panier moyen</dt><dd id="info-panier-jaune">—</dd></div>
+                            <div><dt>Passages en plus / mois</dt><dd id="info-clients-jaune">—</dd></div>
+                        </dl>
+                    </div>
+                    <!-- Quatrième couloir : verte (information seule) -->
+                    <div class="sim-couloir sim-couloir-verte" data-cat="verte">
+                        <div class="sim-couloir-titre">
+                            <span class="sim-couloir-dot" aria-hidden="true"></span>
+                            <span>Verte <span class="sim-couloir-plage">40&nbsp;% les plus hauts — pas de réduction</span></span>
+                        </div>
+                        <dl class="sim-couloir-infos">
+                            <div><dt>Part de votre clientèle</dt><dd id="info-part-verte">—</dd></div>
+                            <div><dt>Passages mensuels réels</dt><dd id="info-passages-verte">—</dd></div>
+                            <div><dt>Panier moyen</dt><dd id="info-panier-verte">—</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone droite : Résultats -->
+            <section class="sim-zone sim-zone-resultats" aria-labelledby="titre-resultats">
+                <h2 class="sim-zone-titre" id="titre-resultats">Vos résultats</h2>
+
+                <div class="sim-hero-resultat" id="hero-resultat">
+                    <p class="sim-hero-chiffre" id="impact-net">—</p>
+                    <p class="sim-hero-ratio" id="impact-ratio"></p>
+                    <p class="sim-hero-ref" id="marge-ref"></p>
+                </div>
+
+                <ul class="sim-recap">
+                    <li>
+                        <span>Marge supplémentaire</span>
+                        <span class="sim-recap-valeur" id="recap-marges">—</span>
+                        <button type="button" class="sim-info-btn" data-info="marges" aria-label="Détail marge supplémentaire">ⓘ</button>
+                    </li>
+                    <li>
+                        <span>Perte sur clients existants</span>
+                        <span class="sim-recap-valeur" id="recap-pertes">—</span>
+                        <button type="button" class="sim-info-btn" data-info="pertes" aria-label="Détail perte sur clients existants">ⓘ</button>
+                    </li>
+                    <li>
+                        <span>Frais de service equiprix <em id="frais-mention"></em></span>
+                        <span class="sim-recap-valeur" id="recap-frais">—</span>
+                        <button type="button" class="sim-info-btn" data-info="frais" aria-label="Détail frais de service">ⓘ</button>
+                    </li>
+                </ul>
+
+                <!-- Tableau par catégorie (mode expert) -->
+                <details class="sim-detail-categories" id="detail-categories">
+                    <summary>Détail par catégorie</summary>
+                    <table class="sim-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Catégorie</th>
+                                <th scope="col">Marge suppl.</th>
+                                <th scope="col">Perte</th>
+                                <th scope="col">Frais</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-categories-body">
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- Suggestion contextuelle -->
+                <p class="sim-suggestion" id="suggestion" hidden></p>
+
+                <!-- Actions -->
+                <div class="sim-actions">
+                    <button type="button" class="btn-primary" id="btn-sauver">Sauver ma simulation</button>
+                    <button type="button" class="btn-primary sim-btn-secondaire" id="btn-optimiser" disabled
+                            title="Disponible dans une prochaine version">Optimiser mes réductions (à venir)</button>
+                </div>
+                <p class="sim-sauvegarde-ok" id="sauvegarde-ok" hidden>Lien copié, gardez-le pour retrouver votre simulation.</p>
+
+                <!-- Mode expert : paramètres avancés -->
+                <fieldset class="sim-fieldset sim-expert-only" id="parametres-expert">
+                    <legend class="sim-label">Paramètres avancés</legend>
+                    <div class="sim-grid-2">
+                        <div class="sim-field">
+                            <label class="sim-label" for="exp-capture">Taux de capture (%)</label>
+                            <input type="number" id="exp-capture" class="sim-input" min="0" max="100" step="0.5">
+                        </div>
+                        <div class="sim-field">
+                            <label class="sim-label" for="exp-frais">Frais / passage (€)</label>
+                            <input type="number" id="exp-frais" class="sim-input" min="0" step="0.01">
+                        </div>
+                        <div class="sim-field">
+                            <label class="sim-label" for="exp-cap">Cap frais / mois (€)</label>
+                            <input type="number" id="exp-cap" class="sim-input" min="0" step="1">
+                        </div>
+                        <div class="sim-field">
+                            <label class="sim-label" for="exp-marge-nette">Marge nette de référence (%)</label>
+                            <input type="number" id="exp-marge-nette" class="sim-input" min="0" max="100" step="0.5">
+                        </div>
+                    </div>
+                    <details class="sim-expert-sous">
+                        <summary>Revenus médians par catégorie</summary>
+                        <dl class="sim-revenus" id="revenus-categories"></dl>
+                    </details>
+                </fieldset>
+            </section>
+        </div>
+    </main>
+
+    <!-- Sources (pied de page) -->
+    <section class="sim-section">
+        <div class="sim-container">
+            <h2 class="section-title">Sources</h2>
+            <ul class="sim-sources">
+                <li>Répartition des populations communales par niveau de vie&nbsp;:
+                    <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation" target="_blank" rel="noopener noreferrer">Insee, Filosofi 2021 (publication 2024)</a></li>
+                <li>Revenu disponible des diverses catégories&nbsp;:
+                    <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation" target="_blank" rel="noopener noreferrer">Insee, Filosofi 2023 (publication 2026)</a></li>
+            </ul>
+            <p class="sim-note">Résultats estimatifs à visée pédagogique, basés sur les hypothèses affichées en mode expert.</p>
+        </div>
+    </section>
+
+    <!-- Footer (cohérent avec le site) -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo-equiprix.svg" alt="Logo equiprix" class="logo-img">
+                </div>
+                <div class="footer-links">
+                    <a href="mailto:maxime@equiprix.fr" class="footer-link">Nous contacter</a>
+                    <a href="https://www.figma.com/proto/oElbUH0pVMuD44kOiHNxs9/Proto-equiprix?node-id=0-1&t=BwuTNyHQGHvzS19R-1" class="footer-link">Accès démo</a>
+                </div>
+
+                <p class="copyright">&reg; 2026 equiprix</p>
+                <p class="footer-mentions">equiprix est en cours de constitution et sera une structure à but non lucratif.</p>
+                <p class="footer-mentions">Illustrations libres de droit glanées sur flaticon.com — Merci à bqlqn, smashicons, Magnific &amp; monkik !</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Infobulle globale -->
+    <div class="sim-tooltip" id="tooltip" role="tooltip" hidden></div>
+
+    <!-- JavaScript : calculs métier puis application -->
+    <script src="js/calculs.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
