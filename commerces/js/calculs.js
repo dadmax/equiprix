@@ -88,6 +88,30 @@ function idType(type, matrice) {
 }
 
 /**
+ * Uplift effectif moyen sur les catégories réduites, pondéré par le potentiel
+ * de passage de chaque catégorie. Utilisé pour la super-catégorie
+ * « Foyers éligibles » (mode non expert).
+ */
+function upliftEffectifMoyen(entree) {
+    let sommePotentiel = 0;
+    let sommePonderee = 0;
+    for (const c of CATEGORIES_REDUITES) {
+        const res = upliftPour(entree.type, entree.reductions[c], entree.matrice);
+        // Potentiel approximatif : ancré sur la verte comme dans simulerMois
+        const partsPop = entree.partsPop;
+        const partsClient = partsClientele(partsPop, entree.profil);
+        const passagesReelsVerts = entree.passages * partsClient.verte;
+        const passagesEquivalents = partsPop.verte > 0
+            ? passagesReelsVerts * partsPop[c] / partsPop.verte
+            : 0;
+        const potentiel = passagesEquivalents * entree.facteurAttractivite;
+        sommePotentiel += potentiel;
+        sommePonderee += potentiel * res.uplift;
+    }
+    return sommePotentiel > 0 ? sommePonderee / sommePotentiel : 0;
+}
+
+/**
  * Simulation complète du mois pour un commerce.
  * @param {object} entree {partsPop, type, profil, facteurAttractivite, marge,
  *   passages, panier, reductions: {rouge, orange, jaune}, parametres, matrice}
@@ -213,6 +237,7 @@ if (typeof module !== "undefined" && module.exports) {
         paniersParCategorie,
         interpolerUplift,
         upliftPour,
+        upliftEffectifMoyen,
         simulerMois,
         formaterEuros,
         formaterPourcent,

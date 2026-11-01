@@ -12,6 +12,13 @@
     "verte": 37380,
     "source": "Filosofi 2023 : D1, D3, médiane, D8 (France métropolitaine)"
   },
+  "partsFranceComparatif": {
+    "rouge": 0.20,
+    "orange": 0.20,
+    "jaune": 0.20,
+    "verte": 0.40,
+    "source": "Définition des catégories equiprix : 20 % les plus bas, 20-40 %, 40-60 %, 40 % les plus hauts"
+  },
   "profilsClientele": [
     {
       "id": "commune",
@@ -103,7 +110,12 @@
   "parametres": {
     "tauxCapture": 0.10,
     "fraisServiceParPassage": 0.50,
-    "capFraisServiceMensuel": 100,
-    "margeNetteDefaut": 0.03
-  }
+    "capFraisServiceMensuel": 100
+  },
+  "textes": {
+    "narratifDefaut": "La tarification solidaire, c'est adapter le prix à la capacité financière de chacun : avec equiprix, vos clients des 60 % de niveaux de vie les plus bas bénéficient d'une réduction en caisse, identifiée par un simple QR code. Jouez avec le simulateur ci-dessous : renseignez votre commerce, choisissez votre réduction, et découvrez l'impact estimé sur votre marge.",
+    "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
+    "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français"
+  },
+  "useCases": []
 }

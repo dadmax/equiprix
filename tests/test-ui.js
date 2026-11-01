@@ -1,14 +1,30 @@
 /* ============================================================
-   test-ui.js — Test d'intégration de l'interface (jsdom).
+   test-ui.js — Tests d'intégration de l'interface (jsdom).
    Charge la page /commerces/ depuis le serveur local, attend le
    chargement des JSON, puis vérifie le cas de référence du tableur
-   via l'URL partagée : impact net ≈ 333,78 €/mois.
-   Prérequis : python3 -m http.server depuis la racine du dépôt.
+   via l'URL partagée + les nouveautés de structure (scénarios,
+   super-catégorie éligibles, mode expert, jauge France comparatif).
+   Prérequis : python3 -m http.server 8765 depuis la racine du dépôt.
    ============================================================ */
 "use strict";
 
-const { JSDOM } = require("/tmp/node_modules/jsdom");
 const fs = require("fs");
+const path = require("path");
+
+// jsdom + polyfill fetch : installés hors dépôt (npm install jsdom whatwg-fetch),
+// résolus depuis NODE_PATH (ex. /tmp/node_modules) ou /tmp/node_modules en secours.
+function chargerModule(nom) {
+    const candidats = [
+        nom, // via NODE_PATH
+        path.join("/tmp/node_modules", nom),
+    ];
+    for (const c of candidats) {
+        try { return require(c); } catch (e) { /* essaie le suivant */ }
+    }
+    throw new Error(`Module ${nom} introuvable. Installer : npm install ${nom} (dans /tmp par ex.) puis relancer avec NODE_PATH=/tmp/node_modules`);
+}
+
+const { JSDOM } = chargerModule("jsdom");
 
 // jsdom ne fournit pas fetch : polyfill whatwg-fetch injecté avant les scripts
 const FETCH_POLYFILL = fs.readFileSync("/tmp/node_modules/whatwg-fetch/dist/fetch.umd.js", "utf-8");
@@ -23,8 +39,8 @@ function attendre(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
 
-async function main() {
-    const dom = await JSDOM.fromURL(URL_REF, {
+async function charger(url) {
+    const dom = await JSDOM.fromURL(url, {
         resources: "usable",
         runScripts: "dangerously",
         pretendToBeVisual: true,
@@ -33,121 +49,212 @@ async function main() {
             window.addEventListener("error", (e) => console.error("JS ERROR:", e.message));
         },
     });
-    const { window } = dom;
-    const document = window.document;
-
-    // Attendre le chargement des JSON et le premier rendu
-    let impact = null;
+    // Attendre le premier rendu (impact renseigné)
     for (let i = 0; i < 100; i++) {
         await attendre(100);
-        impact = document.getElementById("impact-net").textContent;
-        if (impact && impact !== "—") break;
+        const t = dom.window.document.getElementById("impact-net").textContent;
+        if (t && t !== "—") break;
     }
+    return dom;
+}
 
-    let echecs = 0;
-    function verifier(nom, cond, detail) {
-        if (cond) {
-            console.log(`  ✓ ${nom}`);
-        } else {
-            console.error(`  ✗ ${nom}${detail ? " — " + detail : ""}`);
-            echecs++;
-        }
+let echecs = 0;
+function verifier(nom, cond, detail) {
+    if (cond) {
+        console.log(`  ✓ ${nom}`);
+    } else {
+        console.error(`  ✗ ${nom}${detail ? " — " + detail : ""}`);
+        echecs++;
     }
+}
 
-    console.log("Rendu initial (cas de référence via URL)");
+function lireEuro(t) {
+    const m = t.match(/([\d\s\u00a0]+(?:,\d+)?)\s*€/);
+    return m ? parseFloat(m[1].replace(/[\s\u00a0]/g, "").replace(",", ".")) : null;
+}
+
+async function main() {
+    // ================= Cas de référence =================
+    console.log("Cas de référence (URL partagée)");
+    const dom = await charger(URL_REF);
+    const d = dom.window.document;
+
     verifier("Commune affichée (78700 — Conflans-Sainte-Honorine)",
-        document.getElementById("cp-nom").textContent.includes("78700")
-        && document.getElementById("cp-nom").textContent.includes("Conflans-Sainte-Honorine"),
-        document.getElementById("cp-nom").textContent);
-    verifier("Barre population visible", !document.getElementById("cp-infos").hidden);
+        d.getElementById("cp-nom").textContent.includes("78700")
+        && d.getElementById("cp-nom").textContent.includes("Conflans-Sainte-Honorine"),
+        d.getElementById("cp-nom").textContent);
     verifier("14 515 ménages affichés",
-        document.getElementById("cp-menages").textContent.includes("14"),
-        document.getElementById("cp-menages").textContent);
+        d.getElementById("cp-menages").textContent.includes("14"),
+        d.getElementById("cp-menages").textContent);
 
-    // Impact net : le calcul pur donne 334,43 € (écart d'arrondis tableur ±1 €)
-    const m = impact.match(/([\d\s\u00a0]+)\s*€/);
-    const valeur = m ? parseFloat(m[1].replace(/[\s\u00a0]/g, "").replace(",", ".")) : null;
-    verifier("Impact net ≈ 333,78 € (tolérance ±1 €)",
-        valeur !== null && Math.abs(valeur - 333.78) < 1.0,
-        `lu : ${impact}`);
+    // Jauge secteur + jauge France comparatif (20/20/20/40)
+    const segFrance = d.querySelector("#barre-france .sim-seg-verte").style.width;
+    verifier("Jauge France comparatif : segment vert = 40 %", segFrance === "40%", segFrance);
+    const titreJauge = d.body.textContent.includes("France entière, pour comparatif");
+    verifier("Titre « France entière, pour comparatif » présent", titreJauge);
+    verifier("Titre « Composition de la population de votre secteur » présent",
+        d.body.textContent.includes("Composition de la population de votre secteur"));
+
+    // Impact net ≈ 333,78 € (tolérance ±1 €)
+    const impact = d.getElementById("impact-net").textContent;
+    const valeur = lireEuro(impact);
+    verifier("Impact net ≈ 333,78 € (±1 €)", valeur !== null && Math.abs(valeur - 333.78) < 1.0, `lu : ${impact}`);
     verifier("Signe + devant le montant", impact.startsWith("+"), impact);
-
     verifier("Ratio ≈ +3,7 % de la marge",
-        document.getElementById("impact-ratio").textContent.includes("3,7"),
-        document.getElementById("impact-ratio").textContent);
-    verifier("Marge de référence 9 000 € affichée",
-        document.getElementById("marge-ref").textContent.includes("9"),
-        document.getElementById("marge-ref").textContent);
+        d.getElementById("impact-ratio").textContent.includes("3,7"),
+        d.getElementById("impact-ratio").textContent);
+    verifier("Marge de référence affichée",
+        d.getElementById("marge-ref").textContent.includes("9"),
+        d.getElementById("marge-ref").textContent);
 
-    // Récap : pertes ≈ 55,81 €, marges ≈ 489,59 €, frais 100 € plafonnés
-    const pertes = document.getElementById("recap-pertes").textContent;
-    const marges = document.getElementById("recap-marges").textContent;
-    const frais = document.getElementById("recap-frais").textContent;
-    const lireEuro = (t) => parseFloat(t.replace(/[^\d,\-]/g, "").replace(",", "."));
-    verifier("Pertes ≈ 55,81 € (±0,10)", Math.abs(lireEuro(pertes) - 55.81) < 0.10, pertes);
-    verifier("Marges sup ≈ 489,59 € (±1,10)", Math.abs(lireEuro(marges) - 489.59) < 1.10, marges);
-    verifier("Frais = 100 €", lireEuro(frais) === 100, frais);
-    verifier("Mention « plafonnés » affichée",
-        document.getElementById("frais-mention").textContent.includes("plafonn"),
-        document.getElementById("frais-mention").textContent);
+    // Passages en plus
+    const pp = d.getElementById("passages-plus").textContent;
+    verifier("Passages en plus affichés avec % (≈ +134, soit +13,4 %)",
+        /\+134/.test(pp) && /13,4\s*%/.test(pp), pp);
 
-    // Couloirs : uplift bouche 10 % -> +30 %
-    verifier("Uplift rouge = +30 % de visites (sondage)",
-        document.getElementById("uplift-rouge").textContent.includes("30"),
-        document.getElementById("uplift-rouge").textContent);
-    verifier("Part clientèle rouge ≈ 7,65 % (affichée 7,6 % ou 7,7 %)",
-        /^7,[67]\s*%/.test(document.getElementById("info-part-rouge").textContent),
-        document.getElementById("info-part-rouge").textContent);
+    // Récap
+    verifier("Pertes ≈ 55,81 € (±0,10)",
+        Math.abs(lireEuro(d.getElementById("recap-pertes").textContent) - 55.81) < 0.10,
+        d.getElementById("recap-pertes").textContent);
+    verifier("Marges sup ≈ 489,59 € (±1,10)",
+        Math.abs(lireEuro(d.getElementById("recap-marges").textContent) - 489.59) < 1.10,
+        d.getElementById("recap-marges").textContent);
+    verifier("Frais = 100 € + mention plafonnés",
+        lireEuro(d.getElementById("recap-frais").textContent) === 100
+        && d.getElementById("frais-mention").textContent.includes("plafonn"),
+        d.getElementById("recap-frais").textContent + " " + d.getElementById("frais-mention").textContent);
+
+    // Mode non expert : super-catégorie éligibles visible, couloirs détaillés masqués
+    verifier("Mode non expert : couloir « Foyers éligibles » visible",
+        !d.getElementById("couloir-eligibles").hidden);
+    verifier("Mode non expert : couloirs détaillés masqués",
+        d.getElementById("couloirs-expert").hidden);
+    verifier("Part éligibles ≈ 29,3 % (7,65+9,9+11,7)",
+        /^29,[23]\s*%/.test(d.getElementById("info-part-eligibles").textContent),
+        d.getElementById("info-part-eligibles").textContent);
+    verifier("Uplift éligibles = +30 % (sondage)",
+        d.getElementById("uplift-eligibles").textContent.includes("30")
+        && d.getElementById("uplift-eligibles").textContent.includes("sondage"),
+        d.getElementById("uplift-eligibles").textContent);
+    verifier("Détail par catégorie masqué en non-expert",
+        d.getElementById("detail-categories").hidden);
+
+    // Scénario par défaut
+    verifier("Scénario « Simuler sur mon commerce » présent et coché",
+        d.querySelector('input[name="scenario"][value="monCommerce"]').checked);
+    verifier("Narratif par défaut affiché",
+        d.getElementById("narratif").textContent.length > 30);
+
+    // Source sondage
+    verifier("Source sondage affichée (septembre 2026, 60 ménages)",
+        d.getElementById("source-sondage").textContent.includes("septembre 2026"),
+        d.getElementById("source-sondage").textContent);
 
     // URL mise à jour
-    verifier("URL contient les paramètres", window.location.search.includes("cp=78700")
-        && window.location.search.includes("type=commerceBouche"));
+    verifier("URL contient les paramètres",
+        dom.window.location.search.includes("cp=78700")
+        && dom.window.location.search.includes("type=commerceBouche"));
 
-    console.log("Interaction : changement de réduction rouge 10 % → 0 %");
-    const select = document.getElementById("red-rouge");
-    select.value = "0";
-    select.dispatchEvent(new window.Event("change", { bubbles: true }));
-    await attendre(100);
-    const impact2 = document.getElementById("impact-net").textContent;
-    const m2 = impact2.match(/([\d\s\u00a0]+)\s*€/);
-    const v2 = m2 ? parseFloat(m2[1].replace(/[\s\u00a0]/g, "").replace(",", ".")) : null;
-    // Sans réduction rouge : perte rouge = 0, mais clients+ rouge = 0 aussi
-    // et frais baissent légèrement. L'impact doit diminuer.
-    verifier("Impact diminue quand la réduction rouge passe à 0 %",
-        v2 !== null && v2 < valeur, `avant ${valeur}, après ${v2}`);
-    verifier("URL mise à jour (rr=0)", window.location.search.includes("rr=0"));
+    // ================= Interaction : réduction éligibles 10 % → 5 % =================
+    console.log("Interaction : réduction éligibles 10 % → 5 %");
+    const select = d.getElementById("red-eligibles");
+    const opt5 = [...select.options].find((o) => o.textContent.replace(/\s/g, "") === "5%");
+    select.value = opt5.value;
+    select.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+    await attendre(150);
+    const impact2 = lireEuro(d.getElementById("impact-net").textContent);
+    verifier("Impact recalculé après changement (différent de 334)",
+        impact2 !== null && Math.abs(impact2 - 334.43) > 1, `avant 334,43 après ${impact2}`);
+    verifier("URL mise à jour (rr=0.05)", dom.window.location.search.includes("rr=0.05"));
 
-    console.log("Mode expert");
-    const toggle = document.getElementById("toggle-expert");
+    // ================= Mode expert =================
+    console.log("Bascule mode expert");
+    const toggle = d.getElementById("toggle-expert");
     toggle.checked = true;
-    toggle.dispatchEvent(new window.Event("change", { bubbles: true }));
-    await attendre(50);
-    verifier("Classe mode-expert ajoutée au body",
-        document.body.classList.contains("mode-expert"));
-    verifier("URL contient expert=1", window.location.search.includes("expert=1"));
+    toggle.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+    await attendre(150);
+    verifier("Couloir éligibles masqué en expert", d.getElementById("couloir-eligibles").hidden);
+    verifier("Couloirs détaillés visibles en expert", !d.getElementById("couloirs-expert").hidden);
+    verifier("Détail par catégorie affiché SANS clic (4 lignes)",
+        !d.getElementById("detail-categories").hidden
+        && d.getElementById("detail-categories-body").children.length === 4);
+    verifier("Réduction appliquée aux 3 catégories (selects = 5 %)",
+        ["red-rouge", "red-orange", "red-jaune"].every((id) =>
+            d.getElementById(id).selectedOptions[0].textContent.replace(/\s/g, "") === "5%"),
+        ["red-rouge", "red-orange", "red-jaune"].map((id) => d.getElementById(id).value).join(","));
+    verifier("Revenu médian affiché à côté du panier (rouge 13 200 €)",
+        d.getElementById("rev-rouge").textContent.includes("13"),
+        d.getElementById("rev-rouge").textContent);
+    verifier("URL contient expert=1", dom.window.location.search.includes("expert=1"));
 
-    console.log("Autocomplétion code postal");
-    const input = document.getElementById("cp-input");
+    // Décochage expert : on garde le taux le plus bas
+    console.log("Retour mode non expert (garde le taux le plus bas)");
+    // Modifier d'abord la réduction orange en expert (sélection par le texte affiché "20 %")
+    const selOrange = d.getElementById("red-orange");
+    const opt20 = [...selOrange.options].find((o) => o.textContent.replace(/\s/g, "") === "20%");
+    selOrange.value = opt20.value;
+    selOrange.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+    await attendre(100);
+    toggle.checked = false;
+    toggle.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+    await attendre(150);
+    verifier("Select éligibles = 5 % (min des trois)",
+        d.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "5%",
+        d.getElementById("red-eligibles").value);
+
+    // ================= Autocomplétion + sauvegarde =================
+    console.log("Autocomplétion et sauvegarde");
+    const input = d.getElementById("cp-input");
     input.value = "75001";
-    input.dispatchEvent(new window.Event("input", { bubbles: true }));
+    input.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
     await attendre(50);
-    verifier("Liste déroulante affichée", !document.getElementById("cp-liste").hidden);
-    verifier("75001 Paris 1er proposé",
-        document.getElementById("cp-liste").textContent.includes("75001"),
-        document.getElementById("cp-liste").textContent.slice(0, 100));
+    verifier("75001 proposé dans la liste",
+        !d.getElementById("cp-liste").hidden && d.getElementById("cp-liste").textContent.includes("75001"));
 
-    console.log("Bouton sauver");
-    // Stub presse-papiers
     let copie = null;
-    window.navigator.clipboard = { writeText: (t) => { copie = t; return Promise.resolve(); } };
-    document.getElementById("btn-sauver").click();
+    dom.window.navigator.clipboard = { writeText: (t) => { copie = t; return Promise.resolve(); } };
+    d.getElementById("btn-sauver").click();
     await attendre(50);
     verifier("URL copiée dans le presse-papiers", copie !== null && copie.includes("cp="));
-    verifier("Message « Lien copié » affiché",
-        !document.getElementById("sauvegarde-ok").hidden);
+    verifier("Message « Lien copié » affiché", !d.getElementById("sauvegarde-ok").hidden);
+
+    dom.window.close();
+
+    // ================= Cas limites =================
+    console.log("Cas limites");
+    const cpBase = JSON.parse(fs.readFileSync("commerces/data/codes-postaux-precalc.json", "utf-8"));
+    const sansDonnees = Object.keys(cpBase).find((cp) => !cpBase[cp].donneesDispo);
+
+    const dom2 = await charger(`${BASE}/commerces/?cp=${sansDonnees}&type=supermarche&marge=0.2&pass=8000&panier=50&profil=commune&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    const d2 = dom2.window.document;
+    verifier("CP sans données : avertissement affiché", !d2.getElementById("cp-indisponible").hidden);
+    verifier("CP sans données : jauges masquées", d2.getElementById("cp-infos").hidden);
+    verifier("CP sans données : simulation calculée (moyenne France)",
+        d2.getElementById("impact-net").textContent !== "—");
+    dom2.window.close();
+
+    const dom3 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0&ro=0&rj=0`);
+    const d3 = dom3.window.document;
+    verifier("Réductions 0 % : impact négatif (frais seuls)",
+        d3.getElementById("impact-net").textContent.startsWith("−"));
+    verifier("Réductions 0 % : suggestion affichée", !d3.getElementById("suggestion").hidden);
+    dom3.window.close();
+
+    const dom4 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    const d4 = dom4.window.document;
+    verifier("Marge nulle : ratio masqué, € affiché",
+        d4.getElementById("impact-ratio").hidden && d4.getElementById("impact-net").textContent !== "—");
+    dom4.window.close();
+
+    const dom5 = await charger(`${BASE}/commerces/?cp=78700&type=autre&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    const d5 = dom5.window.document;
+    verifier("Type « Autre commerce » : uplift = estimation prudente ≈ 17 %",
+        d5.getElementById("uplift-eligibles").textContent.includes("estimation prudente")
+        && /1[67]\s*%/.test(d5.getElementById("uplift-eligibles").textContent),
+        d5.getElementById("uplift-eligibles").textContent);
+    dom5.window.close();
 
     console.log(echecs === 0 ? "\nTous les tests UI passent" : `\n${echecs} test(s) UI en échec`);
-    window.close();
     process.exit(echecs === 0 ? 0 : 1);
 }
 

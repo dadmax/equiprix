@@ -2,6 +2,16 @@
    app.js — Interface du simulateur commerçants.
    Charge les JSON, gère l'état (URL uniquement), recalcule en
    temps réel et met à jour le DOM de façon ciblée.
+
+   Structure de la page :
+   - section « Votre commerce » : sous-sections Commune + Activité
+     (hypothèses statiques, configurées une fois) ;
+   - section « Simulation » : sous-sections Vos réductions + Résultats,
+     avec le toggle « Mode expert » en haut de section.
+   En mode non expert, une super-catégorie « Foyers éligibles » (60 %
+   de niveaux de vie les plus bas) pilote les réductions rouge/orange/
+   jaune à la même valeur. En mode expert, les trois catégories sont
+   détaillées individuellement.
    ============================================================ */
 "use strict";
 
@@ -9,32 +19,31 @@
     // ---------- Données chargées au démarrage ----------
     let maître = null;       // data/commerces.json
     let cpBase = null;       // data/codes-postaux-precalc.json
-    let indexNoms = [];      // [{cp, nom, nbMenages}] pour l'autocomplétion
+    let indexNoms = [];      // [{cp, nom, nbMenages, nbCommunes, communes}]
 
     // ---------- État courant ----------
-    // Les valeurs par défaut (type, profil, attractivité, réductions) sont
-    // initialisées depuis le JSON maître : rien de métier n'est codé en dur.
+    // Valeurs par défaut initialisées depuis le JSON maître.
     const LISTE_REDUCTIONS = [0, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50];
+    const ID_USECASE_DEFAUT = "monCommerce";
     const etat = {
-        cp: null,               // code postal sélectionné
-        type: null,             // id du type de commerce (défini depuis le JSON)
+        usecase: ID_USECASE_DEFAUT,
+        cp: null,
+        type: null,
         marge: null,
         passages: null,
         panier: null,
-        profil: null,           // id du profil de clientèle (défini depuis le JSON)
+        profil: null,
         attractiviteIndex: null,
-        reductions: {},         // {rouge, orange, jaune} définis depuis le JSON
+        reductions: {},          // {rouge, orange, jaune}
         expert: false,
-        // Paramètres avancés (modifiables en mode expert)
-        tauxCapture: null,      // null = valeur du JSON maître
-        fraisParPassage: null,
-        capFrais: null,
-        margeNette: null,
     };
 
     // ---------- Éléments DOM ----------
     const $ = (id) => document.getElementById(id);
     const els = {
+        scenariosListe: $("scenarios-liste"),
+        narratif: $("narratif"),
+        narratifImage: $("narratif-image"),
         cpInput: $("cp-input"),
         cpListe: $("cp-liste"),
         cpSelectionne: $("cp-selectionne"),
@@ -44,6 +53,7 @@
         cpIndisponible: $("cp-indisponible"),
         cpMenages: $("cp-menages"),
         barrePopulation: $("barre-population"),
+        barreFrance: $("barre-france"),
         cartesType: $("cartes-type"),
         marge: $("marge"),
         passages: $("passages"),
@@ -55,24 +65,26 @@
         attractiviteNom: $("attractivite-nom"),
         attractiviteFacteur: $("attractivite-facteur"),
         toggleExpert: $("toggle-expert"),
+        couloirEligibles: $("couloir-eligibles"),
+        couloirsExpert: $("couloirs-expert"),
+        redEligibles: $("red-eligibles"),
+        upliftEligibles: $("uplift-eligibles"),
         impactNet: $("impact-net"),
         impactRatio: $("impact-ratio"),
         margeRef: $("marge-ref"),
         heroResultat: $("hero-resultat"),
+        passagesPlus: $("passages-plus"),
         recapMarges: $("recap-marges"),
         recapPertes: $("recap-pertes"),
         recapFrais: $("recap-frais"),
         fraisMention: $("frais-mention"),
+        detailCategories: $("detail-categories"),
         detailBody: $("detail-categories-body"),
         suggestion: $("suggestion"),
         btnSauver: $("btn-sauver"),
         sauvegardeOk: $("sauvegarde-ok"),
         tooltip: $("tooltip"),
-        expCapture: $("exp-capture"),
-        expFrais: $("exp-frais"),
-        expCap: $("exp-cap"),
-        expMargeNette: $("exp-marge-nette"),
-        revenusCategories: $("revenus-categories"),
+        sourceSondage: $("source-sondage"),
     };
 
     // ---------- Initialisation ----------
@@ -86,8 +98,8 @@
             maître = await rMaitre.json();
             cpBase = await rCp.json();
         } catch (e) {
-            document.querySelector(".sim-dashboard").insertAdjacentHTML(
-                "beforebegin",
+            document.querySelector("main").insertAdjacentHTML(
+                "afterbegin",
                 '<p class="sim-warning">Les données n’ont pas pu être chargées. Vérifiez votre connexion puis rechargez la page.</p>'
             );
             return;
@@ -95,11 +107,14 @@
 
         initialiserEtatDepuisJSON();
         construireIndexNoms();
+        construireScenarios();
         construireCartesType();
         construireProfils();
         construireJaugeAttractivite();
-        construireCouloirs();
-        construireParametresExpert();
+        construireSelectEligibles();
+        construireCouloirsExpert();
+        construireBarreFrance();
+        els.sourceSondage.textContent = maître.textes.sondage || "";
         restaurerDepuisURL();
         brancherEvenements();
         mettreAJour();
@@ -111,22 +126,18 @@
         etat.type = premierType;
         etat.marge = maître.typesCommerce[premierType].margeDefaut;
         etat.passages = maître.typesCommerce[premierType].passagesDefaut;
-        etat.pantry = maître.typesCommerce[premierType].panierDefaut;
-        // Profil par défaut : « un peu plus aisée que la moyenne » s'il existe
+        etat.panier = maître.typesCommerce[premierType].panierDefaut;
         const profilDefaut = maître.profilsClientele.find((p) => p.id === "unPeuAisee")
             || maître.profilsClientele[Math.min(1, maître.profilsClientele.length - 1)];
         etat.profil = profilDefaut.id;
-        // Attractivité par défaut : niveau « moyenne » s'il existe
         const idxMoyenne = maître.attractivite.findIndex((a) => a.id === "moyenne");
         etat.attractiviteIndex = idxMoyenne >= 0 ? idxMoyenne : Math.floor(maître.attractivite.length / 2);
-        // Réductions par défaut : 10 % sur les trois catégories réduites
         for (const cat of CATEGORIES_REDUITES) {
             etat.reductions[cat] = 0.10;
         }
-        // Remplir les champs
         els.marge.value = Math.round(etat.marge * 100);
         els.passages.value = etat.passages;
-        els.panier.value = etat.pantry;
+        els.panier.value = etat.panier;
     }
 
     // Index nom → CP pour l'autocomplétion (trié par ménages décroissants)
@@ -139,6 +150,85 @@
             communes: e.communes,
         }));
         indexNoms.sort((a, b) => b.nb - a.nb);
+    }
+
+    // ---------- Scénarios (use cases) ----------
+    function construireScenarios() {
+        els.scenariosListe.innerHTML = "";
+        // Choix par défaut : simuler sur son propre commerce
+        const defaut = creerBoutonScenario(ID_USECASE_DEFAUT, "Simuler sur mon commerce", true);
+        els.scenariosListe.appendChild(defaut);
+        for (const uc of maître.useCases || []) {
+            els.scenariosListe.appendChild(creerBoutonScenario(uc.id, uc.nom, false));
+        }
+    }
+
+    function creerBoutonScenario(id, nom, cocheParDefaut) {
+        const label = document.createElement("label");
+        label.className = "sim-scenario";
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "scenario";
+        radio.value = id;
+        radio.checked = cocheParDefaut;
+        radio.addEventListener("change", () => appliquerUsecase(id));
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(nom));
+        return label;
+    }
+
+    function appliquerUsecase(id) {
+        etat.usecase = id;
+        const uc = (maître.useCases || []).find((u) => u.id === id);
+        if (!uc) {
+            // Retour au scénario par défaut : narratif générique, pas de préconfiguration
+            els.narratif.textContent = maître.textes.narratifDefaut;
+            els.narratifImage.hidden = true;
+            mettreAJour();
+            return;
+        }
+        // Préconfigurer le simulateur avec les hypothèses de l'usescase
+        const p = uc.params || {};
+        if (p.cp && cpBase[p.cp]) choisirCP(p.cp);
+        if (p.type && maître.typesCommerce[p.type]) {
+            etat.type = p.type;
+            const t = maître.typesCommerce[p.type];
+            if (p.marge === undefined) { etat.marge = t.margeDefaut; els.marge.value = Math.round(t.margeDefaut * 100); }
+            if (p.passages === undefined) { etat.passages = t.passagesDefaut; els.passages.value = t.passagesDefaut; }
+            if (p.panier === undefined) { etat.panier = t.panierDefaut; els.panier.value = t.panierDefaut; }
+        }
+        if (p.marge !== undefined) { etat.marge = p.marge; els.marge.value = Math.round(p.marge * 100); }
+        if (p.passages !== undefined) { etat.passages = p.passages; els.passages.value = p.passages; }
+        if (p.panier !== undefined) { etat.panier = p.panier; els.panier.value = p.panier; }
+        if (p.profil && maître.profilsClientele.some((pr) => pr.id === p.profil)) {
+            etat.profil = p.profil;
+            const radio = els.profils.querySelector(`input[value="${p.profil}"]`);
+            if (radio) radio.checked = true;
+        }
+        if (p.attr !== undefined) {
+            const idx = maître.attractivite.findIndex((a) => a.facteur === p.attr);
+            if (idx >= 0) etat.attractiviteIndex = idx;
+        }
+        for (const [cle, cat] of [["rr", "rouge"], ["ro", "orange"], ["rj", "jaune"]]) {
+            if (p[cle] !== undefined) {
+                etat.reductions[cat] = arrondirSurGrille(p[cle]);
+            }
+        }
+        // Narratif + illustration
+        els.narratif.textContent = uc.narratif || maître.textes.narratifDefaut;
+        if (uc.image) {
+            els.narratifImage.src = uc.image;
+            els.narratifImage.alt = uc.nom;
+            els.narratifImage.hidden = false;
+        } else {
+            els.narratifImage.hidden = true;
+        }
+        mettreAJour();
+    }
+
+    function arrondirSurGrille(v) {
+        return LISTE_REDUCTIONS.reduce((prev, curr) =>
+            Math.abs(curr - v) < Math.abs(prev - v) ? curr : prev);
     }
 
     // ---------- Construction des contrôles ----------
@@ -154,13 +244,12 @@
             btn.textContent = type.nom;
             btn.addEventListener("click", () => {
                 etat.type = id;
-                // Préremplissage des valeurs par défaut du type
                 etat.marge = type.margeDefaut;
                 etat.passages = type.passagesDefaut;
                 etat.panier = type.panierDefaut;
                 els.marge.value = Math.round(type.margeDefaut * 100);
                 els.passages.value = type.passagesDefaut;
-                els.pantry = type.panierDefaut;
+                els.panier = type.panierDefaut;
                 els.panier.value = type.panierDefaut;
                 els.estimationNote.hidden = false;
                 mettreAJour();
@@ -190,62 +279,97 @@
     }
 
     function construireJaugeAttractivite() {
-        // Repères sous le curseur
         els.attractiviteReperes.innerHTML = "";
         maître.attractivite.forEach((a) => {
             const span = document.createElement("span");
-            // Libellés raccourcis pour la lisibilité
-            span.textContent = a.nom.split(" — ")[0];
+            span.textContent = a.nom.split(" — ")[0]; // libellés raccourcis
             els.attractiviteReperes.appendChild(span);
         });
+        els.attractivite.max = String(maître.attractivite.length - 1);
         els.attractivite.addEventListener("input", () => {
             etat.attractiviteIndex = Number(els.attractivite.value);
             mettreAJour();
         });
     }
 
-    function construireCouloirs() {
+    // Select « foyers éligibles » (mode non expert)
+    function construireSelectEligibles() {
+        els.redEligibles.innerHTML = "";
+        for (const r of LISTE_REDUCTIONS) {
+            const opt = document.createElement("option");
+            opt.value = String(r);
+            opt.textContent = formaterPourcent(r, 0);
+            els.redEligibles.appendChild(opt);
+        }
+        els.redEligibles.addEventListener("change", () => {
+            const v = arrondirSurGrille(Number(els.redEligibles.value));
+            // Appliquer la même réduction aux trois catégories
+            for (const cat of CATEGORIES_REDUITES) etat.reductions[cat] = v;
+            mettreAJour();
+        });
+    }
+
+    // Couloirs détaillés rouge/orange/jaune (mode expert), construits en JS
+    function construireCouloirsExpert() {
+        const conteneur = els.couloirsExpert;
+        // Le couloir vert est déjà dans le HTML ; insérer les 3 autres avant
         for (const cat of ["rouge", "orange", "jaune"]) {
+            const div = document.createElement("div");
+            div.className = `sim-couloir sim-couloir-${cat}`;
+            const plage = { rouge: "0 à 20 % des niveaux de vie", orange: "20 à 40 % des niveaux de vie", jaune: "40 à 60 % des niveaux de vie" }[cat];
+            div.innerHTML = `
+                <p class="sim-couloir-titre">
+                    <span class="sim-couloir-dot" aria-hidden="true"></span>
+                    ${cat.charAt(0).toUpperCase() + cat.slice(1)} — ${plage}
+                </p>
+                <div class="sim-field">
+                    <label class="sim-label" for="red-${cat}">Réduction</label>
+                    <select id="red-${cat}" class="sim-select"></select>
+                </div>
+                <p class="sim-uplift" id="uplift-${cat}"></p>
+                <dl class="sim-couloir-infos">
+                    <div><dt>Part de votre clientèle</dt><dd id="info-part-${cat}">—</dd></div>
+                    <div><dt>Passages mensuels actuels</dt><dd id="info-passages-${cat}">—</dd></div>
+                    <div><dt>Potentiel de passage mensuel</dt><dd id="info-potentiel-${cat}">—</dd></div>
+                    <div><dt>Panier moyen (proportionnel au revenu médian&nbsp;: <span id="rev-${cat}"></span>)</dt><dd id="info-panier-${cat}">—</dd></div>
+                    <div><dt>Clients mensuels en plus</dt><dd id="info-clients-${cat}">—</dd></div>
+                </dl>`;
+            conteneur.insertBefore(div, conteneur.firstChild);
+        }
+        // Brancher les selects + remplir les revenus médians
+        for (const cat of CATEGORIES_REDUITES) {
             const select = $("red-" + cat);
             select.innerHTML = "";
             for (const r of LISTE_REDUCTIONS) {
+                // Valeurs "0.05" style : String(0.05) = "0.05", String(0.1) = "0.1"
                 const opt = document.createElement("option");
                 opt.value = String(r);
                 opt.textContent = formaterPourcent(r, 0);
-                if (Math.abs(r - etat.reductions[cat]) < 1e-9) opt.selected = true;
                 select.appendChild(opt);
             }
             select.addEventListener("change", () => {
-                etat.reductions[cat] = Number(select.value);
+                // Retrouver la valeur de la grille la plus proche (évite les écarts
+                // de virgule flottante entre "0.05" saisi et 0.05 calculé)
+                etat.reductions[cat] = arrondirSurGrille(Number(select.value));
                 mettreAJour();
             });
+            $("rev-" + cat).textContent = formaterEuros(maître.revenusCategories[cat]);
         }
+        $("rev-verte").textContent = formaterEuros(maître.revenusCategories.verte);
     }
 
-    function construireParametresExpert() {
-        els.expCapture.value = maître.parametres.tauxCapture * 100;
-        els.expFrais.value = maître.parametres.fraisServiceParPassage;
-        els.expCap.value = maître.parametres.capFraisServiceMensuel;
-        els.expMargeNette.value = maître.parametres.margeNetteDefaut * 100;
-
-        // Revenus médians par catégorie (consultables en mode expert)
-        els.revenusCategories.innerHTML = "";
-        const noms = { rouge: "Rouge", orange: "Orange", jaune: "Jaune", verte: "Verte" };
+    // Jauge comparatif France entière (20/20/20/40 depuis le JSON)
+    function construireBarreFrance() {
+        const parts = maître.partsFranceComparatif;
         for (const cat of CATEGORIES) {
-            const div = document.createElement("div");
-            const dt = document.createElement("dt");
-            dt.textContent = noms[cat];
-            const dd = document.createElement("dd");
-            dd.textContent = formaterEuros(maître.revenusCategories[cat]);
-            div.appendChild(dt);
-            div.appendChild(dd);
-            els.revenusCategories.appendChild(div);
+            const seg = els.barreFrance.querySelector(`.sim-seg-${cat}`);
+            seg.style.width = (parts[cat] * 100) + "%";
+            $("legf-" + cat).textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)} — ${formaterPourcent(parts[cat], 0)}`;
         }
     }
 
     // ---------- Événements ----------
     function brancherEvenements() {
-        // Menu mobile (cohérent avec le site)
         document.querySelector(".hamburger").addEventListener("click", function () {
             document.querySelector(".nav-sidebar").classList.toggle("open");
         });
@@ -255,7 +379,6 @@
             });
         });
 
-        // Champs commerce
         els.marge.addEventListener("input", () => {
             etat.marge = (parseFloat(els.marge.value) || 0) / 100;
             els.estimationNote.hidden = true;
@@ -267,7 +390,7 @@
             mettreAJour();
         });
         els.panier.addEventListener("input", () => {
-            etat.pantry = parseFloat(els.panier.value) || 0;
+            etat.panier = parseFloat(els.panier.value) || 0;
             els.estimationNote.hidden = true;
             mettreAJour();
         });
@@ -282,28 +405,18 @@
             if (els.cpInput.value.trim().length >= 2) onRechercheCP();
         });
 
-        // Mode expert
+        // Mode expert : toggle haut de section « Simulation »
         els.toggleExpert.addEventListener("change", () => {
             etat.expert = els.toggleExpert.checked;
-            document.body.classList.toggle("mode-expert", etat.expert);
-            mettreAJourURL();
-        });
-
-        // Paramètres avancés
-        els.expCapture.addEventListener("input", () => {
-            etat.tauxCapture = (parseFloat(els.expCapture.value) ?? maître.parametres.tauxCapture * 100) / 100;
-            mettreAJour();
-        });
-        els.expFrais.addEventListener("input", () => {
-            etat.fraisParPassage = parseFloat(els.expFrais.value) ?? maître.parametres.fraisServiceParPassage;
-            mettreAJour();
-        });
-        els.expCap.addEventListener("input", () => {
-            etat.capFrais = parseFloat(els.expCap.value) ?? maître.parametres.capFraisServiceMensuel;
-            mettreAJour();
-        });
-        els.expMargeNette.addEventListener("input", () => {
-            etat.margeNette = (parseFloat(els.expMargeNette.value) ?? maître.parametres.margeNetteDefaut * 100) / 100;
+            if (etat.expert) {
+                // Toggle vers expert : appliquer la réduction « éligibles » à toutes les catégories
+                const v = Number(els.redEligibles.value);
+                for (const cat of CATEGORIES_REDUITES) etat.reductions[cat] = v;
+            } else {
+                // Décochage expert : ne garder que le taux le plus bas
+                const min = Math.min(...CATEGORIES_REDUITES.map((c) => etat.reductions[c]));
+                for (const cat of CATEGORIES_REDUITES) etat.reductions[cat] = min;
+            }
             mettreAJour();
         });
 
@@ -330,7 +443,6 @@
             btn.addEventListener("blur", cacherTooltip);
         });
 
-        // Fermer la liste d'autocomplétion en cliquant ailleurs
         document.addEventListener("click", (e) => {
             if (!els.cpInput.contains(e.target) && !els.cpListe.contains(e.target)) {
                 els.cpListe.hidden = true;
@@ -364,7 +476,6 @@
             els.cpListe.hidden = true;
             return;
         }
-        // Recherche : CP commençant par q, ou nom contenant q
         resultatsCP = indexNoms.filter((e) => {
             if (/^\d+$/.test(q)) return e.cp.startsWith(q);
             return normaliserTexte(e.nom).includes(q);
@@ -440,30 +551,19 @@
         mettreAJour();
     }
 
-    // ---------- Calcul et affichage ----------
-    function parametresEffectifs() {
-        return {
-            tauxCapture: etat.tauxCapture ?? maître.parametres.tauxCapture,
-            fraisServiceParPassage: etat.fraisParPassage ?? maître.parametres.fraisServiceParPassage,
-            capFraisServiceMensuel: etat.capFrais ?? maître.parametres.capFraisServiceMensuel,
-            margeNetteDefaut: etat.margeNette ?? maître.parametres.margeNetteDefaut,
-        };
-    }
-
-    // Parts population de secours si CP sans données : moyenne française
+    // ---------- Helpers d'accès à l'état ----------
     const PARTS_MOYENNE_FRANCE = { rouge: 0.20, orange: 0.20, jaune: 0.20, verte: 0.40 };
 
     function obtenirPartsPop() {
         if (etat.cp && cpBase[etat.cp] && cpBase[etat.cp].donneesDispo) {
             return cpBase[etat.cp].parts;
         }
-        return PARTS_MOYENNE_FRANCE;
+        // CP sans données (ou non renseigné) : moyenne française
+        return maître.partsFranceComparatif || PARTS_MOYENNE_FRANCE;
     }
 
     function obtenirType() {
-        const type = maître.typesCommerce[etat.type];
-        // Ligne de matrice pour les types « sondage » : même clé que l'id du type
-        return { ...type, idMatrice: etat.type };
+        return { ...maître.typesCommerce[etat.type], idMatrice: etat.type };
     }
 
     function obtenirProfil() {
@@ -474,46 +574,48 @@
         return maître.attractivite[etat.attractiviteIndex].facteur;
     }
 
-    let dernierResultat = null;
-
-    function mettreAJour() {
-        if (!maître || !cpBase) return;
-
-        const partsPop = obtenirPartsPop();
-        const resultat = simulerMois({
-            partsPop,
+    function entreeSimulation() {
+        return {
+            partsPop: obtenirPartsPop(),
             revenus: maître.revenusCategories,
             type: obtenirType(),
             profil: obtenirProfil(),
             facteurAttractivite: obtenirFacteurAttractivite(),
             marge: etat.marge,
             passages: etat.passages,
-            panier: etat.pantry,
+            panier: etat.panier,
             reductions: etat.reductions,
-            parametres: parametresEffectifs(),
+            parametres: maître.parametres,
             matrice: maître.matriceUplift,
-        });
-        dernierResultat = { resultat, partsPop };
+        };
+    }
+
+    let dernierResultat = null;
+
+    // ---------- Mise à jour globale ----------
+    function mettreAJour() {
+        if (!maître || !cpBase) return;
+
+        const resultat = simulerMois(entreeSimulation());
+        dernierResultat = { resultat, partsPop: obtenirPartsPop() };
 
         mettreAJourCommune();
-        mettreAJourCommerce();
-        mettreAJourCouloirs(resultat, partsPop);
+        mettreAJourActivite();
+        mettreAJourReductions(resultat);
         mettreAJourResultats(resultat);
         mettreAJourSuggestion(resultat);
         mettreAJourURL();
     }
 
-    // --- Zone gauche : commune ---
+    // --- Zone commune ---
     function mettreAJourCommune() {
         if (!etat.cp) return;
         const e = cpBase[etat.cp];
         if (!e.donneesDispo) return;
-
         for (const cat of CATEGORIES) {
             const seg = els.barrePopulation.querySelector(`.sim-seg-${cat}`);
-            const part = e.parts[cat];
-            seg.style.width = (part * 100) + "%";
-            seg.title = `${formaterPourcent(part, 1)}`;
+            seg.style.width = (e.parts[cat] * 100) + "%";
+            seg.title = formaterPourcent(e.parts[cat], 1);
         }
         $("leg-rouge").textContent = `Rouge — ${formaterPourcent(e.parts.rouge, 1)}`;
         $("leg-orange").textContent = `Orange — ${formaterPourcent(e.parts.orange, 1)}`;
@@ -522,41 +624,68 @@
         els.cpMenages.textContent = `${formaterNombre(e.nbMenages)} ménages dans le secteur`;
     }
 
-    // --- Zone centre : commerce ---
-    function mettreAJourCommerce() {
-        // Cartes type
+    // --- Zone activité ---
+    function mettreAJourActivite() {
         els.cartesType.querySelectorAll(".sim-carte-type").forEach((btn) => {
             btn.setAttribute("aria-checked", String(btn.dataset.type === etat.type));
         });
-        // Jauge attractivité
         const a = maître.attractivite[etat.attractiviteIndex];
         els.attractivite.value = String(etat.attractiviteIndex);
         els.attractiviteNom.textContent = a.nom;
         els.attractiviteFacteur.textContent = `Facteur multiplicatif × ${a.facteur}`;
     }
 
-    // --- Couloirs réductions ---
-    function mettreAJourCouloirs(resultat, partsPop) {
+    // --- Vos réductions (éligibles vs expert) ---
+    function mettreAJourReductions(resultat) {
+        // Bascule de visibilité
+        els.couloirEligibles.hidden = etat.expert;
+        els.couloirsExpert.hidden = !etat.expert;
+        document.body.classList.toggle("mode-expert", etat.expert);
+        els.detailCategories.hidden = !etat.expert;
+
+        // Super-catégorie éligibles : réduction = min des trois, uplift effectif moyen pondéré
+        const redMin = Math.min(...CATEGORIES_REDUITES.map((c) => etat.reductions[c]));
+        // Comparaison via la grille pour éviter les écarts de virgule flottante
+        if (arrondirSurGrille(Number(els.redEligibles.value)) !== redMin) {
+            els.redEligibles.value = String(LISTE_REDUCTIONS.find((r) => r === redMin));
+        }
+
+        const partEligibles = CATEGORIES_REDUITES.reduce((a, c) => a + resultat.parCategorie[c].partClientele, 0);
+        const passagesEligibles = CATEGORIES_REDUITES.reduce((a, c) => a + resultat.parCategorie[c].passagesReels, 0);
+        const clientsEligibles = CATEGORIES_REDUITES.reduce((a, c) => a + resultat.parCategorie[c].clientsPlus, 0);
+        // Panier moyen des éligibles (pondéré par les parts clientèle)
+        const panierEligibles = partEligibles > 0
+            ? CATEGORIES_REDUITES.reduce((a, c) => a + resultat.parCategorie[c].partClientele * resultat.parCategorie[c].panier, 0) / partEligibles
+            : 0;
+        const upliftMoyen = upliftEffectifMoyen(entreeSimulation());
+        const source = obtenirType().source === "estimation" ? "estimation prudente" : "sondage equiprix";
+
+        $("info-part-eligibles").textContent = formaterPourcent(partEligibles, 1);
+        $("info-passages-eligibles").textContent = formaterNombre(passagesEligibles);
+        $("info-panier-eligibles").textContent = formaterEuros(panierEligibles, 2);
+        $("info-clients-eligibles").textContent = "+" + formaterNombre(clientsEligibles);
+        els.upliftEligibles.textContent = `≈ +${formaterPourcent(upliftMoyen, 0)} de visites (${source})`;
+
+        // Couloirs détaillés (expert)
         for (const cat of CATEGORIES) {
             const r = resultat.parCategorie[cat];
             $("info-part-" + cat).textContent = formaterPourcent(r.partClientele, 1);
             $("info-passages-" + cat).textContent = formaterNombre(r.passagesReels);
             $("info-panier-" + cat).textContent = formaterEuros(r.panier, 2);
             if (CATEGORIES_REDUITES.includes(cat)) {
+                const select = $("red-" + cat);
+                if (arrondirSurGrille(Number(select.value)) !== etat.reductions[cat]) {
+                    select.value = String(LISTE_REDUCTIONS.find((r) => r === etat.reductions[cat]));
+                }
                 $("info-potentiel-" + cat).textContent = formaterNombre(r.potentiel);
                 $("info-clients-" + cat).textContent = "+" + formaterNombre(r.clientsPlus);
-                // Uplift en direct
-                const el = $("uplift-" + cat);
-                const source = r.upliftSource === "estimation" ? "estimation prudente" : "sondage equiprix";
-                el.textContent = `≈ +${formaterPourcent(r.uplift, 0)} de visites (${source})`;
-                // Masquer les lignes vides (part clientèle ~ 0)
-                const couloir = document.querySelector(`.sim-couloir-${cat}`);
-                couloir.classList.toggle("sim-couloir-vide", r.partClientele < 0.001);
+                const src = r.upliftSource === "estimation" ? "estimation prudente" : "sondage equiprix";
+                $("uplift-" + cat).textContent = `≈ +${formaterPourcent(r.uplift, 0)} de visites (${src})`;
             }
         }
     }
 
-    // --- Zone droite : résultats ---
+    // --- Résultats ---
     function mettreAJourResultats(resultat) {
         const impact = resultat.impactNet;
         const signe = impact > 0.005 ? "+" : impact < -0.005 ? "−" : "";
@@ -573,18 +702,22 @@
             els.impactRatio.textContent = `${s}${formaterPourcent(Math.abs(ratio), 1)} de votre marge commerciale mensuelle`;
             els.impactRatio.hidden = false;
         } else {
-            // Garde-fou : marge nulle ou négative -> masquer le ratio
-            els.impactRatio.hidden = true;
+            els.impactRatio.hidden = true; // garde-fou : marge nulle ou négative
         }
         els.margeRef.textContent = `Marge commerciale mensuelle : ${formaterEuros(resultat.margeMensuelle)}`;
         els.margeRef.hidden = resultat.margeMensuelle <= 0;
+
+        // Passages en plus (en % du total)
+        const totalPassages = etat.passages + resultat.totalClientsPlus;
+        const pct = etat.passages > 0 ? resultat.totalClientsPlus / etat.passages : 0;
+        els.passagesPlus.textContent = `+${formaterNombre(resultat.totalClientsPlus)} passages en caisse par mois (${formaterPourcent(pct, 1)} de plus, soit ${formaterNombre(totalPassages)} au total)`;
 
         els.recapMarges.textContent = `+${formaterEuros(resultat.totalMargesSup, 2)}`;
         els.recapPertes.textContent = `−${formaterEuros(resultat.totalPertes, 2)}`;
         els.recapFrais.textContent = `−${formaterEuros(resultat.fraisTotal, 2)}`;
         els.fraisMention.textContent = resultat.fraisCapes ? "(plafonnés)" : "";
 
-        // Tableau par catégorie
+        // Détail par catégorie (visible directement en mode expert)
         els.detailBody.innerHTML = "";
         const noms = { rouge: "Rouge", orange: "Orange", jaune: "Jaune", verte: "Verte" };
         for (const cat of CATEGORIES) {
@@ -608,30 +741,16 @@
         if (etat.marge > 0 && etat.marge < 0.15) {
             texte = "Avec une marge inférieure à 15 %, les réductions equiprix sont rarement gagnantes : vérifiez votre marge réelle.";
         } else if (resultat.impactNet < 0) {
-            // Suggestion chiffrée : réduire la réduction la plus élevée
             const cat = CATEGORIES_REDUITES.reduce((max, c) =>
                 etat.reductions[c] > etat.reductions[max] ? c : max, "rouge");
             const rActuelle = etat.reductions[cat];
             if (rActuelle > 0) {
-                // Tester la réduction inférieure dans la liste
                 const idx = LISTE_REDUCTIONS.indexOf(rActuelle);
                 if (idx > 0) {
                     const rTest = LISTE_REDUCTIONS[idx - 1];
                     const sauv = etat.reductions[cat];
                     etat.reductions[cat] = rTest;
-                    const test = simulerMois({
-                        partsPop: obtenirPartsPop(),
-                        revenus: maître.revenusCategories,
-                        type: obtenirType(),
-                        profil: obtenirProfil(),
-                        facteurAttractivite: obtenirFacteurAttractivite(),
-                        marge: etat.marge,
-                        passages: etat.passages,
-                        panier: etat.pantry,
-                        reductions: etat.reductions,
-                        parametres: parametresEffectifs(),
-                        matrice: maître.matriceUplift,
-                    });
+                    const test = simulerMois(entreeSimulation());
                     etat.reductions[cat] = sauv;
                     if (test.impactNet > 0) {
                         texte = `En passant la réduction ${cat} de ${formaterPourcent(rActuelle, 0)} à ${formaterPourcent(rTest, 0)}, votre résultat devient positif : +${formaterEuros(test.impactNet)} par mois.`;
@@ -642,7 +761,7 @@
                     texte = "Essayez de réduire vos taux de réduction ou d'augmenter votre marge : ajustez les paramètres pour trouver un solde positif.";
                 }
             } else {
-                texte = "Aucune réduction appliquée : equiprix vous coûte les frais de service sans générer de marge supplémentaire. Envisagez une réduction sur au moins une catégorie.";
+                texte = "Aucune réduction appliquée : equiprix vous coûte les frais de service sans générer de marge supplémentaire. Envisagez une réduction pour les foyers éligibles.";
             }
         }
         els.suggestion.textContent = texte;
@@ -668,13 +787,15 @@
             if (etat.expert) {
                 texte += " Détail : " + CATEGORIES_REDUITES.map((c) => {
                     const r = resultat.parCategorie[c];
-                    return `${c} : ${formaterNombre(r.passagesReels)} × ${formaterEuros(r.panier, 2)} × ${formaterPourcent(parametresEffectifs().tauxCapture, 0)} × ${formaterPourcent(etat.reductions[c], 0)} = ${formaterEuros(r.perte, 2)}`;
+                    return `${c} : ${formaterNombre(r.passagesReels)} × ${formaterEuros(r.panier, 2)} × ${formaterPourcent(maître.parametres.tauxCapture, 0)} × ${formaterPourcent(etat.reductions[c], 0)} = ${formaterEuros(r.perte, 2)}`;
                 }).join(" ; ");
             }
         } else if (kind === "frais") {
-            const p = parametresEffectifs();
+            const p = maître.parametres;
             texte = `Frais = ${formaterEuros(p.fraisServiceParPassage, 2)} × (passages réels + clients en plus), toutes catégories, plafonnés à ${formaterEuros(p.capFraisServiceMensuel)} par mois.`;
             texte += ` Total avant cap : ${formaterEuros(resultat.fraisTotalBrut, 2)}.`;
+        } else if (kind === "passages") {
+            texte = maître.textes.alertePassages || "";
         }
         els.tooltip.textContent = texte;
         els.tooltip.hidden = false;
@@ -690,11 +811,12 @@
     // ---------- État dans l'URL ----------
     function mettreAJourURL() {
         const params = new URLSearchParams();
+        if (etat.usecase && etat.usecase !== ID_USECASE_DEFAUT) params.set("uc", etat.usecase);
         if (etat.cp) params.set("cp", etat.cp);
         params.set("type", etat.type);
         params.set("marge", String(etat.marge));
         params.set("pass", String(etat.passages));
-        params.set("panier", String(etat.pantry));
+        params.set("panier", String(etat.panier));
         params.set("profil", etat.profil);
         params.set("attr", String(obtenirFacteurAttractivite()));
         params.set("rr", String(etat.reductions.rouge));
@@ -709,31 +831,39 @@
         const p = new URLSearchParams(window.location.search);
         const get = (k) => p.get(k);
 
-        // Code postal
-        const cp = get("cp");
-        if (cp && cpBase[cp]) {
-            choisirCP(cp);
+        // Scénario
+        const uc = get("uc");
+        if (uc && (maître.useCases || []).some((u) => u.id === uc)) {
+            const radio = els.scenariosListe.querySelector(`input[value="${uc}"]`);
+            if (radio) radio.checked = true;
+            appliquerUsecase(uc);
+        } else {
+            els.narratif.textContent = maître.textes.narratifDefaut;
         }
+
+        // Code postal (param individuel prioritaire sur le usecase)
+        const cp = get("cp");
+        if (cp && cpBase[cp]) choisirCP(cp);
+
         // Type de commerce
         const type = get("type");
         if (type && maître.typesCommerce[type]) {
             etat.type = type;
-            // Préremplir avec les valeurs du type, puis écraser par l'URL
             const t = maître.typesCommerce[type];
             etat.marge = t.margeDefaut;
             etat.passages = t.passagesDefaut;
-            etat.pantry = t.panierDefaut;
+            etat.panier = t.panierDefaut;
             els.marge.value = Math.round(etat.marge * 100);
             els.passages.value = etat.passages;
-            els.panier.value = etat.pantry;
+            els.panier.value = etat.panier;
         }
-        // Valeurs numériques
+        // Valeurs numériques (prioritaires sur le usecase)
         const marge = parseFloat(get("marge"));
-        if (!isNaN(marge) && marge >= 0 && marge <= 1) etat.marge = marge;
+        if (!isNaN(marge) && marge >= 0 && marge <= 1) { etat.marge = marge; els.marge.value = Math.round(marge * 100); }
         const pass = parseInt(get("pass"), 10);
-        if (!isNaN(pass) && pass >= 0) etat.passages = pass;
+        if (!isNaN(pass) && pass >= 0) { etat.passages = pass; els.passages.value = pass; }
         const panier = parseFloat(get("panier"));
-        if (!isNaN(panier) && panier >= 0) etat.pantry = panier;
+        if (!isNaN(panier) && panier >= 0) { etat.panier = panier; els.panier.value = panier; }
         // Profil
         const profil = get("profil");
         if (profil && maître.profilsClientele.some((pr) => pr.id === profil)) {
@@ -750,26 +880,13 @@
         // Réductions
         for (const [cle, cat] of [["rr", "rouge"], ["ro", "orange"], ["rj", "jaune"]]) {
             const v = parseFloat(get(cle));
-            if (!isNaN(v) && v >= 0 && v <= 1) {
-                etat.reductions[cat] = v;
-                const select = $("red-" + cat);
-                // Arrondir à la valeur la plus proche de la liste si hors grille
-                const proche = LISTE_REDUCTIONS.reduce((prev, curr) =>
-                    Math.abs(curr - v) < Math.abs(prev - v) ? curr : prev);
-                etat.reductions[cat] = proche;
-                if (select) select.value = String(proche);
-            }
+            if (!isNaN(v) && v >= 0 && v <= 1) etat.reductions[cat] = arrondirSurGrille(v);
         }
         // Mode expert
         if (get("expert") === "1") {
             etat.expert = true;
             els.toggleExpert.checked = true;
-            document.body.classList.add("mode-expert");
         }
-        // Remplir les champs avec l'état restauré
-        els.marge.value = Math.round(etat.marge * 100);
-        els.passages.value = etat.passages;
-        els.panier.value = etat.pantry;
     }
 
     // ---------- Démarrage ----------

@@ -74,12 +74,49 @@ Toutes les évolutions métier se font **uniquement** par édition de
 - **Ajuster les uplifts** : lignes de `matriceUplift` (la liste `reductions`
   définit les paliers ; l'uplift s'interpole linéairement entre deux paliers) ;
 - **Ajuster les paramètres** : bloc `parametres` (taux de capture, frais de
-  service par passage, cap mensuel, marge nette de référence).
+  service par passage, cap mensuel des frais).
 
 Les bornes de catégories (`bornesCategories`) et les revenus médians
 (`revenusCategories`) y figurent également, à titre de référence (le découpage
 en catégories est porté par la base codes postaux ; les revenus médians
-alimentent le calcul des paniers par catégorie).
+alimentent le calcul des paniers par catégorie). La jauge « France entière,
+pour comparatif » utilise `partsFranceComparatif` (20/20/20/40).
+
+## Scénarios (use cases)
+
+Le carrousel en haut de page propose « Simuler sur mon commerce » (par défaut)
+plus un onglet par entrée du tableau `useCases` de `commerces.json`.
+Chaque use case préconfigure le simulateur **et** le paragraphe narratif :
+
+```json
+"useCases": [
+  {
+    "id": "boulangerie-albertville",
+    "nom": "Boulangerie à Albertville",
+    "image": "../images/boulangerie.jpg",
+    "narratif": "À Albertville, la boulangerie de Mme Martin a proposé 15 % de réduction...",
+    "params": {
+      "cp": "73200",
+      "type": "commerceBouche",
+      "marge": 0.35,
+      "passages": 1200,
+      "panier": 8,
+      "profil": "commune",
+      "attr": 5,
+      "rr": 0.15, "ro": 0.15, "rj": 0.15
+    }
+  }
+]
+```
+
+Champs de `params` (tous optionnels) : `cp` (code postal), `type` (clé de
+`typesCommerce`), `marge` (0-1), `passages`, `panier` (€), `profil` (id de
+`profilsClientele`), `attr` (facteur d'attractivité 2-20), `rr`/`ro`/`rj`
+(réductions rouge/orange/jaune, 0-1). Quand `type` est renseigné sans
+`marge`/`passages`/`panier`, les valeurs par défaut du type sont utilisées.
+`image` est un chemin relatif (ex. `../images/…`) affiché à côté du narratif ;
+sans `image`, aucune illustration n'est affichée. L'`id` du use case est
+ajouté à l'URL (`?uc=…`) pour permettre le partage direct d'un scénario.
 
 ## Tests
 
@@ -135,9 +172,15 @@ La page est accessible sur `equiprix.fr/commerces` (OVH sert automatiquement
   mis à jour via `history.replaceState` à chaque interaction. Pas de
   localStorage. Le bouton « Sauver » copie l'URL dans le presse-papiers.
 - **Recalcul en temps réel** à chaque interaction, mises à jour ciblées du DOM.
-- **Mode expert** (toggle discret) : décomposition par catégorie, paramètres
-  avancés modifiables (taux de capture, frais, cap), revenus médians
-  consultables, pastilles ⓘ avec formules détaillées.
+- **Mode expert** (toggle en haut de la section « Simulation ») : les trois
+  catégories jaune/orange/rouge apparaissent individuellement, avec le détail
+  par catégorie des résultats affiché directement. En non expert, une
+  super-catégorie « Foyers éligibles equiprix — 60 % de niveaux de vie les
+  plus bas » pilote les trois réductions à la même valeur (toggle vers expert :
+  la réduction éligibles s'applique aux 3 catégories ; retour en non expert :
+  seul le taux le plus bas est conservé). Les revenus médians par catégorie
+  apparaissent à côté du panier moyen de chaque catégorie. Pastilles ⓘ avec
+  formules sur chaque total.
 
 ## Sources
 
@@ -145,6 +188,7 @@ La page est accessible sur `equiprix.fr/commerces` (OVH sert automatiquement
   2021 (publication 2024) — https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation
 - Revenu disponible des diverses catégories : Insee, Filosofi 2023
   (publication 2026) — https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation
+- Sondage equiprix (taux de venues) : septembre 2026, 60 ménages français (texte dans `textes.sondage`).
 - Mapping CODGEO ↔ code postal : base data.gouv.fr « Codes postaux ».
 
 Résultats estimatifs à visée pédagogique, basés sur les hypothèses affichées

@@ -23,6 +23,7 @@ const {
     paniersParCategorie,
     interpolerUplift,
     upliftPour,
+    upliftEffectifMoyen,
     simulerMois,
 } = require(path.join(__dirname, "..", "commerces", "js", "calculs.js"));
 
@@ -162,6 +163,50 @@ test("Type « Autre commerce » : coefPrudence × moyenne des bases", () => {
     // moyenne(bar 0,1414 ; bouche 0,30) = 0,2207 ; × 0,75 = 0,165525
     assert.ok(Math.abs(r.uplift - 0.165525) < 1e-9, `uplift ${r.uplift}`);
     assert.strictEqual(r.source, "estimation");
+});
+
+test("upliftEffectifMoyen : entre les uplifts min et max des catégories réduites", () => {
+    const profil = maître.profilsClientele.find((p) => p.id === "unPeuAisee");
+    const type = { ...maître.typesCommerce.commerceBouche, idMatrice: "commerceBouche" };
+    const entree = {
+        partsPop: cpBase["78700"].parts,
+        revenus: maître.revenusCategories,
+        type,
+        profil,
+        facteurAttractivite: 8,
+        marge: 0.30,
+        passages: 1000,
+        panier: 30,
+        reductions: { rouge: 0.10, orange: 0.30, jaune: 0.05 },
+        parametres: maître.parametres,
+        matrice: maître.matriceUplift,
+    };
+    const u = upliftEffectifMoyen(entree);
+    // bouche : 5 % -> 0,1429 ; 10 % -> 0,30 ; 30 % -> 0,60
+    // la moyenne pondérée doit être strictement entre 0,1429 et 0,60
+    assert.ok(u > 0.1429 && u < 0.60, `uplift moyen ${u}`);
+    // Pondération par le potentiel (parts pop proches) : proche de la moyenne simple
+    const simple = (0.30 + 0.60 + 0.1429) / 3;
+    assert.ok(Math.abs(u - simple) < 0.10, `u=${u} vs moyenne simple ${simple}`);
+});
+
+test("upliftEffectifMoyen : réductions identiques -> uplift de la catégorie", () => {
+    const profil = maître.profilsClientele.find((p) => p.id === "unPeuAisee");
+    const type = { ...maître.typesCommerce.commerceBouche, idMatrice: "commerceBouche" };
+    const entree = {
+        partsPop: cpBase["78700"].parts,
+        revenus: maître.revenusCategories,
+        type,
+        profil,
+        facteurAttractivite: 8,
+        marge: 0.30,
+        passages: 1000,
+        panier: 30,
+        reductions: { rouge: 0.10, orange: 0.10, jaune: 0.10 },
+        parametres: maître.parametres,
+        matrice: maître.matriceUplift,
+    };
+    assert.ok(Math.abs(upliftEffectifMoyen(entree) - 0.30) < 1e-12);
 });
 
 // ---------------------------------------------------------------
