@@ -805,7 +805,12 @@
         const pct = etat.passages > 0 ? resultat.totalClientsPlus / etat.passages : 0;
         els.passagesPlus.textContent = `+${formaterNombre(resultat.totalClientsPlus)} passages en caisse par mois (${formaterPourcent(pct, 1)} de plus, soit ${formaterNombre(totalPassages)} au total)`;
 
-        els.recapMarges.textContent = `+${formaterEuros(resultat.totalMargesSup, 2)}`;
+        // Marge supplémentaire : signe et couleur selon le signe (rouge si négative,
+        // comme les deux lignes suivantes), et non toujours « + » en vert
+        const ms = resultat.totalMargesSup;
+        const signeMs = ms > 0.005 ? "+" : ms < -0.005 ? "−" : "";
+        els.recapMarges.textContent = `${signeMs}${formaterEuros(Math.abs(ms), 2)}`;
+        els.recapMarges.classList.toggle("negatif", ms < -0.005);
         els.recapPertes.textContent = `−${formaterEuros(resultat.totalPertes, 2)}`;
         els.recapFrais.textContent = `−${formaterEuros(resultat.fraisTotal, 2)}`;
         els.fraisMention.textContent = resultat.fraisCapes ? "(plafonnés)" : "";
@@ -819,11 +824,18 @@
             const th = document.createElement("td");
             th.innerHTML = `<span class="cat-nom"><span class="sim-dot sim-dot-${cat}" aria-hidden="true"></span>${noms[cat]}</span>`;
             tr.appendChild(th);
-            for (const val of [r.margeSup, r.perte, r.fraisBrut]) {
+            // Colonne « Marge suppl. » : signe − et rouge si négative (réduction > marge)
+            const vals = [r.margeSup, r.perte, r.fraisBrut];
+            vals.forEach((val, i) => {
                 const td = document.createElement("td");
-                td.textContent = formaterEuros(val, 2);
+                if (i === 0 && val < -0.005) {
+                    td.textContent = `−${formaterEuros(Math.abs(val), 2)}`;
+                    td.classList.add("negatif");
+                } else {
+                    td.textContent = formaterEuros(val, 2);
+                }
                 tr.appendChild(td);
-            }
+            });
             els.detailBody.appendChild(tr);
         }
     }
@@ -832,7 +844,9 @@
     function mettreAJourSuggestion(resultat) {
         let texte = "";
         if (etat.marge > 0 && etat.marge < 0.15) {
-            texte = "Avec une marge inférieure à 15 %, les réductions equiprix sont rarement gagnantes : vérifiez votre marge réelle.";
+            // Texte maintenu dans le JSON maître (textes.suggestionMargeFaible)
+            texte = maître.textes.suggestionMargeFaible
+                || "Avec une marge inférieure à 15 %, les réductions equiprix sont rarement gagnantes : vérifiez votre marge réelle.";
         } else if (resultat.impactNet < 0) {
             const cat = CATEGORIES_REDUITES.reduce((max, c) =>
                 etat.reductions[c] > etat.reductions[max] ? c : max, "rouge");

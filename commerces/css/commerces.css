@@ -670,6 +670,11 @@ main.sim-container {
     color: var(--resultat-positif);
 }
 
+/* Marge supplémentaire négative (réduction > marge) : rouge comme les pertes/frais */
+.sim-recap-valeur.negatif {
+    color: var(--resultat-negatif) !important;
+}
+
 /* Pastille ⓘ */
 .sim-info-btn {
     background: none;
@@ -897,4 +902,10 @@ select:focus-visible {
 .sim-btn-reset:focus-visible {
     background: var(--primary-color);
     color: var(--white);
+}
+
+/* Tableau détail par catégorie : marge suppl. négative en rouge */
+.sim-table td.negatif {
+    color: var(--resultat-negatif);
+    font-weight: 700;
 }

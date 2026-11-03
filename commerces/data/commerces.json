@@ -178,7 +178,8 @@
       "verte": "Verte — ménages aisés"
     },
     "titreBarreSecteur": "Votre secteur",
-    "titreBarreFrance": "France entière (comparatif)"
+    "titreBarreFrance": "France entière (comparatif)",
+    "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?"
   },
   "useCases": [
     {
@@ -230,6 +231,23 @@
         "rr": 0.3,
         "ro": 0.3,
         "rj": 0.3
+      }
+    },
+    {
+      "id": "supérette-montreuil",
+      "nom": "Supérette à Montreuil",
+      "narratif": "Cette supérette de proximité à Montreuil pratique des prix supérieurs à la grande distribution. Sa clientèle est un peu plus aisée que la commune : ceux qui surveillent leur budget groupent leurs achats ailleurs. La concurrence est forte — d’autres supérettes à 150-200 m. Panier moyen 16 €, marge 20 %. Elle applique une réduction modeste de 10 %, uniquement sur les catégories rouge et orange. La clientèle supplémentaire ainsi attirée reste absorbable, même aux pics de caisse, et améliore sa performance économique.",
+      "params": {
+        "cp": "93100",
+        "type": "supermarche",
+        "marge": 0.2,
+        "passages": 2000,
+        "panier": 16,
+        "profil": "unPeuAisee",
+        "attr": 8,
+        "rr": 0.1,
+        "ro": 0.1,
+        "rj": 0
       }
     }
   ]

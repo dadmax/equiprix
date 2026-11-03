@@ -83,7 +83,8 @@ alimentent le calcul des paniers par catégorie). Les deux barres verticales
 côte à côte (secteur / France) utilisent `partsFranceComparatif` (20/20/20/40)
 pour le comparatif ; leurs titres et les légendes qualitatives des catégories
 sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
-`legendesCategories`).
+`legendesCategories`, `suggestionMargeFaible` — message affiché quand la
+marge commerciale est < 15 %).
 
 ## Scénarios (use cases)
 

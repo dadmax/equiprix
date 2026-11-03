@@ -175,7 +175,7 @@ async function main() {
         d.querySelector('[data-scenario="monCommerce"]').getAttribute("aria-pressed") === "true");
     verifier("Boutons scénarios sans radio native (button aria-pressed)",
         d.querySelectorAll('input[name="scenario"]').length === 0
-        && d.querySelectorAll('button.sim-scenario').length === 4);
+        && d.querySelectorAll('button.sim-scenario').length === 5);
     verifier("Narratif par défaut affiché",
         d.getElementById("narratif").textContent.length > 30);
 
@@ -300,8 +300,8 @@ async function main() {
     console.log("Use cases (carrousel en boutons)");
     const dom6 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
     const d6 = dom6.window.document;
-    verifier("Usecase boulangerie : 4 boutons de scénario (défaut + 3 usecases)",
-        d6.querySelectorAll("button.sim-scenario").length === 4,
+    verifier("Usecase boulangerie : 5 boutons de scénario (défaut + 4 usecases)",
+        d6.querySelectorAll("button.sim-scenario").length === 5,
         String(d6.querySelectorAll("button.sim-scenario").length));
     verifier("Bouton « Boulangerie à Albertville » actif via l'URL (aria-pressed)",
         d6.querySelector('[data-scenario="boulangerie-albertville"]').getAttribute("aria-pressed") === "true");
@@ -421,6 +421,72 @@ async function main() {
     verifier("Pas de badge ni de reset sur le scénario par défaut",
         d.getElementById("badge-modifie").hidden === true
         && d.getElementById("btn-reset-usecase").hidden === true);
+
+    // ================= Suggestion marge < 15 % + récap négatif + usecase supérette =================
+    console.log("Suggestion marge faible, récap négatif, usecase supérette");
+    // Marge 10 % -> suggestion avec le nouveau message (réductions ciblées)
+    const domM = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.1&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    const dM = domM.window.document;
+    verifier("Marge 10 % : suggestion affichée avec le message « réductions ciblées » du JSON",
+        !dM.getElementById("suggestion").hidden
+        && dM.getElementById("suggestion").textContent.includes("15 %")
+        && dM.getElementById("suggestion").textContent.includes("cibl"),
+        dM.getElementById("suggestion").textContent.slice(0, 90));
+    domM.window.close();
+
+    // Réduction (30 %) > marge (10 %) -> marge suppl. négative, affichée « − » en rouge
+    const domN2 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.1&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.30&ro=0.30&rj=0.30`);
+    const dN2 = domN2.window.document;
+    const recap = dN2.getElementById("recap-marges");
+    verifier("Réduction > marge : marge suppl. affichée « −980 € » (signe moins)",
+        recap.textContent.includes("−") && lireEuro(recap.textContent) !== null
+        && Math.abs(lireEuro(recap.textContent) - 980.60) < 1.5,
+        recap.textContent);
+    verifier("Réduction > marge : classe .negatif appliquée (rouge) sur la ligne marge suppl.",
+        recap.classList.contains("negatif"));
+    // En expert : le détail par catégorie affiche aussi des négatifs en rouge
+    const tN2 = dN2.getElementById("toggle-expert");
+    tN2.checked = true;
+    tN2.dispatchEvent(new domN2.window.Event("change", { bubbles: true }));
+    await attendre(200);
+    const negatifs = dN2.querySelectorAll("#detail-categories-body td.negatif").length;
+    verifier("Mode expert : 3 cellules « marge suppl. » négatives en rouge dans le détail",
+        negatifs === 3, String(negatifs));
+    // Retour à une marge normale -> plus de classe negatif
+    const domP = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    verifier("Marge 30 % / réduc 10 % : marge suppl. positive, « + » et SANS classe negatif",
+        domP.window.document.getElementById("recap-marges").textContent.includes("+")
+        && !domP.window.document.getElementById("recap-marges").classList.contains("negatif"),
+        domP.window.document.getElementById("recap-marges").textContent);
+    domP.window.close();
+    domN2.window.close();
+
+    // Usecase supérette Montreuil
+    const domS = await charger(`${BASE}/commerces/?uc=supérette-montreuil`);
+    const dS = domS.window.document;
+    verifier("Usecase supérette : bouton actif, commune 93100 — Montreuil",
+        dS.querySelector('[data-scenario="supérette-montreuil"]').getAttribute("aria-pressed") === "true"
+        && dS.getElementById("cp-nom").textContent.includes("93100")
+        && dS.getElementById("cp-nom").textContent.includes("Montreuil"),
+        dS.getElementById("cp-nom").textContent);
+    verifier("Supérette préconfigurée : marge 20 %, 2000 passages, panier 16 €, un peu aisée, attr ×8",
+        dS.getElementById("marge").value === "20"
+        && dS.getElementById("passages").value === "2000"
+        && dS.getElementById("panier").value === "16"
+        && domS.window.location.search.includes("profil=unPeuAisee")
+        && domS.window.location.search.includes("attr=8"));
+    verifier("Supérette : réductions 10 % rouge/orange, 0 % jaune (URL)",
+        domS.window.location.search.includes("rr=0.1")
+        && domS.window.location.search.includes("ro=0.1")
+        && domS.window.location.search.includes("rj=0"),
+        domS.window.location.search);
+    const impactSup = lireEuro(dS.getElementById("impact-net").textContent);
+    verifier("Impact usecase supérette ≈ +194 € (10 % sur rouge/orange uniquement)",
+        impactSup !== null && Math.abs(impactSup - 194.44) < 1.5, `lu ${impactSup}`);
+    verifier("Narratif supérette : histoire seule (pas de résultat en €/mois)",
+        !/\d[\d\s ]*,?\d*\s*€\s*\/\s*mois/.test(dS.getElementById("narratif").textContent)
+        && dS.getElementById("narratif").textContent.includes("Montreuil"));
+    domS.window.close();
 
     // ================= Jauge clientèle + verte condensée =================
     console.log("Jauge clientèle et catégorie verte");
