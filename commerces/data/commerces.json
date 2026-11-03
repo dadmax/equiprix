@@ -184,14 +184,14 @@
     {
       "id": "boulangerie-albertville",
       "nom": "Boulangerie à Albertville",
-      "narratif": "À Albertville, la boulangerie de Mme Martin tourne avec une marge réelle faible : à peine 10 % sur ses produits, ce qui rend compliqué de consentir une réduction sur l'ensemble de la boutique. Pourtant, elle observe un déséquilibre dans ses ventes : tout le monde vient chercher baguettes et pain, mais les produits plus coûteux — gâteaux, pâtisseries — ne partent presque qu'auprès des ménages aisés. Son panier moyen avoisine les 30 €, mais elle ne réalise qu'une quarantaine d'achats par mois : sa pénétration dans le quartier reste faible. Avec equiprix, son objectif est de faire revenir chez elle les clients qui achetaient leurs gâteaux et pâtisseries en grande surface, grâce à une réduction proposée aux foyers éligibles. Jouez avec le simulateur pour trouver le taux de réduction qui lui convient.",
+      "narratif": "Chez Mme Martin, à Albertville, tout le monde vient chercher son pain. Mais les gâteaux et pâtisseries, plus chers, ne partent qu'auprès des ménages aisés. Résultat : un panier moyen de 30 €, une quarantaine d'achats par mois et une pénétration faible dans le quartier. La marge réelle est de 10 % sur l'ensemble, mais de 40 % sur les gâteaux. Avec equiprix, elle vise à faire revenir chez elle les clients qui achetaient leurs pâtisseries en grande surface : une réduction de 15 % sur les foyers éligibles, appliquée à ces produits plus chers.",
       "params": {
         "cp": "73200",
         "type": "commerceBouche",
-        "marge": 0.1,
+        "marge": 0.4,
         "passages": 40,
         "panier": 30,
-        "profil": "commune",
+        "profil": "essentiellementAisee",
         "attr": 20,
         "rr": 0.15,
         "ro": 0.15,
@@ -201,7 +201,7 @@
     {
       "id": "coiffeur-saint-germain",
       "nom": "Coiffeur à Saint-Germain-en-Laye",
-      "narratif": "À Saint-Germain-en-Laye, le salon de M. Diallo souffre d'un planning sous-utilisé : près de 30 % de ses créneaux ouverts restent vides. Pour une coupe autour de 30 €, il propose une réduction d'environ 20 % aux foyers éligibles equiprix. L'idée est double : occuper une partie de ces créneaux vides en attirant une clientèle qui ne venait pas parce que le salon était plus cher que les salons bas de gamme, et fidéliser des clients aux revenus plus faibles qui auraient pu espacer leurs visites — voire partir — en bénéficiant d'un tarif plus abordable. Sur les coupes supplémentaires, sa réflexion porte sur la marge marginale, proche de 90 % : le loyer et le matériel sont déjà payés, il ne reste que l'eau, le nettoyage, un peu d'électricité et le shampoing. Autrement dit, chaque coupe remplie grâce à equiprix est quasiment du gain net.",
+      "narratif": "Le salon de M. Diallo, à Saint-Germain-en-Laye, a 30 % de ses créneaux vides. Une coupe tourne autour de 30 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Sur les coupes supplémentaires, la marge est marginale : loyer et matériel déjà payés, il ne reste que l'eau, le nettoyage, l'électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
       "params": {
         "cp": "78100",
         "type": "autre",
@@ -218,14 +218,14 @@
     {
       "id": "restaurant-lyon",
       "nom": "Restaurant à Lyon",
-      "narratif": "Dans ce restaurant lyonnais, le service du midi laisse environ 20 % des tables vides. Hors frais de cuisine et de service, la marge du restaurant se mesure au coût des ingrédients : environ 50 % du prix du repas. Pour remplir ces tables et attirer une clientèle qui ne serait pas venue, le restaurateur met en place une réduction importante, de l'ordre de 30 %, qu'il applique hors boissons alcoolisées et à condition que chaque client prenne un repas. Sur les tables ainsi remplies, la marge qu'il réalise n'existait tout simplement pas sans la réduction : le simulateur vous permet de tester ce seuil de 30 % et de voir à partir de quel volume de couverts le dispositif devient gagnant.",
+      "narratif": "Ce restaurant lyonnais du 1er arrondissement sert des repas du midi à 20 €. Le midi, 20 % des tables restent vides. La marge totale du restaurant est faible, mais sur chaque repas supplémentaire vendu, elle se mesure au coût des ingrédients : environ 50 % du prix du repas. Ici, le choix n'est pas la réduction qui rapporte le plus de marge tout de suite, mais une réduction agressive de 30 % — hors alcool, avec un repas par personne — pour faire découvrir la table et fidéliser à long terme.",
       "params": {
         "cp": "69001",
         "type": "barRestaurant",
         "marge": 0.5,
         "passages": 600,
-        "panier": 30,
-        "profil": "commune",
+        "panier": 20,
+        "profil": "unPeuAisee",
         "attr": 8,
         "rr": 0.3,
         "ro": 0.3,

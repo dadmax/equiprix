@@ -98,6 +98,16 @@ async function main() {
         d.getElementById("titre-france").textContent.includes("France entière")
         && d.getElementById("titre-france").textContent.includes("comparatif"),
         d.getElementById("titre-france").textContent);
+    // Pourcentages lisibles directement sur les segments des deux jauges
+    const valRougeSecteur = d.querySelector("#barre-population .sim-seg-v-rouge .sim-seg-val").textContent;
+    verifier("Jauge secteur : % lisible sur le segment (rouge ≈ 15 %)",
+        valRougeSecteur.replace(/[\s\u00a0]/g, "") === "15%", valRougeSecteur);
+    const valVerteFrance = d.querySelector("#barre-france .sim-seg-v-verte .sim-seg-val").textContent;
+    verifier("Jauge France : % lisible sur le segment vert = 40 %",
+        valVerteFrance.replace(/[\s\u00a0]/g, "") === "40%", valVerteFrance);
+    verifier("Jauge France : les 4 segments portent un %",
+        ["rouge", "orange", "jaune", "verte"].every((cat) =>
+            d.querySelector(`#barre-france .sim-seg-v-${cat} .sim-seg-val`).textContent.includes("%")));
     const hRouge = parseFloat(d.querySelector("#barre-population .sim-seg-v-rouge").style.height);
     verifier("Barre secteur : segment rouge vertical ≈ 15,3 % de hauteur",
         Math.abs(hRouge - 15.3) < 0.01, String(hRouge));
@@ -304,10 +314,19 @@ async function main() {
         d6.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "15%",
         d6.getElementById("red-eligibles").value);
     const impactUC = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase boulangerie ≈ −63 €, affiché négatif (marge 10 %, réduc 15 %)",
-        impactUC !== null && Math.abs(impactUC - 63.08) < 1.5
-        && d6.getElementById("impact-net").textContent.includes("−"),
+    verifier("Impact usecase boulangerie ≈ +146 € (marge 40 % sur gâteaux, clientèle aisée, 40 achats, réduc 15 %)",
+        impactUC !== null && Math.abs(impactUC - 146.28) < 1.5,
         `lu ${impactUC} | brut ${d6.getElementById("impact-net").textContent}`);
+    verifier("Boulangerie préconfigurée selon le texte : marge 40 %, 40 passages, panier 30, clientèle essentiellement aisée, attr ×20",
+        d6.getElementById("marge").value === "40"
+        && d6.getElementById("passages").value === "40"
+        && d6.getElementById("panier").value === "30"
+        && dom6.window.location.search.includes("profil=essentiellementAisee")
+        && dom6.window.location.search.includes("attr=20"),
+        [d6.getElementById("marge").value, d6.getElementById("passages").value, d6.getElementById("panier").value, dom6.window.location.search].join(" | "));
+    verifier("Badge « modifiés » caché au chargement du usecase",
+        d6.getElementById("badge-modifie").hidden === true
+        && d6.getElementById("btn-reset-usecase").hidden === true);
 
     // Clic sur le coiffeur (bouton, plus de radio)
     d6.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
@@ -326,7 +345,7 @@ async function main() {
     dom6.window.close();
 
     // ================= Usecase restaurant + bascule sur saisie manuelle =================
-    console.log("Usecase restaurant et bascule sur « mon commerce »");
+    console.log("Usecase restaurant, badge modifiés et reset");
     const dom8 = await charger(`${BASE}/commerces/?uc=restaurant-lyon`);
     const d8 = dom8.window.document;
     verifier("Usecase restaurant : bouton actif via l'URL",
@@ -335,9 +354,9 @@ async function main() {
         d8.getElementById("cp-nom").textContent.includes("69001")
         && d8.getElementById("cp-nom").textContent.includes("ménages"),
         d8.getElementById("cp-nom").textContent);
-    verifier("Narratif restaurant (mentionne Lyon, aucun montant en €)",
+    verifier("Narratif restaurant (mentionne Lyon, aucun RÉSULTAT en €/mois de la simulation)",
         /lyon/i.test(d8.getElementById("narratif").textContent)
-        && !/\d[\d\s ]*,?\d*\s*€/.test(d8.getElementById("narratif").textContent),
+        && !/\d[\d\s ]*,?\d*\s*€\s*\/\s*mois/.test(d8.getElementById("narratif").textContent),
         d8.getElementById("narratif").textContent.slice(0, 80));
     // Les narratifs des 3 usecases ne citent aucun résultat chiffré de la simulation
     // (seuls les paramètres d'entrée peuvent contenir un €, ex. panier 30 €)
@@ -351,40 +370,57 @@ async function main() {
         narrCoiffeur.slice(0, 80));
     domN.window.close();
     const impactResto = lireEuro(d8.getElementById("impact-net").textContent);
-    verifier("Impact usecase restaurant \u2248 +5 € (seuil 30 %, 600 couverts)",
-        impactResto !== null && Math.abs(impactResto - 4.92) < 1.5, `lu ${impactResto}`);
+    verifier("Impact usecase restaurant \u2248 +51 \u20ac (repas 20 \u20ac, client\u00e8le un peu ais\u00e9e, r\u00e9duc 30 %)",
+        impactResto !== null && Math.abs(impactResto - 50.75) < 1.5, `lu ${impactResto}`);
     verifier("Réduction éligibles préconfigurée à 30 %",
         d8.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "30%",
         d8.getElementById("red-eligibles").value);
 
-    // Toute saisie manuelle sur un usecase bascule sur « Simuler sur mon commerce »
+    // Saisie manuelle sur un usecase : on GARDE le usecase et son narratif,
+    // mais un badge « paramètres modifiés » + un bouton reset apparaissent.
     const marge8 = d8.getElementById("marge");
     marge8.value = "12";
     marge8.dispatchEvent(new dom8.window.Event("input", { bubbles: true }));
     await attendre(200);
-    verifier("Édition de la marge sur un usecase : bascule sur monCommerce",
-        d8.querySelector(".sim-scenario.actif").dataset.scenario === "monCommerce"
-        && !dom8.window.location.search.includes("uc="),
+    verifier("Édition de la marge sur un usecase : le usecase reste actif, narratif conservé",
+        d8.querySelector(".sim-scenario.actif").dataset.scenario === "restaurant-lyon"
+        && dom8.window.location.search.includes("uc=restaurant-lyon")
+        && /lyon/i.test(d8.getElementById("narratif").textContent),
         d8.querySelector(".sim-scenario.actif").dataset.scenario + " | " + dom8.window.location.search);
-    verifier("Narratif restauré au texte par défaut après bascule",
-        d8.getElementById("narratif").textContent.includes("tarification solidaire"),
-        d8.getElementById("narratif").textContent.slice(0, 60));
+    verifier("Badge « paramètres modifiés » + bouton reset visibles après édition",
+        d8.getElementById("badge-modifie").hidden === false
+        && d8.getElementById("btn-reset-usecase").hidden === false);
+    // Le reset remet les params du usecase (marge 50 %) et masque le badge
+    d8.getElementById("btn-reset-usecase").click();
+    await attendre(200);
+    verifier("Reset : marge restaurée à 50 %, badge masqué, usecase toujours actif",
+        d8.getElementById("marge").value === "50"
+        && d8.getElementById("badge-modifie").hidden === true
+        && d8.getElementById("btn-reset-usecase").hidden === true
+        && d8.querySelector(".sim-scenario.actif").dataset.scenario === "restaurant-lyon",
+        "marge=" + d8.getElementById("marge").value);
 
-    // Bascule aussi via la carte type de commerce
+    // La carte type change le type sans quitter le usecase (badge affiché)
     const dom9 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
     const d9 = dom9.window.document;
     d9.querySelector('.sim-carte-type[data-type="supermarche"]').click();
     await attendre(200);
-    verifier("Clic carte supermarché sur un usecase : bascule monCommerce + valeurs du type",
-        d9.querySelector(".sim-scenario.actif").dataset.scenario === "monCommerce"
-        && !dom9.window.location.search.includes("uc=")
+    verifier("Clic carte supermarché sur un usecase : usecase conservé, type changé, badge affiché",
+        d9.querySelector(".sim-scenario.actif").dataset.scenario === "boulangerie-albertville"
+        && dom9.window.location.search.includes("uc=boulangerie-albertville")
         && d9.querySelector('.sim-carte-type[data-type="supermarche"]').getAttribute("aria-checked") === "true"
         && d9.getElementById("marge").value === "20"
         && d9.getElementById("passages").value === "8000"
-        && d9.getElementById("panier").value === "50",
+        && d9.getElementById("panier").value === "50"
+        && d9.getElementById("badge-modifie").hidden === false,
         d9.getElementById("marge").value + "/" + d9.getElementById("passages").value + "/" + d9.getElementById("panier").value);
     dom9.window.close();
     dom8.window.close();
+
+    // En mode « mon commerce » (cas de réf), pas de badge ni de reset
+    verifier("Pas de badge ni de reset sur le scénario par défaut",
+        d.getElementById("badge-modifie").hidden === true
+        && d.getElementById("btn-reset-usecase").hidden === true);
 
     // ================= Jauge clientèle + verte condensée =================
     console.log("Jauge clientèle et catégorie verte");

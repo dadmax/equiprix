@@ -36,6 +36,9 @@
         attractiviteIndex: null,
         reductions: {},          // {rouge, orange, jaune}
         expert: false,
+        // Copie des params du usecase actif (null sur « mon commerce ») :
+        // sert à détecter les modifications manuelles (badge + bouton reset)
+        paramsUsecase: null,
     };
 
     // ---------- Éléments DOM ----------
@@ -64,6 +67,8 @@
         attractiviteReperes: $("attractivite-reperes"),
         attractiviteNom: $("attractivite-nom"),
         toggleExpert: $("toggle-expert"),
+        badgeModifie: $("badge-modifie"),
+        btnResetUsecase: $("btn-reset-usecase"),
         couloirEligibles: $("couloir-eligibles"),
         couloirsExpert: $("couloirs-expert"),
         redEligibles: $("red-eligibles"),
@@ -187,18 +192,16 @@
     }
 
     function appliquerUsecase(id) {
-        applicationUsecaseEnCours = true;
-        try {
-            appliquerUsecaseParams(id);
-        } finally {
-            applicationUsecaseEnCours = false;
-        }
+        appliquerUsecaseParams(id);
     }
 
     function appliquerUsecaseParams(id) {
         etat.usecase = id;
         activerBoutonScenario(id);
         const uc = (maître.useCases || []).find((u) => u.id === id);
+        // Référence des params du usecase pour détecter les modifs manuelles
+        etat.paramsUsecase = uc ? JSON.parse(JSON.stringify(uc.params || {})) : null;
+        mettreAJourBadgeModifie();
         if (!uc) {
             // Retour au scénario par défaut : narratif générique, pas de préconfiguration
             els.narratif.textContent = maître.textes.narratifDefaut;
@@ -243,6 +246,42 @@
         mettreAJour();
     }
 
+    // ---------- Badge « paramètres modifiés » + reset du usecase ----------
+    // Vrai si l'état courant diffère des params du usecase actif
+    function paramsSontModifies() {
+        if (!etat.usecase || etat.usecase === ID_USECASE_DEFAUT || !etat.paramsUsecase) return false;
+        const ref = etat.paramsUsecase;
+        // On ne compare que les champs explicitement définis dans le usecase ;
+        // marge/passages/panier omis => valeur de référence = défaut du type.
+        const typeRef = (ref.type && maître.typesCommerce[ref.type]) || {};
+        if (ref.cp !== undefined && etat.cp !== ref.cp) return true;
+        if (ref.type !== undefined && etat.type !== ref.type) return true;
+        if (ref.marge !== undefined && Math.abs(etat.marge - ref.marge) > 1e-9) return true;
+        if (ref.passages !== undefined && etat.passages !== ref.passages) return true;
+        if (ref.panier !== undefined && etat.panier !== ref.panier) return true;
+        if (ref.profil !== undefined && etat.profil !== ref.profil) return true;
+        if (ref.attr !== undefined && obtenirFacteurAttractivite() !== ref.attr) return true;
+        if (ref.marge === undefined && ref.type !== undefined && Math.abs(etat.marge - typeRef.margeDefaut) > 1e-9) return true;
+        if (ref.passages === undefined && ref.type !== undefined && etat.passages !== typeRef.passagesDefaut) return true;
+        if (ref.panier === undefined && ref.type !== undefined && etat.panier !== typeRef.panierDefaut) return true;
+        return CATEGORIES_REDUITES.some((cat) => {
+            const cle = { rouge: "rr", orange: "ro", jaune: "rj" }[cat];
+            return ref[cle] !== undefined
+                && Math.abs(etat.reductions[cat] - arrondirSurGrille(ref[cle])) > 1e-9;
+        });
+    }
+
+    function mettreAJourBadgeModifie() {
+        const modifie = paramsSontModifies();
+        els.badgeModifie.hidden = !modifie;
+        els.btnResetUsecase.hidden = !modifie;
+    }
+
+    // Appelé à chaque mise à jour globale
+    function mettreAJourUsecase() {
+        mettreAJourBadgeModifie();
+    }
+
     function arrondirSurGrille(v) {
         return LISTE_REDUCTIONS.reduce((prev, curr) =>
             Math.abs(curr - v) < Math.abs(prev - v) ? curr : prev);
@@ -260,15 +299,9 @@
             btn.dataset.type = id;
             btn.textContent = type.nom;
             btn.addEventListener("click", () => {
+                // On garde le usecase actif (et son narratif) : la modification
+                // est signalée par le badge « paramètres modifiés ».
                 etat.type = id;
-                // Toute modification manuelle bascule sur « Simuler sur mon commerce » :
-                // on ne modifie pas un usecase préconfiguré
-                if (etat.usecase !== ID_USECASE_DEFAUT) {
-                    etat.usecase = ID_USECASE_DEFAUT;
-                    activerBoutonScenario(ID_USECASE_DEFAUT);
-                    els.narratif.textContent = maître.textes.narratifDefaut;
-                    els.narratifImage.hidden = true;
-                }
                 etat.marge = type.margeDefaut;
                 etat.passages = type.passagesDefaut;
                 etat.panier = type.panierDefaut;
@@ -292,7 +325,6 @@
         });
         els.profil.max = String(maître.profilsClientele.length - 1);
         els.profil.addEventListener("input", () => {
-            basculerSurMonCommerceSiUsecase();
             etat.profil = maître.profilsClientele[Number(els.profil.value)].id;
             mettreAJour();
         });
@@ -316,7 +348,6 @@
         });
         els.attractivite.max = String(maître.attractivite.length - 1);
         els.attractivite.addEventListener("input", () => {
-            basculerSurMonCommerceSiUsecase();
             etat.attractiviteIndex = Number(els.attractivite.value);
             mettreAJour();
         });
@@ -332,7 +363,6 @@
             els.redEligibles.appendChild(opt);
         }
         els.redEligibles.addEventListener("change", () => {
-            basculerSurMonCommerceSiUsecase();
             const v = arrondirSurGrille(Number(els.redEligibles.value));
             // Appliquer la même réduction aux trois catégories
             for (const cat of CATEGORIES_REDUITES) etat.reductions[cat] = v;
@@ -386,7 +416,6 @@
                 select.appendChild(opt);
             }
             select.addEventListener("change", () => {
-                basculerSurMonCommerceSiUsecase();
                 // Retrouver la valeur de la grille la plus proche (évite les écarts
                 // de virgule flottante entre "0.05" saisi et 0.05 calculé)
                 etat.reductions[cat] = arrondirSurGrille(Number(select.value));
@@ -397,13 +426,20 @@
         $("rev-verte").textContent = formaterEuros(maître.revenusCategories.verte);
     }
 
+    // Remplit hauteur + pourcentage lisible de chaque segment d'une barre verticale
+    function remplirBarreVerticale(barre, parts) {
+        for (const cat of CATEGORIES) {
+            const seg = barre.querySelector(`.sim-seg-v-${cat}`);
+            seg.style.height = (parts[cat] * 100) + "%";
+            const val = seg.querySelector(".sim-seg-val");
+            if (val) val.textContent = formaterPourcent(parts[cat], 0);
+        }
+    }
+
     // Barre verticale France entière (20/20/20/40 depuis le JSON) + titres
     function construireBarreFrance() {
         const parts = maître.partsFranceComparatif;
-        for (const cat of CATEGORIES) {
-            const seg = els.barreFrance.querySelector(`.sim-seg-v-${cat}`);
-            seg.style.height = (parts[cat] * 100) + "%";
-        }
+        remplirBarreVerticale(els.barreFrance, parts);
         $("titre-france").textContent = maître.textes.titreBarreFrance || "France entière (comparatif)";
         $("titre-secteur").textContent = maître.textes.titreBarreSecteur || "Votre secteur";
         // Légendes communes (libellés qualitatifs du JSON)
@@ -415,19 +451,6 @@
     }
 
     // ---------- Événements ----------
-    // Toute saisie manuelle (hors application d'un usecase) repasse sur
-    // « Simuler sur mon commerce » pour ne pas altérer un usecase préconfiguré.
-    let applicationUsecaseEnCours = false;
-    function basculerSurMonCommerceSiUsecase() {
-        if (applicationUsecaseEnCours) return;
-        if (etat.usecase !== ID_USECASE_DEFAUT) {
-            etat.usecase = ID_USECASE_DEFAUT;
-            activerBoutonScenario(ID_USECASE_DEFAUT);
-            els.narratif.textContent = maître.textes.narratifDefaut;
-            els.narratifImage.hidden = true;
-        }
-    }
-
     function brancherEvenements() {
         document.querySelector(".hamburger").addEventListener("click", function () {
             document.querySelector(".nav-sidebar").classList.toggle("open");
@@ -439,19 +462,16 @@
         });
 
         els.marge.addEventListener("input", () => {
-            basculerSurMonCommerceSiUsecase();
             etat.marge = (parseFloat(els.marge.value) || 0) / 100;
             els.estimationNote.hidden = true;
             mettreAJour();
         });
         els.passages.addEventListener("input", () => {
-            basculerSurMonCommerceSiUsecase();
             etat.passages = parseInt(els.passages.value, 10) || 0;
             els.estimationNote.hidden = true;
             mettreAJour();
         });
         els.panier.addEventListener("input", () => {
-            basculerSurMonCommerceSiUsecase();
             etat.panier = parseFloat(els.panier.value) || 0;
             els.estimationNote.hidden = true;
             mettreAJour();
@@ -465,6 +485,13 @@
         });
         els.cpInput.addEventListener("focus", () => {
             if (els.cpInput.value.trim().length >= 2) onRechercheCP();
+        });
+
+        // Reset : remettre les paramètres par défaut du usecase actif
+        els.btnResetUsecase.addEventListener("click", () => {
+            if (etat.usecase && etat.usecase !== ID_USECASE_DEFAUT) {
+                appliquerUsecase(etat.usecase);
+            }
         });
 
         // Mode expert : toggle haut de section « Simulation »
@@ -594,7 +621,6 @@
     }
 
     function choisirCP(cp) {
-        basculerSurMonCommerceSiUsecase();
         etat.cp = cp;
         els.cpListe.hidden = true;
         els.cpInput.setAttribute("aria-expanded", "false");
@@ -671,6 +697,7 @@
         mettreAJourReductions(resultat);
         mettreAJourResultats(resultat);
         mettreAJourSuggestion(resultat);
+        mettreAJourUsecase();
         mettreAJourURL();
     }
 
@@ -683,10 +710,10 @@
         // (tronqué proprement si trop long, jamais rogné au milieu)
         $("titre-secteur").textContent = e.communes[0];
         $("titre-secteur").title = e.communes[0]; // tooltip si tronqué
+        remplirBarreVerticale(els.barrePopulation, e.parts);
         for (const cat of CATEGORIES) {
-            const seg = els.barrePopulation.querySelector(`.sim-seg-v-${cat}`);
-            seg.style.height = (e.parts[cat] * 100) + "%";
-            seg.title = `${cat} : ${formaterPourcent(e.parts[cat], 1)}`;
+            els.barrePopulation.querySelector(`.sim-seg-v-${cat}`)
+                .setAttribute("title", `${cat} : ${formaterPourcent(e.parts[cat], 1)}`);
         }
     }
 
@@ -905,11 +932,7 @@
             els.narratif.textContent = maître.textes.narratifDefaut;
         }
 
-        // Code postal (param individuel prioritaire sur le usecase).
-        // NB : choisirCP appelle basculerSurMonCommerceSiUsecase, mais
-        // applicationUsecaseEnCours est encore à true ici (restaurateur dans
-        // le bloc try/finally) : la bascule est donc neutralisée pendant le
-        // chargement initial, ce qui est le comportement voulu.
+        // Code postal (param individuel prioritaire sur le usecase)
         const cp = get("cp");
         if (cp && cpBase[cp]) choisirCP(cp);
 

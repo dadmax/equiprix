@@ -95,19 +95,19 @@
                             <div class="sim-barre-verticale-bloc">
                                 <p class="sim-barre-titre" id="titre-secteur">Votre secteur</p>
                                 <div class="sim-barre-verticale" id="barre-population" role="img" aria-label="Répartition de la population de votre secteur par catégorie equiprix">
-                                    <div class="sim-seg-v sim-seg-v-rouge" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-orange" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-jaune" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-verte" style="height:40%"></div>
+                                    <div class="sim-seg-v sim-seg-v-rouge" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-orange" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-jaune" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-verte" style="height:40%"><span class="sim-seg-val" aria-hidden="true"></span></div>
                                 </div>
                             </div>
                             <div class="sim-barre-verticale-bloc">
                                 <p class="sim-barre-titre" id="titre-france">France entière (comparatif)</p>
                                 <div class="sim-barre-verticale" id="barre-france" role="img" aria-label="Répartition de la population française par catégorie equiprix">
-                                    <div class="sim-seg-v sim-seg-v-rouge" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-orange" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-jaune" style="height:20%"></div>
-                                    <div class="sim-seg-v sim-seg-v-verte" style="height:40%"></div>
+                                    <div class="sim-seg-v sim-seg-v-rouge" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-orange" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-jaune" style="height:20%"><span class="sim-seg-val" aria-hidden="true"></span></div>
+                                    <div class="sim-seg-v sim-seg-v-verte" style="height:40%"><span class="sim-seg-val" aria-hidden="true"></span></div>
                                 </div>
                             </div>
                         </div>
@@ -165,10 +165,16 @@
         <section class="sim-section-basse" aria-labelledby="titre-simulation">
             <div class="sim-section-basse-entete">
                 <h2 class="sim-section-titre" id="titre-simulation">Simulation</h2>
-                <label class="sim-toggle-expert">
-                    <input type="checkbox" id="toggle-expert">
-                    Mode expert
-                </label>
+                <div class="sim-entete-actions">
+                    <span class="sim-badge-modifie" id="badge-modifie" hidden>paramètres modifiés</span>
+                    <button type="button" class="sim-btn-reset" id="btn-reset-usecase" hidden>
+                        Réinitialiser le scénario
+                    </button>
+                    <label class="sim-toggle-expert">
+                        <input type="checkbox" id="toggle-expert">
+                        Mode expert
+                    </label>
+                </div>
             </div>
 
             <div class="sim-deux-colonnes">

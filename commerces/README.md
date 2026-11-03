@@ -125,10 +125,13 @@ ajouté à l'URL (`?uc=…`) pour permettre le partage direct d'un scénario.
 ce que equiprix change) **sans citer les résultats chiffrés** affichés par le
 simulateur — ils sont déjà à l'écran, les répéter ne sert à rien.
 
-**Bascule automatique** : dès qu'un commerçant modifie un paramètre à la main
-(marge, passages, panier, profil, pénétration, réductions, code postal, type de
-commerce) alors qu'un use case est actif, le scénario repasse automatiquement sur
-« Simuler sur mon commerce » — on ne modifie jamais un use case préconfiguré.
+**Modification d'un use case actif** : on garde le use case (et son narratif)
+lorsqu'on change un paramètre à la main — c'est voulu, pour explorer. En
+revanche un badge « paramètres modifiés » + un bouton « Réinitialiser le
+scénario » (à côté du toggle mode expert, en haut de la section Simulation)
+apparaissent dès que l'état courant diffère des `params` du use case ; le
+bouton restaure les paramètres par défaut du use case. Sur « Simuler sur mon
+commerce », aucun badge ni reset.
 
 ## Tests
 
