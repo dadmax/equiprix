@@ -487,6 +487,35 @@ async function main() {
         !/\d[\d\s ]*,?\d*\s*€\s*\/\s*mois/.test(dS.getElementById("narratif").textContent)
         && dS.getElementById("narratif").textContent.includes("Montreuil"));
     domS.window.close();
+    // Réductions différenciées (rj=0) -> mode expert coché automatiquement
+    const domS2 = await charger(`${BASE}/commerces/?uc=supérette-montreuil`);
+    const dS2 = domS2.window.document;
+    verifier("Usecase à réductions différenciées : mode expert coché par défaut (toggle + URL expert=1)",
+        dS2.getElementById("toggle-expert").checked === true
+        && domS2.window.location.search.includes("expert=1"));
+    verifier("Usecase à réductions différenciées : couloir éligibles masqué, 3 couloirs visibles",
+        dS2.getElementById("couloir-eligibles").hidden === true
+        && dS2.getElementById("couloirs-expert").hidden === false
+        && dS2.querySelectorAll("#couloirs-expert .sim-couloir").length === 3);
+    verifier("Usecase à réductions identiques (boulangerie 15/15/15) : mode NON expert par défaut",
+        (() => {
+            const ok = d6.getElementById("toggle-expert").checked === false
+                && !dom6.window.location.search.includes("expert=1");
+            return ok;
+        })());
+    domS2.window.close();
+
+    // Nouveau message « résultat négatif » (deux pistes), depuis le JSON
+    const domNeg = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=100&panier=30&profil=commune&attr=2&rr=0.50&ro=0.50&rj=0.50`);
+    const dNeg = domNeg.window.document;
+    const sugNeg = dNeg.getElementById("suggestion").textContent;
+    verifier("Résultat négatif : suggestion « deux pistes » (modifier le taux / cibler forte marge)",
+        !dNeg.getElementById("suggestion").hidden
+        && sugNeg.includes("Résultat négatif")
+        && sugNeg.includes("taux de réduction")
+        && sugNeg.includes("forte marge"),
+        sugNeg.slice(0, 90));
+    domNeg.window.close();
 
     // ================= Jauge clientèle + verte condensée =================
     console.log("Jauge clientèle et catégorie verte");

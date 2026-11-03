@@ -179,7 +179,8 @@
     },
     "titreBarreSecteur": "Votre secteur",
     "titreBarreFrance": "France entière (comparatif)",
-    "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?"
+    "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?",
+    "suggestionResultatNegatif": "Résultat négatif : deux pistes pour revenir à un solde positif. 1) Modifier le taux de réduction pratiqué. 2) Cibler les réductions sur des produits ou services à forte marge, sur lesquels vous resterez gagnant malgré la réduction."
   },
   "useCases": [
     {

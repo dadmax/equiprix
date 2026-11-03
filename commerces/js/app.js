@@ -204,6 +204,8 @@
         mettreAJourBadgeModifie();
         if (!uc) {
             // Retour au scénario par défaut : narratif générique, pas de préconfiguration
+            etat.expert = false;
+            els.toggleExpert.checked = false;
             els.narratif.textContent = maître.textes.narratifDefaut;
             els.narratifImage.hidden = true;
             mettreAJour();
@@ -234,6 +236,14 @@
                 etat.reductions[cat] = arrondirSurGrille(p[cle]);
             }
         }
+        // Réductions différenciées (ex. 10 % sur rouge/orange, 0 % sur jaune) :
+        // la super-catégorie « éligibles » n'a plus de sens -> mode expert coché
+        // par défaut. L'URL (?expert=1) reste prioritaire si présente.
+        const reds = CATEGORIES_REDUITES.map((c) => etat.reductions[c]);
+        const expertForce = CATEGORIES_REDUITES.some((c) => p[["rr", "ro", "rj"][CATEGORIES_REDUITES.indexOf(c)]] !== undefined)
+            && reds.some((r) => Math.abs(r - reds[0]) > 1e-9);
+        etat.expert = expertForce;
+        els.toggleExpert.checked = expertForce;
         // Narratif + illustration
         els.narratif.textContent = uc.narratif || maître.textes.narratifDefaut;
         if (uc.image) {
@@ -862,10 +872,10 @@
                     if (test.impactNet > 0) {
                         texte = `En passant la réduction ${cat} de ${formaterPourcent(rActuelle, 0)} à ${formaterPourcent(rTest, 0)}, votre résultat devient positif : +${formaterEuros(test.impactNet)} par mois.`;
                     } else {
-                        texte = "Essayez de réduire vos taux de réduction ou d'augmenter votre marge : ajustez les paramètres pour trouver un solde positif.";
+                        texte = maître.textes.suggestionResultatNegatif || "";
                     }
                 } else {
-                    texte = "Essayez de réduire vos taux de réduction ou d'augmenter votre marge : ajustez les paramètres pour trouver un solde positif.";
+                    texte = maître.textes.suggestionResultatNegatif || "";
                 }
             } else {
                 texte = "Aucune réduction appliquée : equiprix vous coûte les frais de service sans générer de marge supplémentaire. Envisagez une réduction pour les foyers éligibles.";

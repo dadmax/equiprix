@@ -84,7 +84,8 @@ côte à côte (secteur / France) utilisent `partsFranceComparatif` (20/20/20/40
 pour le comparatif ; leurs titres et les légendes qualitatives des catégories
 sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
 `legendesCategories`, `suggestionMargeFaible` — message affiché quand la
-marge commerciale est < 15 %).
+marge commerciale est < 15 %, `suggestionResultatNegatif` — deux pistes
+affichées quand le solde net est négatif).
 
 ## Scénarios (use cases)
 
@@ -125,6 +126,12 @@ ajouté à l'URL (`?uc=…`) pour permettre le partage direct d'un scénario.
 **Règle d'or des narratifs** : raconter l'histoire du commerce (contexte, enjeux,
 ce que equiprix change) **sans citer les résultats chiffrés** affichés par le
 simulateur — ils sont déjà à l'écran, les répéter ne sert à rien.
+
+**Mode expert forcé** : si un use case définit des réductions
+**différenciées** (ex. 10 % sur rouge/orange, 0 % sur jaune), la
+super-catégorie « éligibles » n'a plus de sens : le mode expert est coché
+automatiquement (`expert=1` dans l'URL). Les usecases à réductions
+identiques restent en mode non expert.
 
 **Modification d'un use case actif** : on garde le use case (et son narratif)
 lorsqu'on change un paramètre à la main — c'est voulu, pour explorer. En
