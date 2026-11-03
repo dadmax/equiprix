@@ -59,7 +59,9 @@
         passages: $("passages"),
         panier: $("panier"),
         estimationNote: $("estimation-note"),
-        profils: $("profils"),
+        profil: $("profil"),
+        profilReperes: $("profil-reperes"),
+        profilNom: $("profil-nom"),
         attractivite: $("attractivite"),
         attractiviteReperes: $("attractivite-reperes"),
         attractiviteNom: $("attractivite-nom"),
@@ -202,8 +204,6 @@
         if (p.panier !== undefined) { etat.panier = p.panier; els.panier.value = p.panier; }
         if (p.profil && maître.profilsClientele.some((pr) => pr.id === p.profil)) {
             etat.profil = p.profil;
-            const radio = els.profils.querySelector(`input[value="${p.profil}"]`);
-            if (radio) radio.checked = true;
         }
         if (p.attr !== undefined) {
             const idx = maître.attractivite.findIndex((a) => a.facteur === p.attr);
@@ -258,24 +258,30 @@
         }
     }
 
+    // Clientèle en jauge (3 repères, comme la pénétration)
     function construireProfils() {
-        els.profils.innerHTML = "";
+        els.profilReperes.innerHTML = "";
         maître.profilsClientele.forEach((profil) => {
-            const label = document.createElement("label");
-            label.className = "sim-radio-profil";
-            const radio = document.createElement("input");
-            radio.type = "radio";
-            radio.name = "profil";
-            radio.value = profil.id;
-            radio.checked = profil.id === etat.profil;
-            radio.addEventListener("change", () => {
-                etat.profil = profil.id;
-                mettreAJour();
-            });
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(profil.nom));
-            els.profils.appendChild(label);
+            const span = document.createElement("span");
+            span.textContent = profil.nom.split(" ")[0] === "Comme"
+                ? "Comme la commune"
+                : profil.nom.split(" plus")[0].split(" aisée")[0];
+            els.profilReperes.appendChild(span);
         });
+        els.profil.max = String(maître.profilsClientele.length - 1);
+        els.profil.addEventListener("input", () => {
+            etat.profil = maître.profilsClientele[Number(els.profil.value)].id;
+            mettreAJour();
+        });
+    }
+
+    // Applique l'index du profil courant au curseur
+    function mettreAJourProfilJauge() {
+        const idx = maître.profilsClientele.findIndex((p) => p.id === etat.profil);
+        if (idx >= 0) {
+            els.profil.value = String(idx);
+            els.profilNom.textContent = maître.profilsClientele[idx].nom;
+        }
     }
 
     function construireJaugeAttractivite() {
@@ -312,7 +318,9 @@
     // Couloirs détaillés rouge/orange/jaune (mode expert), construits en JS
     function construireCouloirsExpert() {
         const conteneur = els.couloirsExpert;
-        // Le couloir vert est déjà dans le HTML ; insérer les 3 autres avant
+        // Ordre d'affichage : rouge, orange, jaune (du plus bas au plus haut)
+        // On insère chaque couloir après le précédent pour conserver l'ordre.
+        let precedent = null;
         for (const cat of ["rouge", "orange", "jaune"]) {
             const div = document.createElement("div");
             div.className = `sim-couloir sim-couloir-${cat}`;
@@ -334,7 +342,12 @@
                     <div><dt>Panier moyen (proportionnel au revenu médian&nbsp;: <span id="rev-${cat}"></span>)</dt><dd id="info-panier-${cat}">—</dd></div>
                     <div><dt>Clients mensuels en plus</dt><dd id="info-clients-${cat}">—</dd></div>
                 </dl>`;
-            conteneur.insertBefore(div, conteneur.firstChild);
+            if (precedent) {
+                conteneur.insertBefore(div, precedent.nextSibling);
+            } else {
+                conteneur.insertBefore(div, conteneur.firstChild);
+            }
+            precedent = div;
         }
         // Brancher les selects + remplir les revenus médians
         for (const cat of CATEGORIES_REDUITES) {
@@ -358,13 +371,20 @@
         $("rev-verte").textContent = formaterEuros(maître.revenusCategories.verte);
     }
 
-    // Jauge comparatif France entière (20/20/20/40 depuis le JSON)
+    // Barre verticale France entière (20/20/20/40 depuis le JSON) + titres
     function construireBarreFrance() {
         const parts = maître.partsFranceComparatif;
         for (const cat of CATEGORIES) {
-            const seg = els.barreFrance.querySelector(`.sim-seg-${cat}`);
-            seg.style.width = (parts[cat] * 100) + "%";
-            $("legf-" + cat).textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)} — ${formaterPourcent(parts[cat], 0)}`;
+            const seg = els.barreFrance.querySelector(`.sim-seg-v-${cat}`);
+            seg.style.height = (parts[cat] * 100) + "%";
+        }
+        $("titre-france").textContent = maître.textes.titreBarreFrance || "France entière (comparatif)";
+        $("titre-secteur").textContent = maître.textes.titreBarreSecteur || "Votre secteur";
+        // Légendes communes (libellés qualitatifs du JSON)
+        const legendes = maître.textes.legendesCategories || {};
+        for (const cat of CATEGORIES) {
+            $("leg-" + cat).textContent = legendes[cat]
+                || `${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
         }
     }
 
@@ -601,27 +621,26 @@
 
         mettreAJourCommune();
         mettreAJourActivite();
+        mettreAJourProfilJauge();
         mettreAJourReductions(resultat);
         mettreAJourResultats(resultat);
         mettreAJourSuggestion(resultat);
         mettreAJourURL();
     }
 
-    // --- Zone commune ---
+    // --- Zone commune : barre verticale du secteur (hauteur = part en %) ---
     function mettreAJourCommune() {
         if (!etat.cp) return;
         const e = cpBase[etat.cp];
         if (!e.donneesDispo) return;
+        // Le titre de la barre de gauche reprend le nom de la commune principale
+        $("titre-secteur").textContent = e.communes[0];
         for (const cat of CATEGORIES) {
-            const seg = els.barrePopulation.querySelector(`.sim-seg-${cat}`);
-            seg.style.width = (e.parts[cat] * 100) + "%";
-            seg.title = formaterPourcent(e.parts[cat], 1);
+            const seg = els.barrePopulation.querySelector(`.sim-seg-v-${cat}`);
+            seg.style.height = (e.parts[cat] * 100) + "%";
+            seg.title = `${cat} : ${formaterPourcent(e.parts[cat], 1)}`;
         }
-        $("leg-rouge").textContent = `Rouge — ${formaterPourcent(e.parts.rouge, 1)}`;
-        $("leg-orange").textContent = `Orange — ${formaterPourcent(e.parts.orange, 1)}`;
-        $("leg-jaune").textContent = `Jaune — ${formaterPourcent(e.parts.jaune, 1)}`;
-        $("leg-verte").textContent = `Verte — ${formaterPourcent(e.parts.verte, 1)}`;
-        els.cpMenages.textContent = `${formaterNombre(e.nbMenages)} ménages dans le secteur`;
+        els.cpMenages.textContent = `${formaterNombre(e.nbMenages)} ménages`;
     }
 
     // --- Zone activité ---
@@ -868,8 +887,6 @@
         const profil = get("profil");
         if (profil && maître.profilsClientele.some((pr) => pr.id === profil)) {
             etat.profil = profil;
-            const radio = els.profils.querySelector(`input[value="${profil}"]`);
-            if (radio) radio.checked = true;
         }
         // Attractivité (par facteur)
         const attr = parseInt(get("attr"), 10);

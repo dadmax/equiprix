@@ -115,7 +115,50 @@
   "textes": {
     "narratifDefaut": "La tarification solidaire, c'est adapter le prix à la capacité financière de chacun : avec equiprix, vos clients des 60 % de niveaux de vie les plus bas bénéficient d'une réduction en caisse, identifiée par un simple QR code. Jouez avec le simulateur ci-dessous : renseignez votre commerce, choisissez votre réduction, et découvrez l'impact estimé sur votre marge.",
     "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
-    "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français"
+    "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français",
+    "legendesCategories": {
+      "rouge": "Rouge — ménage sous ou proche du seuil de pauvreté",
+      "orange": "Orange — ménage modeste",
+      "jaune": "Jaune — classe moyenne",
+      "verte": "Verte — ménage aisé"
+    },
+    "titreBarreSecteur": "Votre secteur",
+    "titreBarreFrance": "France entière (comparatif)"
   },
-  "useCases": []
+  "useCases": [
+    {
+      "id": "boulangerie-albertville",
+      "nom": "Boulangerie à Albertville",
+      "narratif": "À Albertville (73200), la boulangerie de Mme Martin accueille 1 200 passages par mois pour un panier moyen de 8 € et une marge de 35 %. Sa clientèle reflète la population de la commune, plus modeste que la moyenne française (21 % de foyers rouges contre 20 % en France). En proposant 15 % de réduction aux foyers éligibles equiprix, elle estime attirer +161 clients par mois (+13 %) pour un solde net d'environ +25 €/mois. À 20 %, la réduction fait fondre son solde : ajustez le taux pour trouver votre équilibre.",
+      "params": {
+        "cp": "73200",
+        "type": "commerceBouche",
+        "marge": 0.35,
+        "passages": 1200,
+        "panier": 8,
+        "profil": "commune",
+        "attr": 5,
+        "rr": 0.15,
+        "ro": 0.15,
+        "rj": 0.15
+      }
+    },
+    {
+      "id": "coiffeur-saint-germain",
+      "nom": "Coiffeur à Saint-Germain-en-Laye",
+      "narratif": "À Saint-Germain-en-Laye (78100), le salon de coiffure de M. Diallo réalise 400 coupes par mois à 35 € HT, avec une marge de 50 %. Sa clientèle est un peu plus aisée que la moyenne et la commune compte 67 % de foyers verts. Avec 10 % de réduction pour les foyers éligibles, il estime attirer +21 clients par mois (+5 %) pour un solde net d'environ +49 €/mois — la réduction reste rentable malgré des frais de service plafonnés à 100 €.",
+      "params": {
+        "cp": "78100",
+        "type": "autre",
+        "marge": 0.50,
+        "passages": 400,
+        "panier": 35,
+        "profil": "unPeuAisee",
+        "attr": 8,
+        "rr": 0.10,
+        "ro": 0.10,
+        "rj": 0.10
+      }
+    }
+  ]
 }

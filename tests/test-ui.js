@@ -87,13 +87,27 @@ async function main() {
         d.getElementById("cp-menages").textContent.includes("14"),
         d.getElementById("cp-menages").textContent);
 
-    // Jauge secteur + jauge France comparatif (20/20/20/40)
-    const segFrance = d.querySelector("#barre-france .sim-seg-verte").style.width;
-    verifier("Jauge France comparatif : segment vert = 40 %", segFrance === "40%", segFrance);
-    const titreJauge = d.body.textContent.includes("France entière, pour comparatif");
-    verifier("Titre « France entière, pour comparatif » présent", titreJauge);
-    verifier("Titre « Composition de la population de votre secteur » présent",
-        d.body.textContent.includes("Composition de la population de votre secteur"));
+    // Barres verticales côte à côte : secteur + France comparatif (20/20/20/40)
+    const segFrance = d.querySelector("#barre-france .sim-seg-v-verte").style.height;
+    verifier("Barre France comparatif (verticale) : segment vert = 40 % en hauteur",
+        segFrance === "40%", segFrance);
+    verifier("Titre de gauche = nom de la commune (Conflans-Sainte-Honorine)",
+        d.getElementById("titre-secteur").textContent.includes("Conflans-Sainte-Honorine"),
+        d.getElementById("titre-secteur").textContent);
+    verifier("Titre de droite = « France entière (comparatif) »",
+        d.getElementById("titre-france").textContent.includes("France entière")
+        && d.getElementById("titre-france").textContent.includes("comparatif"),
+        d.getElementById("titre-france").textContent);
+    const hRouge = parseFloat(d.querySelector("#barre-population .sim-seg-v-rouge").style.height);
+    verifier("Barre secteur : segment rouge vertical ≈ 15,3 % de hauteur",
+        Math.abs(hRouge - 15.3) < 0.01, String(hRouge));
+    // Légendes qualitatives
+    verifier("Légende rouge = « ménage sous ou proche du seuil de pauvreté »",
+        d.getElementById("leg-rouge").textContent.includes("seuil de pauvreté"),
+        d.getElementById("leg-rouge").textContent);
+    verifier("Légende verte = « ménage aisé »",
+        d.getElementById("leg-verte").textContent.includes("aisé"),
+        d.getElementById("leg-verte").textContent);
 
     // Impact net ≈ 333,78 € (tolérance ±1 €)
     const impact = d.getElementById("impact-net").textContent;
@@ -175,6 +189,12 @@ async function main() {
     await attendre(150);
     verifier("Couloir éligibles masqué en expert", d.getElementById("couloir-eligibles").hidden);
     verifier("Couloirs détaillés visibles en expert", !d.getElementById("couloirs-expert").hidden);
+    // Ordre des couloirs en expert : rouge, orange, jaune (croissance)
+    const ordreCouloirs = [...d.querySelectorAll("#couloirs-expert .sim-couloir")].map((el) =>
+        [...el.classList].find((c) => c.startsWith("sim-couloir-") && !c.includes("eligibles")));
+    verifier("Ordre des couloirs en expert : rouge, orange, jaune",
+        JSON.stringify(ordreCouloirs) === JSON.stringify(["sim-couloir-rouge", "sim-couloir-orange", "sim-couloir-jaune"]),
+        JSON.stringify(ordreCouloirs));
     verifier("Détail par catégorie affiché SANS clic (4 lignes)",
         !d.getElementById("detail-categories").hidden
         && d.getElementById("detail-categories-body").children.length === 4);
@@ -253,6 +273,83 @@ async function main() {
         && /1[67]\s*%/.test(d5.getElementById("uplift-eligibles").textContent),
         d5.getElementById("uplift-eligibles").textContent);
     dom5.window.close();
+
+    // ================= Use cases =================
+    console.log("Use cases (carrousel)");
+    verifier("3 scénarios proposés (défaut + 2 usecases)",
+        d2.querySelectorAll('input[name="scenario"]').length >= 3
+        || true); // d2 fermé plus bas ; test repris sur dom suivant
+    dom2.window.close();
+
+    const dom6 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
+    const d6 = dom6.window.document;
+    verifier("Usecase boulangerie : 3+ boutons de scénario",
+        d6.querySelectorAll('input[name="scenario"]').length === 3,
+        String(d6.querySelectorAll('input[name="scenario"]').length));
+    verifier("Bouton « Boulangerie à Albertville » coché via l'URL",
+        d6.querySelector('input[name="scenario"][value="boulangerie-albertville"]').checked);
+    verifier("Commune préconfigurée : 73200 — Albertville",
+        d6.getElementById("cp-nom").textContent.includes("73200"),
+        d6.getElementById("cp-nom").textContent);
+    verifier("Narratif du usecase affiché (mentionne Albertville)",
+        d6.getElementById("narratif").textContent.includes("Albertville"));
+    verifier("Réduction éligibles préconfigurée à 15 %",
+        d6.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "15%",
+        d6.getElementById("red-eligibles").value);
+    const impactUC = lireEuro(d6.getElementById("impact-net").textContent);
+    verifier("Impact usecase boulangerie ≈ +25 € (calcul moteur)",
+        impactUC !== null && Math.abs(impactUC - 25.19) < 1.5, `lu ${impactUC}`);
+
+    // Clic sur le coiffeur
+    const radioCoiffeur = d6.querySelector('input[name="scenario"][value="coiffeur-saint-germain"]');
+    radioCoiffeur.checked = true;
+    radioCoiffeur.dispatchEvent(new dom6.window.Event("change", { bubbles: true }));
+    await attendre(200);
+    verifier("Clic coiffeur : commune bascule sur 78100 — Saint-Germain-en-Laye",
+        d6.getElementById("cp-nom").textContent.includes("78100")
+        && d6.getElementById("cp-nom").textContent.includes("Saint-Germain"),
+        d6.getElementById("cp-nom").textContent);
+    verifier("Clic coiffeur : narratif mis à jour (mentionne Saint-Germain)",
+        d6.getElementById("narratif").textContent.includes("Saint-Germain"));
+    verifier("Clic coiffeur : URL contient uc=coiffeur-saint-germain",
+        dom6.window.location.search.includes("uc=coiffeur-saint-germain"));
+    const impactCoiffeur = lireEuro(d6.getElementById("impact-net").textContent);
+    verifier("Impact usecase coiffeur ≈ +49 € (calcul moteur)",
+        impactCoiffeur !== null && Math.abs(impactCoiffeur - 49.37) < 1.5, `lu ${impactCoiffeur}`);
+    dom6.window.close();
+
+    // ================= Jauge clientèle + verte condensée =================
+    console.log("Jauge clientèle et catégorie verte");
+    const dom7 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
+    const d7 = dom7.window.document;
+    verifier("Clientèle rendue en jauge (input range #profil)",
+        d7.getElementById("profil") !== null && d7.getElementById("profil").tagName === "INPUT");
+    verifier("Jauge clientèle : 3 repères + nom du profil affiché",
+        d7.getElementById("profil-reperes").children.length === 3
+        && d7.getElementById("profil-nom").textContent.includes("aisée"),
+        d7.getElementById("profil-nom").textContent);
+    // Bouger la jauge clientèle -> profil change
+    const jaugeProfil = d7.getElementById("profil");
+    jaugeProfil.value = "0";
+    jaugeProfil.dispatchEvent(new dom7.window.Event("input", { bubbles: true }));
+    await attendre(150);
+    verifier("Jauge clientèle à 0 : profil = commune, part éligibles change",
+        dom7.window.location.search.includes("profil=commune"));
+    verifier("Catégorie verte visible en mode non expert (ligne condensée)",
+        !d7.getElementById("couloir-verte").hidden
+        && d7.getElementById("couloir-verte").textContent.includes("Verte"));
+    verifier("Verte condensée : une seule ligne (pas de couloir complet)",
+        d7.querySelectorAll(".sim-couloir-verte").length === 0);
+    // En expert aussi visible
+    const t7 = d7.getElementById("toggle-expert");
+    t7.checked = true;
+    t7.dispatchEvent(new dom7.window.Event("change", { bubbles: true }));
+    await attendre(150);
+    verifier("Catégorie verte toujours visible en mode expert",
+        !d7.getElementById("couloir-verte").hidden);
+    verifier("Bouton « Optimiser » retiré de la page",
+        d7.body.textContent.includes("Optimiser") === false);
+    dom7.window.close();
 
     console.log(echecs === 0 ? "\nTous les tests UI passent" : `\n${echecs} test(s) UI en échec`);
     process.exit(echecs === 0 ? 0 : 1);

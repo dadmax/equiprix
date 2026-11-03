@@ -26,7 +26,7 @@
 /* ---------- En-tête ---------- */
 .sim-hero {
     background-color: var(--bg-why);
-    padding: 48px 0 32px;
+    padding: 32px 0 24px;
     text-align: center;
 }
 
@@ -38,32 +38,18 @@
 
 .sim-title {
     color: var(--primary-color);
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 /* ---------- Carrousel de scénarios ---------- */
-.sim-scenarios {
-    border: none;
-    margin: 0 0 24px;
-    padding: 0;
-}
-
-.sim-scenarios-legend {
-    font-weight: 600;
-    color: var(--dark-gray);
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-    float: left;
-    width: 100%;
-}
-
 .sim-scenarios-liste {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
+    margin-bottom: 16px;
 }
 
 .sim-scenario {
@@ -72,9 +58,9 @@
     gap: 8px;
     border: 2px solid #D0D5DD;
     border-radius: 999px;
-    padding: 8px 16px;
+    padding: 6px 14px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
     color: var(--dark-gray);
     background: var(--white);
@@ -99,7 +85,7 @@
 .sim-narratif-bloc {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
     max-width: 900px;
     margin: 0 auto;
     text-align: left;
@@ -114,9 +100,10 @@
 
 .sim-narratif {
     color: var(--dark-gray);
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 0.95rem;
+    line-height: 1.55;
     flex: 1;
+    margin: 0;
 }
 
 .sim-narratif-image {
@@ -129,7 +116,7 @@
 /* ---------- Sections ---------- */
 .sim-section-haute,
 .sim-section-basse {
-    padding: 40px 0;
+    padding: 24px 0;
 }
 
 .sim-section-basse {
@@ -144,30 +131,28 @@ main.sim-container {
 
 .sim-section-titre {
     color: var(--primary-color);
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.sim-section-intro {
-    color: #667085;
-    font-size: 0.95rem;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .sim-section-basse-entete {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.sim-section-basse-entete .sim-section-titre {
+    margin-bottom: 0;
 }
 
 .sim-deux-colonnes {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 16px;
     align-items: start;
 }
 
@@ -175,25 +160,29 @@ main.sim-container {
     .sim-deux-colonnes {
         grid-template-columns: 1fr 1fr;
     }
+    /* Section « Votre commerce » : commune max 30 %, activité 70 % */
+    .sim-deux-colonnes-30-70 {
+        grid-template-columns: 30% 1fr;
+    }
 }
 
 .sim-zone {
     background-color: var(--white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
-    padding: 24px;
+    padding: 16px 20px;
 }
 
 .sim-zone-titre {
     color: var(--primary-color);
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 /* ---------- Champs ---------- */
 .sim-field {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .sim-label {
@@ -233,14 +222,9 @@ main.sim-container {
 .sim-fieldset {
     border: 1px solid #EAECF0;
     border-radius: var(--border-radius);
-    padding: 16px;
-    margin-bottom: 16px;
-}
-
-.sim-fieldset legend.sim-label {
-    padding: 0 6px;
-    margin-bottom: 10px;
-}
+    padding: 12px 16px;
+    margin-bottom: 12px;
+} 
 
 .sim-grid-3 {
     display: grid;
@@ -299,40 +283,68 @@ main.sim-container {
     color: #667085;
 }
 
-/* ---------- Jauges de population ---------- */
-.sim-jauge-titre {
-    font-size: 0.9rem;
+/* ---------- Barres de population : deux barres verticales côte à côte ---------- */
+.sim-barres-cote-a-cote {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    margin-top: 12px;
+}
+
+.sim-barre-verticale-bloc {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+}
+
+.sim-barre-titre {
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--dark-gray);
-    margin: 20px 0 8px;
+    margin: 0 0 6px;
+    /* Nom de commune potentiellement long : tronqué proprement */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.sim-stacked-bar {
+.sim-barre-verticale {
     display: flex;
-    height: 28px;
+    flex-direction: column-reverse; /* rouge en bas, verte en haut */
+    width: 100%;
+    max-width: 90px;
+    height: 140px;
+    margin: 0 auto;
     border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 8px;
+    border: 1px solid #EAECF0;
 }
 
-.sim-seg {
-    transition: width 0.3s ease;
+.sim-seg-v {
+    transition: height 0.3s ease;
+    width: 100%;
 }
 
-.sim-seg-rouge { background-color: var(--cat-rouge); }
-.sim-seg-orange { background-color: var(--cat-orange); }
-.sim-seg-jaune { background-color: var(--cat-jaune); }
-.sim-seg-verte { background-color: var(--cat-verte); }
+.sim-seg-v-rouge { background-color: var(--cat-rouge); }
+.sim-seg-v-orange { background-color: var(--cat-orange); }
+.sim-seg-v-jaune { background-color: var(--cat-jaune); }
+.sim-seg-v-verte { background-color: var(--cat-verte); }
 
 .sim-legend {
     list-style: none;
     padding: 0;
-    margin: 0 0 8px;
+    margin: 8px 0 6px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px 12px;
-    font-size: 0.85rem;
+    gap: 2px 12px;
+    font-size: 0.78rem;
 }
+
+@media (min-width: 576px) {
+    .sim-legend-4col {
+        grid-template-columns: 1fr 1fr;
+    }
+} 
 
 .sim-legend li {
     display: flex;
@@ -371,18 +383,18 @@ main.sim-container {
 .sim-cartes-type {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 6px;
 }
 
 .sim-carte-type {
     border: 2px solid #EAECF0;
     border-radius: var(--border-radius);
     background: var(--white);
-    padding: 12px 8px;
+    padding: 8px 6px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--dark-gray);
     text-align: center;
@@ -399,37 +411,8 @@ main.sim-container {
     color: var(--primary-color);
 }
 
-/* ---------- Radios profil clientèle ---------- */
-.sim-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sim-radio-profil {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 2px solid #EAECF0;
-    border-radius: var(--border-radius);
-    padding: 10px 12px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-}
-
-.sim-radio-profil:hover {
-    border-color: var(--primary-color);
-}
-
-.sim-radio-profil input {
-    accent-color: var(--primary-color);
-}
-
-.sim-radio-profil:has(input:checked) {
-    border-color: var(--primary-color);
-    background-color: var(--bg-why);
-}
+/* ---------- Jauge clientèle (comme la pénétration) ---------- */
+/* styles communs avec .sim-slider / .sim-jauge-reperes / .sim-attractivite-nom */
 
 /* ---------- Jauge attractivité ---------- */
 .sim-slider {
@@ -440,28 +423,49 @@ main.sim-container {
 .sim-jauge-reperes {
     display: flex;
     justify-content: space-between;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: #667085;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .sim-attractivite-nom {
     font-weight: 600;
-    font-size: 0.9rem;
-    margin-top: 8px;
+    font-size: 0.88rem;
+    margin-top: 6px;
+    margin-bottom: 0;
 }
 
 /* ---------- Couloirs réductions ---------- */
 .sim-couloirs {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .sim-couloir {
     border-radius: var(--border-radius);
-    padding: 16px;
+    padding: 12px 16px;
     border-left: 6px solid;
+}
+
+/* Catégorie verte : toujours visible, condensée sur une ligne */
+.sim-couloir-verte-ligne {
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+    background-color: var(--cat-verte-fond);
+    border-left: 6px solid var(--cat-verte);
+    border-radius: var(--border-radius);
+    padding: 8px 16px;
+    margin: 10px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sim-help-inline {
+    color: #667085;
+    font-size: 0.78rem;
 }
 
 .sim-couloir-rouge {
@@ -521,15 +525,15 @@ main.sim-container {
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--primary-color);
-    margin: 8px 0;
+    margin: 6px 0;
 }
 
 .sim-couloir-infos {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 4px 16px;
-    margin: 10px 0 0;
-    font-size: 0.85rem;
+    gap: 2px 16px;
+    margin: 8px 0 0;
+    font-size: 0.82rem;
 }
 
 @media (min-width: 576px) {
@@ -559,7 +563,7 @@ main.sim-container {
 /* ---------- Résultats ---------- */
 .sim-zone-resultats {
     position: sticky;
-    top: 88px;
+    top: 80px;
 }
 
 @media (max-width: 991px) {
@@ -570,9 +574,9 @@ main.sim-container {
 
 .sim-hero-resultat {
     text-align: center;
-    padding: 16px;
+    padding: 12px;
     border-radius: var(--border-radius);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     background-color: var(--light-gray);
     transition: background-color 0.3s ease;
 }
@@ -581,9 +585,10 @@ main.sim-container {
 .sim-hero-resultat.negatif { background-color: var(--cat-rouge-fond); }
 
 .sim-hero-chiffre {
-    font-size: 2rem;
+    font-size: 1.7rem;
     font-weight: 700;
     color: var(--dark-gray);
+    margin: 0;
 }
 
 .sim-hero-resultat.positif .sim-hero-chiffre { color: var(--resultat-positif); }
@@ -607,25 +612,25 @@ main.sim-container {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--primary-color);
-    margin: 0 0 16px;
+    margin: 0 0 12px;
 }
 
 .sim-recap {
     list-style: none;
     padding: 0;
-    margin: 0 0 16px;
+    margin: 0 0 12px;
 }
 
 .sim-recap li {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px solid #EAECF0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .sim-recap li > span:first-child {
@@ -680,7 +685,7 @@ main.sim-container {
 
 /* Tableau détail par catégorie (visible directement en mode expert) */
 .sim-detail-categories {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .sim-table {
@@ -717,9 +722,9 @@ main.sim-container {
 .sim-suggestion {
     background-color: var(--bg-collectivites);
     border-radius: var(--border-radius);
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    margin-bottom: 16px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    margin-bottom: 12px;
 }
 
 /* Actions */
@@ -754,13 +759,14 @@ main.sim-container {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
     color: var(--primary-color);
     background: var(--white);
     border: 2px solid var(--primary-color);
     border-radius: 999px;
-    padding: 8px 16px;
+    padding: 6px 14px;
+    margin: 0;
 }
 
 .sim-toggle-expert input {
@@ -769,7 +775,7 @@ main.sim-container {
 
 /* ---------- Sources ---------- */
 .sim-section-sources {
-    padding: 32px 0 48px;
+    padding: 24px 0 40px;
 }
 
 .sim-sources {

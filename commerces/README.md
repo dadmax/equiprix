@@ -79,8 +79,11 @@ Toutes les évolutions métier se font **uniquement** par édition de
 Les bornes de catégories (`bornesCategories`) et les revenus médians
 (`revenusCategories`) y figurent également, à titre de référence (le découpage
 en catégories est porté par la base codes postaux ; les revenus médians
-alimentent le calcul des paniers par catégorie). La jauge « France entière,
-pour comparatif » utilise `partsFranceComparatif` (20/20/20/40).
+alimentent le calcul des paniers par catégorie). Les deux barres verticales
+côte à côte (secteur / France) utilisent `partsFranceComparatif` (20/20/20/40)
+pour le comparatif ; leurs titres et les légendes qualitatives des catégories
+sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
+`legendesCategories`).
 
 ## Scénarios (use cases)
 
