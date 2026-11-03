@@ -387,10 +387,6 @@ main.sim-container {
 .sim-dot-verte { background-color: var(--cat-verte); }
 .sim-dot-eligibles { background-color: var(--cat-eligibles); }
 
-.sim-menages {
-    font-size: 0.85rem;
-    color: #667085;
-}
 
 .sim-warning {
     background-color: var(--cat-jaune-fond);

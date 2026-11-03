@@ -51,7 +51,6 @@
         cpDetail: $("cp-detail"),
         cpInfos: $("cp-infos"),
         cpIndisponible: $("cp-indisponible"),
-        cpMenages: $("cp-menages"),
         barrePopulation: $("barre-population"),
         barreFrance: $("barre-france"),
         cartesType: $("cartes-type"),
@@ -174,21 +173,31 @@
         if (cocheParDefaut) btn.classList.add("actif");
         btn.innerHTML = '<span class="sim-scenario-check" aria-hidden="true">✓</span>';
         btn.appendChild(document.createTextNode(nom));
-        btn.addEventListener("click", () => {
-            // Un seul scénario actif à la fois
-            els.scenariosListe.querySelectorAll(".sim-scenario").forEach((b) => {
-                b.classList.remove("actif");
-                b.setAttribute("aria-pressed", "false");
-            });
-            btn.classList.add("actif");
-            btn.setAttribute("aria-pressed", "true");
-            appliquerUsecase(id);
-        });
+        btn.addEventListener("click", () => appliquerUsecase(id));
         return btn;
     }
 
+    // Active visuellement le bouton d'un scénario (sans réappliquer ses params)
+    function activerBoutonScenario(id) {
+        els.scenariosListe.querySelectorAll(".sim-scenario").forEach((b) => {
+            const actif = b.dataset.scenario === id;
+            b.classList.toggle("actif", actif);
+            b.setAttribute("aria-pressed", String(actif));
+        });
+    }
+
     function appliquerUsecase(id) {
+        applicationUsecaseEnCours = true;
+        try {
+            appliquerUsecaseParams(id);
+        } finally {
+            applicationUsecaseEnCours = false;
+        }
+    }
+
+    function appliquerUsecaseParams(id) {
         etat.usecase = id;
+        activerBoutonScenario(id);
         const uc = (maître.useCases || []).find((u) => u.id === id);
         if (!uc) {
             // Retour au scénario par défaut : narratif générique, pas de préconfiguration
@@ -252,12 +261,19 @@
             btn.textContent = type.nom;
             btn.addEventListener("click", () => {
                 etat.type = id;
+                // Toute modification manuelle bascule sur « Simuler sur mon commerce » :
+                // on ne modifie pas un usecase préconfiguré
+                if (etat.usecase !== ID_USECASE_DEFAUT) {
+                    etat.usecase = ID_USECASE_DEFAUT;
+                    activerBoutonScenario(ID_USECASE_DEFAUT);
+                    els.narratif.textContent = maître.textes.narratifDefaut;
+                    els.narratifImage.hidden = true;
+                }
                 etat.marge = type.margeDefaut;
                 etat.passages = type.passagesDefaut;
                 etat.panier = type.panierDefaut;
                 els.marge.value = Math.round(type.margeDefaut * 100);
                 els.passages.value = type.passagesDefaut;
-                els.panier = type.panierDefaut;
                 els.panier.value = type.panierDefaut;
                 els.estimationNote.hidden = false;
                 mettreAJour();
@@ -276,6 +292,7 @@
         });
         els.profil.max = String(maître.profilsClientele.length - 1);
         els.profil.addEventListener("input", () => {
+            basculerSurMonCommerceSiUsecase();
             etat.profil = maître.profilsClientele[Number(els.profil.value)].id;
             mettreAJour();
         });
@@ -299,6 +316,7 @@
         });
         els.attractivite.max = String(maître.attractivite.length - 1);
         els.attractivite.addEventListener("input", () => {
+            basculerSurMonCommerceSiUsecase();
             etat.attractiviteIndex = Number(els.attractivite.value);
             mettreAJour();
         });
@@ -314,6 +332,7 @@
             els.redEligibles.appendChild(opt);
         }
         els.redEligibles.addEventListener("change", () => {
+            basculerSurMonCommerceSiUsecase();
             const v = arrondirSurGrille(Number(els.redEligibles.value));
             // Appliquer la même réduction aux trois catégories
             for (const cat of CATEGORIES_REDUITES) etat.reductions[cat] = v;
@@ -367,6 +386,7 @@
                 select.appendChild(opt);
             }
             select.addEventListener("change", () => {
+                basculerSurMonCommerceSiUsecase();
                 // Retrouver la valeur de la grille la plus proche (évite les écarts
                 // de virgule flottante entre "0.05" saisi et 0.05 calculé)
                 etat.reductions[cat] = arrondirSurGrille(Number(select.value));
@@ -395,6 +415,19 @@
     }
 
     // ---------- Événements ----------
+    // Toute saisie manuelle (hors application d'un usecase) repasse sur
+    // « Simuler sur mon commerce » pour ne pas altérer un usecase préconfiguré.
+    let applicationUsecaseEnCours = false;
+    function basculerSurMonCommerceSiUsecase() {
+        if (applicationUsecaseEnCours) return;
+        if (etat.usecase !== ID_USECASE_DEFAUT) {
+            etat.usecase = ID_USECASE_DEFAUT;
+            activerBoutonScenario(ID_USECASE_DEFAUT);
+            els.narratif.textContent = maître.textes.narratifDefaut;
+            els.narratifImage.hidden = true;
+        }
+    }
+
     function brancherEvenements() {
         document.querySelector(".hamburger").addEventListener("click", function () {
             document.querySelector(".nav-sidebar").classList.toggle("open");
@@ -406,16 +439,19 @@
         });
 
         els.marge.addEventListener("input", () => {
+            basculerSurMonCommerceSiUsecase();
             etat.marge = (parseFloat(els.marge.value) || 0) / 100;
             els.estimationNote.hidden = true;
             mettreAJour();
         });
         els.passages.addEventListener("input", () => {
+            basculerSurMonCommerceSiUsecase();
             etat.passages = parseInt(els.passages.value, 10) || 0;
             els.estimationNote.hidden = true;
             mettreAJour();
         });
         els.panier.addEventListener("input", () => {
+            basculerSurMonCommerceSiUsecase();
             etat.panier = parseFloat(els.panier.value) || 0;
             els.estimationNote.hidden = true;
             mettreAJour();
@@ -558,13 +594,17 @@
     }
 
     function choisirCP(cp) {
+        basculerSurMonCommerceSiUsecase();
         etat.cp = cp;
         els.cpListe.hidden = true;
         els.cpInput.setAttribute("aria-expanded", "false");
         const e = cpBase[cp];
         els.cpInput.value = "";
         els.cpSelectionne.hidden = false;
-        els.cpNom.textContent = `${cp} — ${e.communes[0]}`;
+        // Le nombre de ménages du secteur suit directement le nom de la commune :
+        // « 73200 — Albertville (14 255 ménages) »
+        const menages = e.donneesDispo && e.nbMenages ? ` (${formaterNombre(e.nbMenages)} ménages)` : "";
+        els.cpNom.textContent = `${cp} — ${e.communes[0]}${menages}`;
         if (e.communes.length > 1) {
             els.cpDetail.textContent = `et ${e.communes.length - 1} autre${e.communes.length > 2 ? "s" : ""} commune${e.communes.length > 2 ? "s" : ""}`;
             els.cpDetail.title = e.communes.join(", ");
@@ -648,7 +688,6 @@
             seg.style.height = (e.parts[cat] * 100) + "%";
             seg.title = `${cat} : ${formaterPourcent(e.parts[cat], 1)}`;
         }
-        els.cpMenages.textContent = `${formaterNombre(e.nbMenages)} ménages`;
     }
 
     // --- Zone activité ---
@@ -861,21 +900,16 @@
         // Scénario
         const uc = get("uc");
         if (uc && (maître.useCases || []).some((u) => u.id === uc)) {
-            const btn = els.scenariosListe.querySelector(`[data-scenario="${uc}"]`);
-            if (btn) {
-                els.scenariosListe.querySelectorAll(".sim-scenario").forEach((b) => {
-                    b.classList.remove("actif");
-                    b.setAttribute("aria-pressed", "false");
-                });
-                btn.classList.add("actif");
-                btn.setAttribute("aria-pressed", "true");
-            }
             appliquerUsecase(uc);
         } else {
             els.narratif.textContent = maître.textes.narratifDefaut;
         }
 
-        // Code postal (param individuel prioritaire sur le usecase)
+        // Code postal (param individuel prioritaire sur le usecase).
+        // NB : choisirCP appelle basculerSurMonCommerceSiUsecase, mais
+        // applicationUsecaseEnCours est encore à true ici (restaurateur dans
+        // le bloc try/finally) : la bascule est donc neutralisée pendant le
+        // chargement initial, ce qui est le comportement voulu.
         const cp = get("cp");
         if (cp && cpBase[cp]) choisirCP(cp);
 

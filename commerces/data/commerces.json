@@ -13,10 +13,10 @@
     "source": "Filosofi 2023 : D1, D3, médiane, D8 (France métropolitaine)"
   },
   "partsFranceComparatif": {
-    "rouge": 0.20,
-    "orange": 0.20,
-    "jaune": 0.20,
-    "verte": 0.40,
+    "rouge": 0.2,
+    "orange": 0.2,
+    "jaune": 0.2,
+    "verte": 0.4,
     "source": "Définition des catégories equiprix : 20 % les plus bas, 20-40 %, 40-60 %, 40 % les plus hauts"
   },
   "profilsClientele": [
@@ -81,21 +81,21 @@
     "supermarche": {
       "nom": "Supermarché",
       "source": "sondage",
-      "margeDefaut": 0.20,
+      "margeDefaut": 0.2,
       "passagesDefaut": 8000,
       "panierDefaut": 50
     },
     "barRestaurant": {
       "nom": "Bar / restaurant",
       "source": "sondage",
-      "margeDefaut": 0.50,
+      "margeDefaut": 0.5,
       "passagesDefaut": 8000,
       "panierDefaut": 50
     },
     "commerceBouche": {
       "nom": "Commerce de bouche",
       "source": "sondage",
-      "margeDefaut": 0.30,
+      "margeDefaut": 0.3,
       "passagesDefaut": 1000,
       "panierDefaut": 30
     },
@@ -103,21 +103,68 @@
       "nom": "Autre commerce",
       "source": "estimation",
       "coefPrudence": 0.75,
-      "base": ["barRestaurant", "commerceBouche"],
-      "margeDefaut": 0.30,
+      "base": [
+        "barRestaurant",
+        "commerceBouche"
+      ],
+      "margeDefaut": 0.3,
       "passagesDefaut": 1000,
       "panierDefaut": 30
     }
   },
   "matriceUplift": {
-    "reductions": [0, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50],
-    "supermarche":    [0, 0.1536, 0.20,   0.3276, 0.4933, 0.60,   0.65,   0.70,   0.75, 0.80],
-    "barRestaurant":  [0, 0.03,   0.05,   0.1414, 0.16,   0.1828, 0.20,   0.30,   0.35, 0.40],
-    "commerceBouche": [0, 0.1429, 0.20,   0.30,   0.4310, 0.50,   0.55,   0.60,   0.65, 0.70]
+    "reductions": [
+      0,
+      0.05,
+      0.08,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "supermarche": [
+      0,
+      0.1536,
+      0.2,
+      0.3276,
+      0.4933,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8
+    ],
+    "barRestaurant": [
+      0,
+      0.03,
+      0.05,
+      0.1414,
+      0.16,
+      0.1828,
+      0.2,
+      0.3,
+      0.35,
+      0.4
+    ],
+    "commerceBouche": [
+      0,
+      0.1429,
+      0.2,
+      0.3,
+      0.431,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7
+    ]
   },
   "parametres": {
-    "tauxCapture": 0.10,
-    "fraisServiceParPassage": 0.50,
+    "tauxCapture": 0.1,
+    "fraisServiceParPassage": 0.5,
     "capFraisServiceMensuel": 100
   },
   "textes": {
@@ -137,15 +184,15 @@
     {
       "id": "boulangerie-albertville",
       "nom": "Boulangerie à Albertville",
-      "narratif": "À Albertville (73200), la boulangerie de Mme Martin accueille 1 200 passages par mois pour un panier moyen de 8 € et une marge de 35 %. Sa clientèle reflète la population de la commune, plus modeste que la moyenne française (21 % de foyers rouges contre 20 % en France). En proposant 15 % de réduction aux foyers éligibles equiprix, elle estime attirer +161 clients par mois (+13 %) pour un solde net d'environ +25 €/mois. À 20 %, la réduction fait fondre son solde : ajustez le taux pour trouver votre équilibre.",
+      "narratif": "À Albertville, la boulangerie de Mme Martin tourne avec une marge réelle faible : à peine 10 % sur ses produits, ce qui rend compliqué de consentir une réduction sur l'ensemble de la boutique. Pourtant, elle observe un déséquilibre dans ses ventes : tout le monde vient chercher baguettes et pain, mais les produits plus coûteux — gâteaux, pâtisseries — ne partent presque qu'auprès des ménages aisés. Son panier moyen avoisine les 30 €, mais elle ne réalise qu'une quarantaine d'achats par mois : sa pénétration dans le quartier reste faible. Avec equiprix, son objectif est de faire revenir chez elle les clients qui achetaient leurs gâteaux et pâtisseries en grande surface, grâce à une réduction proposée aux foyers éligibles. Jouez avec le simulateur pour trouver le taux de réduction qui lui convient.",
       "params": {
         "cp": "73200",
         "type": "commerceBouche",
-        "marge": 0.35,
-        "passages": 1200,
-        "panier": 8,
+        "marge": 0.1,
+        "passages": 40,
+        "panier": 30,
         "profil": "commune",
-        "attr": 5,
+        "attr": 20,
         "rr": 0.15,
         "ro": 0.15,
         "rj": 0.15
@@ -154,18 +201,35 @@
     {
       "id": "coiffeur-saint-germain",
       "nom": "Coiffeur à Saint-Germain-en-Laye",
-      "narratif": "À Saint-Germain-en-Laye (78100), le salon de coiffure de M. Diallo réalise 400 coupes par mois à 35 € HT, avec une marge de 50 %. Sa clientèle est un peu plus aisée que la moyenne et la commune compte 67 % de foyers verts. Avec 10 % de réduction pour les foyers éligibles, il estime attirer +21 clients par mois (+5 %) pour un solde net d'environ +49 €/mois — la réduction reste rentable malgré des frais de service plafonnés à 100 €.",
+      "narratif": "À Saint-Germain-en-Laye, le salon de M. Diallo souffre d'un planning sous-utilisé : près de 30 % de ses créneaux ouverts restent vides. Pour une coupe autour de 30 €, il propose une réduction d'environ 20 % aux foyers éligibles equiprix. L'idée est double : occuper une partie de ces créneaux vides en attirant une clientèle qui ne venait pas parce que le salon était plus cher que les salons bas de gamme, et fidéliser des clients aux revenus plus faibles qui auraient pu espacer leurs visites — voire partir — en bénéficiant d'un tarif plus abordable. Sur les coupes supplémentaires, sa réflexion porte sur la marge marginale, proche de 90 % : le loyer et le matériel sont déjà payés, il ne reste que l'eau, le nettoyage, un peu d'électricité et le shampoing. Autrement dit, chaque coupe remplie grâce à equiprix est quasiment du gain net.",
       "params": {
         "cp": "78100",
         "type": "autre",
-        "marge": 0.50,
-        "passages": 400,
-        "panier": 35,
+        "marge": 0.9,
+        "passages": 280,
+        "panier": 30,
         "profil": "unPeuAisee",
         "attr": 8,
-        "rr": 0.10,
-        "ro": 0.10,
-        "rj": 0.10
+        "rr": 0.2,
+        "ro": 0.2,
+        "rj": 0.2
+      }
+    },
+    {
+      "id": "restaurant-lyon",
+      "nom": "Restaurant à Lyon",
+      "narratif": "Dans ce restaurant lyonnais, le service du midi laisse environ 20 % des tables vides. Hors frais de cuisine et de service, la marge du restaurant se mesure au coût des ingrédients : environ 50 % du prix du repas. Pour remplir ces tables et attirer une clientèle qui ne serait pas venue, le restaurateur met en place une réduction importante, de l'ordre de 30 %, qu'il applique hors boissons alcoolisées et à condition que chaque client prenne un repas. Sur les tables ainsi remplies, la marge qu'il réalise n'existait tout simplement pas sans la réduction : le simulateur vous permet de tester ce seuil de 30 % et de voir à partir de quel volume de couverts le dispositif devient gagnant.",
+      "params": {
+        "cp": "69001",
+        "type": "barRestaurant",
+        "marge": 0.5,
+        "passages": 600,
+        "panier": 30,
+        "profil": "commune",
+        "attr": 8,
+        "rr": 0.3,
+        "ro": 0.3,
+        "rj": 0.3
       }
     }
   ]

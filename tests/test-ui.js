@@ -83,9 +83,9 @@ async function main() {
         d.getElementById("cp-nom").textContent.includes("78700")
         && d.getElementById("cp-nom").textContent.includes("Conflans-Sainte-Honorine"),
         d.getElementById("cp-nom").textContent);
-    verifier("14 515 ménages affichés",
-        d.getElementById("cp-menages").textContent.includes("14"),
-        d.getElementById("cp-menages").textContent);
+    verifier("Ménages dans la ligne CP : « 78700 — Conflans-Sainte-Honorine (14 515 ménages) »",
+        d.getElementById("cp-nom").textContent.includes("14") && d.getElementById("cp-nom").textContent.includes("ménages"),
+        d.getElementById("cp-nom").textContent);
 
     // Barres verticales côte à côte : secteur + France comparatif (20/20/20/40)
     const segFrance = d.querySelector("#barre-france .sim-seg-v-verte").style.height;
@@ -165,7 +165,7 @@ async function main() {
         d.querySelector('[data-scenario="monCommerce"]').getAttribute("aria-pressed") === "true");
     verifier("Boutons scénarios sans radio native (button aria-pressed)",
         d.querySelectorAll('input[name="scenario"]').length === 0
-        && d.querySelectorAll('button.sim-scenario').length === 3);
+        && d.querySelectorAll('button.sim-scenario').length === 4);
     verifier("Narratif par défaut affiché",
         d.getElementById("narratif").textContent.length > 30);
 
@@ -290,8 +290,8 @@ async function main() {
     console.log("Use cases (carrousel en boutons)");
     const dom6 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
     const d6 = dom6.window.document;
-    verifier("Usecase boulangerie : 3 boutons de scénario",
-        d6.querySelectorAll("button.sim-scenario").length === 3,
+    verifier("Usecase boulangerie : 4 boutons de scénario (défaut + 3 usecases)",
+        d6.querySelectorAll("button.sim-scenario").length === 4,
         String(d6.querySelectorAll("button.sim-scenario").length));
     verifier("Bouton « Boulangerie à Albertville » actif via l'URL (aria-pressed)",
         d6.querySelector('[data-scenario="boulangerie-albertville"]').getAttribute("aria-pressed") === "true");
@@ -304,8 +304,10 @@ async function main() {
         d6.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "15%",
         d6.getElementById("red-eligibles").value);
     const impactUC = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase boulangerie ≈ +25 € (calcul moteur)",
-        impactUC !== null && Math.abs(impactUC - 25.19) < 1.5, `lu ${impactUC}`);
+    verifier("Impact usecase boulangerie ≈ −63 €, affiché négatif (marge 10 %, réduc 15 %)",
+        impactUC !== null && Math.abs(impactUC - 63.08) < 1.5
+        && d6.getElementById("impact-net").textContent.includes("−"),
+        `lu ${impactUC} | brut ${d6.getElementById("impact-net").textContent}`);
 
     // Clic sur le coiffeur (bouton, plus de radio)
     d6.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
@@ -319,9 +321,70 @@ async function main() {
     verifier("Clic coiffeur : URL contient uc=coiffeur-saint-germain",
         dom6.window.location.search.includes("uc=coiffeur-saint-germain"));
     const impactCoiffeur = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase coiffeur ≈ +49 € (calcul moteur)",
-        impactCoiffeur !== null && Math.abs(impactCoiffeur - 49.37) < 1.5, `lu ${impactCoiffeur}`);
+    verifier("Impact usecase coiffeur ≈ +151 € (marge marginale 90 % sur coupes)",
+        impactCoiffeur !== null && Math.abs(impactCoiffeur - 150.57) < 1.5, `lu ${impactCoiffeur}`);
     dom6.window.close();
+
+    // ================= Usecase restaurant + bascule sur saisie manuelle =================
+    console.log("Usecase restaurant et bascule sur « mon commerce »");
+    const dom8 = await charger(`${BASE}/commerces/?uc=restaurant-lyon`);
+    const d8 = dom8.window.document;
+    verifier("Usecase restaurant : bouton actif via l'URL",
+        d8.querySelector('[data-scenario="restaurant-lyon"]').getAttribute("aria-pressed") === "true");
+    verifier("Commune préconfigurée : 69001 — Lyon 1er (ménages entre parenthèses)",
+        d8.getElementById("cp-nom").textContent.includes("69001")
+        && d8.getElementById("cp-nom").textContent.includes("ménages"),
+        d8.getElementById("cp-nom").textContent);
+    verifier("Narratif restaurant (mentionne Lyon, aucun montant en €)",
+        /lyon/i.test(d8.getElementById("narratif").textContent)
+        && !/\d[\d\s ]*,?\d*\s*€/.test(d8.getElementById("narratif").textContent),
+        d8.getElementById("narratif").textContent.slice(0, 80));
+    // Les narratifs des 3 usecases ne citent aucun résultat chiffré de la simulation
+    // (seuls les paramètres d'entrée peuvent contenir un €, ex. panier 30 €)
+    const domN = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
+    const dN = domN.window.document;
+    dN.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
+    await attendre(200);
+    const narrCoiffeur = dN.getElementById("narratif").textContent;
+    verifier("Narratif coiffeur : histoire seule (pas de « +X €/mois » de la simulation)",
+        !/\+?\d[\d\s ]*,?\d*\s*€\s*\/\s*mois/.test(narrCoiffeur),
+        narrCoiffeur.slice(0, 80));
+    domN.window.close();
+    const impactResto = lireEuro(d8.getElementById("impact-net").textContent);
+    verifier("Impact usecase restaurant \u2248 +5 € (seuil 30 %, 600 couverts)",
+        impactResto !== null && Math.abs(impactResto - 4.92) < 1.5, `lu ${impactResto}`);
+    verifier("Réduction éligibles préconfigurée à 30 %",
+        d8.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "30%",
+        d8.getElementById("red-eligibles").value);
+
+    // Toute saisie manuelle sur un usecase bascule sur « Simuler sur mon commerce »
+    const marge8 = d8.getElementById("marge");
+    marge8.value = "12";
+    marge8.dispatchEvent(new dom8.window.Event("input", { bubbles: true }));
+    await attendre(200);
+    verifier("Édition de la marge sur un usecase : bascule sur monCommerce",
+        d8.querySelector(".sim-scenario.actif").dataset.scenario === "monCommerce"
+        && !dom8.window.location.search.includes("uc="),
+        d8.querySelector(".sim-scenario.actif").dataset.scenario + " | " + dom8.window.location.search);
+    verifier("Narratif restauré au texte par défaut après bascule",
+        d8.getElementById("narratif").textContent.includes("tarification solidaire"),
+        d8.getElementById("narratif").textContent.slice(0, 60));
+
+    // Bascule aussi via la carte type de commerce
+    const dom9 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
+    const d9 = dom9.window.document;
+    d9.querySelector('.sim-carte-type[data-type="supermarche"]').click();
+    await attendre(200);
+    verifier("Clic carte supermarché sur un usecase : bascule monCommerce + valeurs du type",
+        d9.querySelector(".sim-scenario.actif").dataset.scenario === "monCommerce"
+        && !dom9.window.location.search.includes("uc=")
+        && d9.querySelector('.sim-carte-type[data-type="supermarche"]').getAttribute("aria-checked") === "true"
+        && d9.getElementById("marge").value === "20"
+        && d9.getElementById("passages").value === "8000"
+        && d9.getElementById("panier").value === "50",
+        d9.getElementById("marge").value + "/" + d9.getElementById("passages").value + "/" + d9.getElementById("panier").value);
+    dom9.window.close();
+    dom8.window.close();
 
     // ================= Jauge clientèle + verte condensée =================
     console.log("Jauge clientèle et catégorie verte");

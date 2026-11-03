@@ -97,15 +97,15 @@ Chaque use case préconfigure le simulateur **et** le paragraphe narratif :
     "id": "boulangerie-albertville",
     "nom": "Boulangerie à Albertville",
     "image": "../images/boulangerie.jpg",
-    "narratif": "À Albertville, la boulangerie de Mme Martin a proposé 15 % de réduction...",
+    "narratif": "À Albertville, la boulangerie de Mme Martin... (histoire seule, sans répéter les chiffres de la simulation)",
     "params": {
       "cp": "73200",
       "type": "commerceBouche",
-      "marge": 0.35,
-      "passages": 1200,
-      "panier": 8,
+      "marge": 0.10,
+      "passages": 40,
+      "panier": 30,
       "profil": "commune",
-      "attr": 5,
+      "attr": 20,
       "rr": 0.15, "ro": 0.15, "rj": 0.15
     }
   }
@@ -120,6 +120,15 @@ Champs de `params` (tous optionnels) : `cp` (code postal), `type` (clé de
 `image` est un chemin relatif (ex. `../images/…`) affiché à côté du narratif ;
 sans `image`, aucune illustration n'est affichée. L'`id` du use case est
 ajouté à l'URL (`?uc=…`) pour permettre le partage direct d'un scénario.
+
+**Règle d'or des narratifs** : raconter l'histoire du commerce (contexte, enjeux,
+ce que equiprix change) **sans citer les résultats chiffrés** affichés par le
+simulateur — ils sont déjà à l'écran, les répéter ne sert à rien.
+
+**Bascule automatique** : dès qu'un commerçant modifie un paramètre à la main
+(marge, passages, panier, profil, pénétration, réductions, code postal, type de
+commerce) alors qu'un use case est actif, le scénario repasse automatiquement sur
+« Simuler sur mon commerce » — on ne modifie jamais un use case préconfiguré.
 
 ## Tests
 
