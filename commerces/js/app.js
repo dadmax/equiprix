@@ -61,11 +61,9 @@
         estimationNote: $("estimation-note"),
         profil: $("profil"),
         profilReperes: $("profil-reperes"),
-        profilNom: $("profil-nom"),
         attractivite: $("attractivite"),
         attractiviteReperes: $("attractivite-reperes"),
         attractiviteNom: $("attractivite-nom"),
-        attractiviteFacteur: $("attractivite-facteur"),
         toggleExpert: $("toggle-expert"),
         couloirEligibles: $("couloir-eligibles"),
         couloirsExpert: $("couloirs-expert"),
@@ -165,18 +163,28 @@
         }
     }
 
+    // Boutons pilule sans radio native : le <button> porte aria-pressed,
+    // l'état actif se lit via la classe .actif (pastille ✓ + fond plein).
     function creerBoutonScenario(id, nom, cocheParDefaut) {
-        const label = document.createElement("label");
-        label.className = "sim-scenario";
-        const radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = "scenario";
-        radio.value = id;
-        radio.checked = cocheParDefaut;
-        radio.addEventListener("change", () => appliquerUsecase(id));
-        label.appendChild(radio);
-        label.appendChild(document.createTextNode(nom));
-        return label;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sim-scenario";
+        btn.dataset.scenario = id;
+        btn.setAttribute("aria-pressed", String(cocheParDefaut));
+        if (cocheParDefaut) btn.classList.add("actif");
+        btn.innerHTML = '<span class="sim-scenario-check" aria-hidden="true">✓</span>';
+        btn.appendChild(document.createTextNode(nom));
+        btn.addEventListener("click", () => {
+            // Un seul scénario actif à la fois
+            els.scenariosListe.querySelectorAll(".sim-scenario").forEach((b) => {
+                b.classList.remove("actif");
+                b.setAttribute("aria-pressed", "false");
+            });
+            btn.classList.add("actif");
+            btn.setAttribute("aria-pressed", "true");
+            appliquerUsecase(id);
+        });
+        return btn;
     }
 
     function appliquerUsecase(id) {
@@ -263,9 +271,7 @@
         els.profilReperes.innerHTML = "";
         maître.profilsClientele.forEach((profil) => {
             const span = document.createElement("span");
-            span.textContent = profil.nom.split(" ")[0] === "Comme"
-                ? "Comme la commune"
-                : profil.nom.split(" plus")[0].split(" aisée")[0];
+            span.textContent = profil.court || profil.nom; // libellés courts complets
             els.profilReperes.appendChild(span);
         });
         els.profil.max = String(maître.profilsClientele.length - 1);
@@ -275,12 +281,12 @@
         });
     }
 
-    // Applique l'index du profil courant au curseur
+    // Applique l'index du profil courant au curseur (le libellé détaillé
+    // du profil n'est plus répété sous la jauge : les repères suffisent)
     function mettreAJourProfilJauge() {
         const idx = maître.profilsClientele.findIndex((p) => p.id === etat.profil);
         if (idx >= 0) {
             els.profil.value = String(idx);
-            els.profilNom.textContent = maître.profilsClientele[idx].nom;
         }
     }
 
@@ -288,7 +294,7 @@
         els.attractiviteReperes.innerHTML = "";
         maître.attractivite.forEach((a) => {
             const span = document.createElement("span");
-            span.textContent = a.nom.split(" — ")[0]; // libellés raccourcis
+            span.textContent = a.court || a.nom.split(" — ")[0]; // libellés courts
             els.attractiviteReperes.appendChild(span);
         });
         els.attractivite.max = String(maître.attractivite.length - 1);
@@ -634,7 +640,9 @@
         const e = cpBase[etat.cp];
         if (!e.donneesDispo) return;
         // Le titre de la barre de gauche reprend le nom de la commune principale
+        // (tronqué proprement si trop long, jamais rogné au milieu)
         $("titre-secteur").textContent = e.communes[0];
+        $("titre-secteur").title = e.communes[0]; // tooltip si tronqué
         for (const cat of CATEGORIES) {
             const seg = els.barrePopulation.querySelector(`.sim-seg-v-${cat}`);
             seg.style.height = (e.parts[cat] * 100) + "%";
@@ -650,8 +658,8 @@
         });
         const a = maître.attractivite[etat.attractiviteIndex];
         els.attractivite.value = String(etat.attractiviteIndex);
+        // Intitulé complet de la pénétration (le facteur ×20…×2 n'est plus affiché)
         els.attractiviteNom.textContent = a.nom;
-        els.attractiviteFacteur.textContent = `Facteur multiplicatif × ${a.facteur}`;
     }
 
     // --- Vos réductions (éligibles vs expert) ---
@@ -853,8 +861,15 @@
         // Scénario
         const uc = get("uc");
         if (uc && (maître.useCases || []).some((u) => u.id === uc)) {
-            const radio = els.scenariosListe.querySelector(`input[value="${uc}"]`);
-            if (radio) radio.checked = true;
+            const btn = els.scenariosListe.querySelector(`[data-scenario="${uc}"]`);
+            if (btn) {
+                els.scenariosListe.querySelectorAll(".sim-scenario").forEach((b) => {
+                    b.classList.remove("actif");
+                    b.setAttribute("aria-pressed", "false");
+                });
+                btn.classList.add("actif");
+                btn.setAttribute("aria-pressed", "true");
+            }
             appliquerUsecase(uc);
         } else {
             els.narratif.textContent = maître.textes.narratifDefaut;

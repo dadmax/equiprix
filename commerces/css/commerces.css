@@ -52,6 +52,7 @@
     margin-bottom: 16px;
 }
 
+/* Boutons pilule sans radio native : pastille ✓ discrète, état actif en fond plein */
 .sim-scenario {
     display: inline-flex;
     align-items: center;
@@ -60,6 +61,7 @@
     border-radius: 999px;
     padding: 6px 14px;
     cursor: pointer;
+    font-family: inherit;
     font-size: 0.88rem;
     font-weight: 600;
     color: var(--dark-gray);
@@ -69,16 +71,26 @@
 
 .sim-scenario:hover {
     border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
-.sim-scenario:has(input:checked) {
+.sim-scenario .sim-scenario-check {
+    display: none;
+    font-weight: 700;
+}
+
+.sim-scenario.actif {
     border-color: var(--primary-color);
     background-color: var(--primary-color);
     color: var(--white);
 }
 
-.sim-scenario input {
-    accent-color: var(--primary-color);
+.sim-scenario.actif .sim-scenario-check {
+    display: inline;
+}
+
+.sim-scenario.actif:hover {
+    color: var(--white);
 }
 
 /* ---------- Narratif ---------- */
@@ -149,11 +161,12 @@ main.sim-container {
     margin-bottom: 0;
 }
 
+/* Les deux sous-sections occupent toute la hauteur disponible (étirées) */
 .sim-deux-colonnes {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    align-items: start;
+    align-items: stretch; /* hauteurs égales */
 }
 
 @media (min-width: 992px) {
@@ -171,6 +184,7 @@ main.sim-container {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     padding: 16px 20px;
+    height: 100%; /* remplit la hauteur de la grille */
 }
 
 .sim-zone-titre {
@@ -283,11 +297,12 @@ main.sim-container {
     color: #667085;
 }
 
-/* ---------- Barres de population : deux barres verticales côte à côte ---------- */
+/* ---------- Barres de population : deux barres verticales côte à côte,
+   alignées par le bas (les barres ont la même hauteur, les titres au-dessus) ---------- */
 .sim-barres-cote-a-cote {
     display: flex;
     gap: 20px;
-    align-items: flex-end;
+    align-items: flex-end; /* alignement par le bas */
     margin-top: 12px;
 }
 
@@ -295,6 +310,9 @@ main.sim-container {
     flex: 1;
     text-align: center;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* contenu ancré en bas */
 }
 
 .sim-barre-titre {
@@ -302,10 +320,14 @@ main.sim-container {
     font-weight: 600;
     color: var(--dark-gray);
     margin: 0 0 6px;
-    /* Nom de commune potentiellement long : tronqué proprement */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Jamais rogné : retour à la ligne autorisé, tooltip en complément */
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
+    min-height: 2.1em; /* réserve 2 lignes pour garder les barres alignées */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .sim-barre-verticale {

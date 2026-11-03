@@ -102,12 +102,19 @@ async function main() {
     verifier("Barre secteur : segment rouge vertical ≈ 15,3 % de hauteur",
         Math.abs(hRouge - 15.3) < 0.01, String(hRouge));
     // Légendes qualitatives
-    verifier("Légende rouge = « ménage sous ou proche du seuil de pauvreté »",
-        d.getElementById("leg-rouge").textContent.includes("seuil de pauvreté"),
+    verifier("Légende rouge au pluriel = « ménages sous ou proches du seuil de pauvreté »",
+        d.getElementById("leg-rouge").textContent.includes("ménages") && d.getElementById("leg-rouge").textContent.includes("seuil de pauvreté"),
         d.getElementById("leg-rouge").textContent);
-    verifier("Légende verte = « ménage aisé »",
-        d.getElementById("leg-verte").textContent.includes("aisé"),
+    verifier("Légende verte au pluriel = « ménages aisés »",
+        d.getElementById("leg-verte").textContent.includes("ménages aisés"),
         d.getElementById("leg-verte").textContent);
+    // Alignement par le bas des deux barres + titre France lisible en entier
+    verifier("Titre France comparatif non tronqué (retour à la ligne autorisé)",
+        d.getElementById("titre-france").textContent === "France entière (comparatif)");
+    verifier("Structure : conteneur flex + 2 blocs de barre (alignement par le bas en CSS)",
+        d.querySelectorAll(".sim-barre-verticale-bloc").length === 2
+        && d.querySelector(".sim-barres-cote-a-cote") !== null
+        && d.querySelectorAll(".sim-barre-verticale").length === 2);
 
     // Impact net ≈ 333,78 € (tolérance ±1 €)
     const impact = d.getElementById("impact-net").textContent;
@@ -154,8 +161,11 @@ async function main() {
         d.getElementById("detail-categories").hidden);
 
     // Scénario par défaut
-    verifier("Scénario « Simuler sur mon commerce » présent et coché",
-        d.querySelector('input[name="scenario"][value="monCommerce"]').checked);
+    verifier("Scénario « Simuler sur mon commerce » présent et actif",
+        d.querySelector('[data-scenario="monCommerce"]').getAttribute("aria-pressed") === "true");
+    verifier("Boutons scénarios sans radio native (button aria-pressed)",
+        d.querySelectorAll('input[name="scenario"]').length === 0
+        && d.querySelectorAll('button.sim-scenario').length === 3);
     verifier("Narratif par défaut affiché",
         d.getElementById("narratif").textContent.length > 30);
 
@@ -274,20 +284,17 @@ async function main() {
         d5.getElementById("uplift-eligibles").textContent);
     dom5.window.close();
 
-    // ================= Use cases =================
-    console.log("Use cases (carrousel)");
-    verifier("3 scénarios proposés (défaut + 2 usecases)",
-        d2.querySelectorAll('input[name="scenario"]').length >= 3
-        || true); // d2 fermé plus bas ; test repris sur dom suivant
     dom2.window.close();
 
+    // ================= Use cases =================
+    console.log("Use cases (carrousel en boutons)");
     const dom6 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
     const d6 = dom6.window.document;
-    verifier("Usecase boulangerie : 3+ boutons de scénario",
-        d6.querySelectorAll('input[name="scenario"]').length === 3,
-        String(d6.querySelectorAll('input[name="scenario"]').length));
-    verifier("Bouton « Boulangerie à Albertville » coché via l'URL",
-        d6.querySelector('input[name="scenario"][value="boulangerie-albertville"]').checked);
+    verifier("Usecase boulangerie : 3 boutons de scénario",
+        d6.querySelectorAll("button.sim-scenario").length === 3,
+        String(d6.querySelectorAll("button.sim-scenario").length));
+    verifier("Bouton « Boulangerie à Albertville » actif via l'URL (aria-pressed)",
+        d6.querySelector('[data-scenario="boulangerie-albertville"]').getAttribute("aria-pressed") === "true");
     verifier("Commune préconfigurée : 73200 — Albertville",
         d6.getElementById("cp-nom").textContent.includes("73200"),
         d6.getElementById("cp-nom").textContent);
@@ -300,10 +307,8 @@ async function main() {
     verifier("Impact usecase boulangerie ≈ +25 € (calcul moteur)",
         impactUC !== null && Math.abs(impactUC - 25.19) < 1.5, `lu ${impactUC}`);
 
-    // Clic sur le coiffeur
-    const radioCoiffeur = d6.querySelector('input[name="scenario"][value="coiffeur-saint-germain"]');
-    radioCoiffeur.checked = true;
-    radioCoiffeur.dispatchEvent(new dom6.window.Event("change", { bubbles: true }));
+    // Clic sur le coiffeur (bouton, plus de radio)
+    d6.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
     await attendre(200);
     verifier("Clic coiffeur : commune bascule sur 78100 — Saint-Germain-en-Laye",
         d6.getElementById("cp-nom").textContent.includes("78100")
@@ -324,10 +329,18 @@ async function main() {
     const d7 = dom7.window.document;
     verifier("Clientèle rendue en jauge (input range #profil)",
         d7.getElementById("profil") !== null && d7.getElementById("profil").tagName === "INPUT");
-    verifier("Jauge clientèle : 3 repères + nom du profil affiché",
+    verifier("Jauge clientèle : 3 repères avec libellés courts complets",
         d7.getElementById("profil-reperes").children.length === 3
-        && d7.getElementById("profil-nom").textContent.includes("aisée"),
-        d7.getElementById("profil-nom").textContent);
+        && d7.getElementById("profil-reperes").textContent.includes("Un peu plus aisée")
+        && d7.getElementById("profil-reperes").textContent.includes("Essentiellement aisée"),
+        d7.getElementById("profil-reperes").textContent);
+    verifier("Libellé détaillé du profil non répété sous la jauge",
+        d7.getElementById("profil-nom") === null);
+    verifier("Facteur multiplicatif non affiché sous la pénétration",
+        !d7.body.textContent.includes("Facteur multiplicatif")
+        && !d7.body.textContent.includes("× 20") && !d7.body.textContent.includes("×20"));
+    verifier("Intitulé complet de la pénétration affiché",
+        d7.getElementById("attractivite-nom").textContent.includes("Moyenne —"));
     // Bouger la jauge clientèle -> profil change
     const jaugeProfil = d7.getElementById("profil");
     jaugeProfil.value = "0";
