@@ -176,8 +176,9 @@ async function main() {
     verifier("Boutons scénarios sans radio native (button aria-pressed)",
         d.querySelectorAll('input[name="scenario"]').length === 0
         && d.querySelectorAll('button.sim-scenario').length === 5);
-    verifier("Narratif par défaut affiché",
-        d.getElementById("narratif").textContent.length > 30);
+    verifier("Narratif par défaut affiché (nouveau texte : cibler ceux qui en ont le plus besoin)",
+        d.getElementById("narratif").textContent.includes("tarification solidaire")
+        && d.getElementById("narratif").textContent.includes("le plus besoin"));
 
     // Source sondage
     verifier("Source sondage affichée (septembre 2026, 60 ménages)",
@@ -296,6 +297,23 @@ async function main() {
 
     dom2.window.close();
 
+    // Défauts du type supermarché (17,5 % / 8 000 / 50 €) + label/aide marge
+    const domT = await charger(`${BASE}/commerces/`);
+    const dT = domT.window.document;
+    dT.querySelector('.sim-carte-type[data-type="supermarche"]').click();
+    await attendre(200);
+    verifier("Carte supermarché : préremplit marge 17,5 % (champ 18 ou 17 selon arrondi), 8 000 passages, 50 €",
+        dT.getElementById("passages").value === "8000"
+        && dT.getElementById("panier").value === "50"
+        && ["17", "18"].includes(dT.getElementById("marge").value),
+        [dT.getElementById("marge").value, dT.getElementById("passages").value, dT.getElementById("panier").value].join("/"));
+    verifier("Label marge = « Marge sur produit (%) » + aide formule (prix vente − coût achat) / prix vente",
+        dT.getElementById("label-marge").textContent.includes("Marge sur produit")
+        && dT.getElementById("aide-marge").textContent.includes("coût d’achat")
+        && dT.getElementById("aide-marge").textContent.includes("prix de vente"),
+        dT.getElementById("label-marge").textContent + " | " + dT.getElementById("aide-marge").textContent);
+    domT.window.close();
+
     // ================= Use cases =================
     console.log("Use cases (carrousel en boutons)");
     const dom6 = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
@@ -329,19 +347,19 @@ async function main() {
         && d6.getElementById("btn-reset-usecase").hidden === true);
 
     // Clic sur le coiffeur (bouton, plus de radio)
-    d6.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
+    d6.querySelector('[data-scenario="coiffeur-pessac"]').click();
     await attendre(200);
-    verifier("Clic coiffeur : commune bascule sur 78100 — Saint-Germain-en-Laye",
-        d6.getElementById("cp-nom").textContent.includes("78100")
-        && d6.getElementById("cp-nom").textContent.includes("Saint-Germain"),
+    verifier("Clic coiffeur : commune bascule sur 33600 — Pessac",
+        d6.getElementById("cp-nom").textContent.includes("33600")
+        && d6.getElementById("cp-nom").textContent.includes("Pessac"),
         d6.getElementById("cp-nom").textContent);
-    verifier("Clic coiffeur : narratif mis à jour (mentionne Saint-Germain)",
-        d6.getElementById("narratif").textContent.includes("Saint-Germain"));
-    verifier("Clic coiffeur : URL contient uc=coiffeur-saint-germain",
-        dom6.window.location.search.includes("uc=coiffeur-saint-germain"));
+    verifier("Clic coiffeur : narratif mis à jour (mentionne Pessac)",
+        d6.getElementById("narratif").textContent.includes("Pessac"));
+    verifier("Clic coiffeur : URL contient uc=coiffeur-pessac",
+        dom6.window.location.search.includes("uc=coiffeur-pessac"));
     const impactCoiffeur = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase coiffeur ≈ +151 € (marge marginale 90 % sur coupes)",
-        impactCoiffeur !== null && Math.abs(impactCoiffeur - 150.57) < 1.5, `lu ${impactCoiffeur}`);
+    verifier("Impact usecase coiffeur Pessac ≈ +270 € (panier 25 €, marge marginale 90 %)",
+        impactCoiffeur !== null && Math.abs(impactCoiffeur - 270.36) < 1.5, `lu ${impactCoiffeur}`);
     dom6.window.close();
 
     // ================= Usecase restaurant + bascule sur saisie manuelle =================
@@ -362,7 +380,7 @@ async function main() {
     // (seuls les paramètres d'entrée peuvent contenir un €, ex. panier 30 €)
     const domN = await charger(`${BASE}/commerces/?uc=boulangerie-albertville`);
     const dN = domN.window.document;
-    dN.querySelector('[data-scenario="coiffeur-saint-germain"]').click();
+    dN.querySelector('[data-scenario="coiffeur-pessac"]').click();
     await attendre(200);
     const narrCoiffeur = dN.getElementById("narratif").textContent;
     verifier("Narratif coiffeur : histoire seule (pas de « +X €/mois » de la simulation)",
@@ -409,7 +427,7 @@ async function main() {
         d9.querySelector(".sim-scenario.actif").dataset.scenario === "boulangerie-albertville"
         && dom9.window.location.search.includes("uc=boulangerie-albertville")
         && d9.querySelector('.sim-carte-type[data-type="supermarche"]').getAttribute("aria-checked") === "true"
-        && d9.getElementById("marge").value === "20"
+        && ["17", "18"].includes(d9.getElementById("marge").value)
         && d9.getElementById("passages").value === "8000"
         && d9.getElementById("panier").value === "50"
         && d9.getElementById("badge-modifie").hidden === false,

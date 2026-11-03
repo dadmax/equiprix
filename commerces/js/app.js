@@ -119,6 +119,9 @@
         construireCouloirsExpert();
         construireBarreFrance();
         els.sourceSondage.textContent = maître.textes.sondage || "";
+        // Libellé + aide de la marge (précise : marge sur produit, pas marge totale charges incluses)
+        if (maître.textes.labelMarge) $("label-marge").textContent = maître.textes.labelMarge;
+        if (maître.textes.aideMarge) $("aide-marge").textContent = maître.textes.aideMarge;
         restaurerDepuisURL();
         brancherEvenements();
         mettreAJour();

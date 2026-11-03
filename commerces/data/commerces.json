@@ -81,7 +81,7 @@
     "supermarche": {
       "nom": "Supermarché",
       "source": "sondage",
-      "margeDefaut": 0.2,
+      "margeDefaut": 0.175,
       "passagesDefaut": 8000,
       "panierDefaut": 50
     },
@@ -168,7 +168,7 @@
     "capFraisServiceMensuel": 100
   },
   "textes": {
-    "narratifDefaut": "La tarification solidaire, c'est adapter le prix à la capacité financière de chacun : avec equiprix, vos clients des 60 % de niveaux de vie les plus bas bénéficient d'une réduction en caisse, identifiée par un simple QR code. Jouez avec le simulateur ci-dessous : renseignez votre commerce, choisissez votre réduction, et découvrez l'impact estimé sur votre marge.",
+    "narratifDefaut": "La tarification solidaire, c’est adapter le prix à la capacité financière de chacun : avec equiprix, vous pouvez proposer des réductions aux clients aux niveaux de vie les plus bas. Cela permet de cibler les réductions sur les clients qui en ont le plus besoin pour passer la porte de votre commerce. Utilisez le simulateur ci-dessous pour trouver la tarification solidaire qui améliore la performance de votre enseigne, ou entrez directement dans l’un des cas ci-dessus.",
     "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
     "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français",
     "legendesCategories": {
@@ -180,7 +180,9 @@
     "titreBarreSecteur": "Votre secteur",
     "titreBarreFrance": "France entière (comparatif)",
     "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?",
-    "suggestionResultatNegatif": "Résultat négatif : deux pistes pour revenir à un solde positif. 1) Modifier le taux de réduction pratiqué. 2) Cibler les réductions sur des produits ou services à forte marge, sur lesquels vous resterez gagnant malgré la réduction."
+    "suggestionResultatNegatif": "Résultat négatif : deux pistes pour revenir à un solde positif. 1) Modifier le taux de réduction pratiqué. 2) Cibler les réductions sur des produits ou services à forte marge, sur lesquels vous resterez gagnant malgré la réduction.",
+    "labelMarge": "Marge sur produit (%)",
+    "aideMarge": "= (prix de vente HT − coût d’achat HT) / prix de vente HT. Exemple : vendu 10 €, acheté 7 € → marge 30 %."
   },
   "useCases": [
     {
@@ -201,15 +203,15 @@
       }
     },
     {
-      "id": "coiffeur-saint-germain",
-      "nom": "Coiffeur à Saint-Germain-en-Laye",
-      "narratif": "Le salon de M. Diallo, à Saint-Germain-en-Laye, a 30 % de ses créneaux vides. Une coupe tourne autour de 30 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Sur les coupes supplémentaires, la marge est marginale : loyer et matériel déjà payés, il ne reste que l'eau, le nettoyage, l'électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
+      "id": "coiffeur-pessac",
+      "nom": "Coiffeur à Pessac",
+      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Sur les coupes supplémentaires, la marge est marginale : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
       "params": {
-        "cp": "78100",
+        "cp": "33600",
         "type": "autre",
         "marge": 0.9,
         "passages": 280,
-        "panier": 30,
+        "panier": 25,
         "profil": "unPeuAisee",
         "attr": 8,
         "rr": 0.2,
