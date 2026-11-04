@@ -198,8 +198,8 @@ async function main() {
     const h1 = d.querySelector("h1");
     verifier("H1 hero = slogan (proposition de valeur)",
         h1 && h1.textContent.includes("Des réductions qui font du bien à vos clients"), h1 && h1.textContent);
-    verifier("Sous-titre hero rempli depuis le JSON",
-        d.getElementById("hero-sous-titre").textContent.length > 40,
+    verifier("Sous-titre hero EN DUR dans le HTML",
+        d.getElementById("hero-sous-titre").textContent.includes("chaque client paie selon ses moyens"),
         d.getElementById("hero-sous-titre").textContent);
     verifier("CTA hero « Lancer la simulation » vers #simulateur",
         !!d.querySelector('.sim-hero-cta a.btn-primary[href="#simulateur"]'));
@@ -210,9 +210,9 @@ async function main() {
     const secSim = d.getElementById("simulateur");
     verifier("Accroche présente et AVANT le simulateur",
         !!secAccroche && !!secSim && (secAccroche.compareDocumentPosition(secSim) & F) === F);
-    verifier("Accroche : titre + texte remplis depuis le JSON",
+    verifier("Accroche : titre + texte EN DUR dans le HTML",
         d.getElementById("titre-accroche").textContent.includes("tarification solidaire")
-        && d.getElementById("accroche-texte").textContent.length > 80);
+        && d.getElementById("accroche-texte").textContent.includes("capacité financière"));
     verifier("Scénarios + narratif DANS le bloc simulateur",
         secSim.contains(d.getElementById("scenarios-liste")) && secSim.contains(d.getElementById("narratif")));
     verifier("Bloc simulateur englobe « Votre commerce » et « Simulation »",
@@ -232,19 +232,21 @@ async function main() {
         etapes.length === 3
         && d.getElementById("ccm-img-0").getAttribute("src").includes("images/etape-1")
         && d.getElementById("ccm-img-2").getAttribute("src").includes("images/etape-3"));
-    verifier("Comment ça marche : titres/textes/alt remplis depuis le JSON",
-        d.getElementById("ccm-titre-0").textContent.length > 5
-        && d.getElementById("ccm-texte-2").textContent.length > 40
-        && d.getElementById("ccm-img-1").alt.length > 10);
+    verifier("Comment ça marche : titres/textes EN DUR dans le HTML",
+        d.getElementById("ccm-titre-0").textContent.includes("QR code")
+        && d.getElementById("ccm-texte-2").textContent.length > 40,
+        d.getElementById("ccm-titre-0").textContent);
+    verifier("Comment ça marche : alt des maquettes en dur dans le HTML",
+        d.getElementById("ccm-img-1").alt.includes("prix plein"));
     verifier("Comment ça marche vient APRÈS le simulateur",
         (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F);
 
     verifier("Engagement : titre « …faites-le rayonner »",
         d.getElementById("titre-engagement").textContent.includes("rayonner"));
-    verifier("Engagement : stat 90 % + légende + paragraphe",
+    verifier("Engagement : stat 90 % + légende + paragraphe EN DUR dans le HTML",
         d.getElementById("engagement-stat").textContent.includes("90")
-        && d.getElementById("engagement-stat-legende").textContent.length > 30
-        && d.getElementById("engagement-texte").textContent.length > 80);
+        && d.getElementById("engagement-stat-legende").textContent.includes("réaction de soutien")
+        && d.getElementById("engagement-texte").textContent.includes("bouche"));
     verifier("Engagement : badge visuel (image + alt)",
         d.getElementById("engagement-badge").getAttribute("src").includes("badge-engage")
         && d.getElementById("engagement-badge").alt.length > 10);
@@ -252,9 +254,15 @@ async function main() {
     verifier("Tarification : message d'alignement",
         d.getElementById("tar-alignement").textContent.includes("aligné"));
     const fraisTxt = d.getElementById("tar-frais").textContent;
-    verifier("Tarification : {fraisParPassage}/{cap} remplacés depuis parametres (0,50 € / 100 €)",
-        fraisTxt.includes("0,50") && fraisTxt.includes("100")
-        && !fraisTxt.includes("{cap}") && !fraisTxt.includes("{fraisParPassage}"), fraisTxt);
+    verifier("Tarification : texte en dur + valeurs injectées depuis parametres (0,50 € / 100 €)",
+        fraisTxt.includes("frais de service") && fraisTxt.includes("capés")
+        && d.getElementById("tar-frais-par-passage").textContent.includes("0,50")
+        && d.getElementById("tar-cap-mensuel").textContent.includes("100"), fraisTxt);
+    const jsonMaitre = JSON.parse(fs.readFileSync("commerces/data/commerces.json", "utf-8"));
+    verifier("Textes marketing HORS du JSON (heroSousTitre/accroche/commentCaMarche/engagement/tarification absents)",
+        !jsonMaitre.textes.heroSousTitre && !jsonMaitre.textes.accroche
+        && !jsonMaitre.textes.commentCaMarche && !jsonMaitre.textes.engagement
+        && !jsonMaitre.textes.tarification);
     verifier("Tarification : sous-bloc marketing (vitrine vs milliers de ménages)",
         d.getElementById("tar-marketing-titre").textContent.length > 5
         && d.getElementById("tar-marketing-texte").textContent.includes("vitrine"));

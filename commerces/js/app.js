@@ -12,7 +12,9 @@
      les sources en <details> replié (pas de titre H2) ;
    - « Comment ça marche ? » (3 maquettes d'appli), « Engagement »,
      « Tarification ».
-   Textes marketing éditables dans data/commerces.json (textes.*).
+   Textes marketing EN DUR dans index.html (éditables directement, avec
+   balisage) ; seules les valeurs chiffrées de la tarification (frais par
+   passage, cap mensuel) sont injectées depuis parametres.* du JSON.
    En mode non expert, une super-catégorie « Foyers éligibles » (60 %
    de niveaux de vie les plus bas) pilote les réductions rouge/orange/
    jaune à la même valeur. En mode expert, les trois catégories sont
@@ -94,21 +96,9 @@
         sauvegardeOk: $("sauvegarde-ok"),
         tooltip: $("tooltip"),
         sourceSondage: $("source-sondage"),
-        // Textes de page (remplis depuis textes.* du JSON maître)
-        heroSousTitre: $("hero-sous-titre"),
-        accrocheTitre: $("titre-accroche"),
-        accrocheTexte: $("accroche-texte"),
-        engagementTitre: $("titre-engagement"),
-        engagementStat: $("engagement-stat"),
-        engagementStatLegende: $("engagement-stat-legende"),
-        engagementTexte: $("engagement-texte"),
-        engagementBadge: $("engagement-badge"),
-        tarTitre: $("titre-tarification"),
-        tarAlignement: $("tar-alignement"),
-        tarCommission: $("tar-commission"),
-        tarFrais: $("tar-frais"),
-        tarMarketingTitre: $("tar-marketing-titre"),
-        tarMarketingTexte: $("tar-marketing-texte"),
+        // Seules valeurs injectées depuis le JSON maître (textes marketing en dur dans le HTML)
+        tarFraisParPassage: $("tar-frais-par-passage"),
+        tarCapMensuel: $("tar-cap-mensuel"),
     };
 
     // ---------- Initialisation ----------
@@ -142,7 +132,7 @@
         // Libellé + aide de la marge (précise : marge sur produit, pas marge totale charges incluses)
         if (maître.textes.labelMarge) $("label-marge").textContent = maître.textes.labelMarge;
         if (maître.textes.aideMarge) $("aide-marge").textContent = maître.textes.aideMarge;
-        appliquerTextesPage();
+        appliquerValeursTarification();
         restaurerDepuisURL();
         brancherEvenements();
         mettreAJour();
@@ -484,55 +474,14 @@
         }
     }
 
-    // ---------- Textes de la page (depuis textes.* du JSON maître) ----------
-    function poserTexte(el, texte) {
-        if (el && texte) el.textContent = texte;
-    }
-
-    function appliquerTextesPage() {
-        const t = maître.textes;
-        poserTexte(els.heroSousTitre, t.heroSousTitre);
-        poserTexte(els.accrocheTitre, t.accroche && t.accroche.titre);
-        poserTexte(els.accrocheTexte, t.accroche && t.accroche.texte);
-
-        // « Comment ça marche ? » : 3 étapes (maquette + titre + texte)
-        (t.commentCaMarche || []).forEach((etape, i) => {
-            poserTexte($("ccm-titre-" + i), etape.titre);
-            poserTexte($("ccm-texte-" + i), etape.texte);
-            const img = $("ccm-img-" + i);
-            if (img && etape.image) {
-                img.src = etape.image;
-                if (etape.alt) img.alt = etape.alt;
-            }
-        });
-
-        // Bloc engagement (stat + paragraphe + badge visuel)
-        if (t.engagement) {
-            poserTexte(els.engagementTitre, t.engagement.titre);
-            poserTexte(els.engagementStat, t.engagement.stat);
-            poserTexte(els.engagementStatLegende, t.engagement.statLegende);
-            poserTexte(els.engagementTexte, t.engagement.texte);
-            if (t.engagement.badgeImage && els.engagementBadge) {
-                els.engagementBadge.src = t.engagement.badgeImage;
-                if (t.engagement.badgeAlt) els.engagementBadge.alt = t.engagement.badgeAlt;
-            }
-        }
-
-        // Bloc tarification : le cap et le tarif par passage viennent de
-        // parametres.* (placeholders {cap} / {fraisParPassage}, rien en dur)
-        if (t.tarification) {
-            poserTexte(els.tarTitre, t.tarification.titre);
-            poserTexte(els.tarAlignement, t.tarification.alignement);
-            poserTexte(els.tarCommission, t.tarification.commission);
-            if (t.tarification.frais && els.tarFrais) {
-                const p = maître.parametres;
-                els.tarFrais.textContent = t.tarification.frais
-                    .split("{fraisParPassage}").join(formaterEuros(p.fraisServiceParPassage, 2))
-                    .split("{cap}").join(formaterEuros(p.capFraisServiceMensuel));
-            }
-            poserTexte(els.tarMarketingTitre, t.tarification.marketingTitre);
-            poserTexte(els.tarMarketingTexte, t.tarification.marketing);
-        }
+    // ---------- Valeurs de la tarification ----------
+    // Les textes marketing sont en dur dans index.html ; seuls le tarif par
+    // passage et le cap mensuel proviennent de parametres.* du JSON maître
+    // (les <span> du HTML servent de repli si le JSON ne charge pas).
+    function appliquerValeursTarification() {
+        const p = maître.parametres;
+        if (els.tarFraisParPassage) els.tarFraisParPassage.textContent = formaterEuros(p.fraisServiceParPassage, 2);
+        if (els.tarCapMensuel) els.tarCapMensuel.textContent = formaterEuros(p.capFraisServiceMensuel);
     }
 
     // ---------- Événements ----------

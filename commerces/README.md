@@ -98,14 +98,13 @@ sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
 marge commerciale est < 15 %, `suggestionResultatNegatif` — deux pistes
 affichées quand le solde net est négatif).
 
-Textes de la page (hors simulateur) dans `textes` : `heroSousTitre`,
-`accroche` ({titre, texte}), `commentCaMarche` (3 étapes {image, alt, titre,
-texte}), `engagement` ({titre, stat, statLegende, texte, badgeImage,
-badgeAlt}), `tarification` ({titre, alignement, commission, frais,
-marketingTitre, marketing}). Dans `tarification.frais`, les placeholders
-`{fraisParPassage}` et `{cap}` sont remplacés à l'affichage par
-`parametres.fraisServiceParPassage` et `parametres.capFraisServiceMensuel`
-(aucune valeur en dur dans le code).
+**Textes marketing de la page (hero, accroche, comment ça marche,
+engagement, tarification) : en dur dans `index.html`** — éditables directement,
+avec balisage HTML possible. Seules les **valeurs chiffrées** de la
+tarification sont injectées depuis le JSON maître : `parametres.fraisServiceParPassage`
+et `parametres.capFraisServiceMensuel` remplissent les `<span>`
+`#tar-frais-par-passage` et `#tar-cap-mensuel` (les valeurs présentes dans le
+HTML servent de repli si le JSON ne charge pas).
 
 ## Scénarios (use cases)
 
