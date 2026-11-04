@@ -182,7 +182,48 @@
     "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?",
     "suggestionResultatNegatif": "Résultat négatif : deux pistes pour revenir à un solde positif. 1) Modifier le taux de réduction pratiqué. 2) Cibler les réductions sur des produits ou services à forte marge, sur lesquels vous resterez gagnant malgré la réduction.",
     "labelMarge": "Marge sur produit (%)",
-    "aideMarge": "= (prix de vente HT − coût d’achat HT) / prix de vente HT. Exemple : vendu 10 €, acheté 7 € → marge 30 %."
+    "aideMarge": "= (prix de vente HT − coût d’achat HT) / prix de vente HT. Exemple : vendu 10 €, acheté 7 € → marge 30 %.",
+    "heroSousTitre": "Avec equiprix, chaque client paie selon ses moyens : les foyers aux niveaux de vie les plus bas bénéficient d'une réduction en caisse, et de nouveaux clients franchissent la porte de votre commerce. Estimez l'impact sur votre marge avec le simulateur ci-dessous.",
+    "accroche": {
+      "titre": "La tarification solidaire, c'est quoi ?",
+      "texte": "La tarification solidaire, c'est adapter le prix à la capacité financière de chacun : avec equiprix, vous pouvez proposer des réductions aux clients aux niveaux de vie les plus bas. Cela permet de cibler les réductions sur les clients qui en ont le plus besoin pour passer la porte de votre commerce."
+    },
+    "commentCaMarche": [
+      {
+        "image": "images/etape-1.svg",
+        "alt": "Maquette de l'appli equiprix : le client scanne le QR code equiprix en caisse",
+        "titre": "Le client scanne le QR code",
+        "texte": "En caisse, le client présente le QR code de son compte equiprix. Aucun document à fournir : son niveau de vie est déjà renseigné, en toute confidentialité."
+      },
+      {
+        "image": "images/etape-2.svg",
+        "alt": "Maquette de l'appli equiprix : fiche produit avec le prix plein et le prix solidaire affichés côte à côte",
+        "titre": "Le prix s'affine automatiquement",
+        "texte": "Le prix affiché s'adapte à la catégorie de niveau de vie du client : prix plein pour les clients non éligibles, prix réduit pour les foyers éligibles. La réduction est appliquée d'elle-même, sans calcul en caisse."
+      },
+      {
+        "image": "images/etape-3.svg",
+        "alt": "Maquette de l'appli equiprix : validation de la vente et tableau de bord mensuel du commerçant",
+        "titre": "Vous validez, equiprix s'occupe du reste",
+        "texte": "L'encaissement se fait comme d'habitude. equiprix calcule les frais de service et vous détaille chaque mois les clients attirés et l'impact sur votre marge, comme dans le simulateur ci-dessus."
+      }
+    ],
+    "engagement": {
+      "titre": "Engagez votre commerce et faites-le rayonner",
+      "stat": "90 %",
+      "statLegende": "des clients ont une réaction de soutien envers un commerce qui pratique la tarification solidaire",
+      "texte": "Afficher votre engagement solidaire, c'est le faire rayonner : auprès de vos clients, qui en parlent autour d'eux, et auprès de vos employés, fiers de travailler pour un commerce engagé. Le badge « Commerce engagé equiprix » vous est fourni pour votre vitrine et votre fiche dans l'appli : les ménages qui cherchent des commerces engagés vous trouvent directement, sans surcoût.",
+      "badgeImage": "images/badge-engage.svg",
+      "badgeAlt": "Badge « Commerce engagé equiprix » à afficher en vitrine"
+    },
+    "tarification": {
+      "titre": "Tarification",
+      "alignement": "equiprix est aligné avec vos intérêts et avec l'intérêt général.",
+      "commission": "equiprix ne prélève de commission que lorsque votre commerce attire des clients grâce à la tarification solidaire : aucun client attiré, aucun frais.",
+      "frais": "Un frais de service de {fraisParPassage} s'applique à chaque passage en caisse, client existant ou client attiré. Lors des premiers mois, l'impact est faible et les frais restent faibles ; une fois la tarification bien mise en œuvre, l'impact est plus fort et les frais augmentent, mais ils sont capés à {cap} par mois pour ne pas représenter une ligne de budget trop importante.",
+      "marketingTitre": "equiprix gère le marketing pour vous",
+      "marketing": "Votre vitrine parle dans la rue devant chez vous ; une réduction diffusée sur equiprix parle à des milliers de ménages autour de chez vous. equiprix assure la visibilité de votre commerce et l'acquisition de clients, sans surcoût supplémentaire : uniquement sur la base des réductions que vous mettez en œuvre."
+    }
   },
   "useCases": [
     {

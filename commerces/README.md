@@ -1,18 +1,29 @@
-# Simulateur « Que peut m'apporter equiprix ? » — equiprix.fr/commerces
+# Page « equiprix pour les commerces » — equiprix.fr/commerces
 
-Simulateur destiné aux commerçants : à partir du code postal, du type de
-commerce, du profil de clientèle, de l'attractivité et des réductions
-envisagées par catégorie equiprix, il estime l'impact mensuel sur la marge
-(clients supplémentaires, perte sur clients existants, frais de service,
-solde net rapporté au chiffre d'affaires).
+Page destinée aux commerçants, **contenant un simulateur** : à partir du code
+postal, du type de commerce, du profil de clientèle, de l'attractivité et des
+réductions envisagées par catégorie equiprix, le simulateur estime l'impact
+mensuel sur la marge (clients supplémentaires, perte sur clients existants,
+frais de service, solde net rapporté au chiffre d'affaires).
+
+Ordre de la page : en-tête (proposition de valeur + CTA) → accroche
+« La tarification solidaire, c'est quoi ? » → bloc `#simulateur` (scénarios +
+narratif, « Votre commerce », « Simulation », puis **sources en `<details>`
+replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli,
+3 colonnes sur desktop / empilées sur mobile) → « Engagement » (stat + badge
+« Commerce engagé equiprix ») → « Tarification » (alignement, commission
+conditionnelle, frais capés lus dans `parametres`, sous-bloc marketing).
+Textes marketing éditables dans `textes.*` de `data/commerces.json` ;
+maquettes provisoires dans `commerces/images/` (à remplacer par les vraies).
 
 ## Structure
 
 ```
 commerces/
-├── index.html                     # Page du simulateur (tableau de bord 3 zones)
+├── index.html                     # Page commerçants (hero, accroche, simulateur, ccm, engagement, tarification)
 ├── css/
-│   └── commerces.css              # Styles du simulateur (s'ajoute à ../style.css)
+│   └── commerces.css              # Styles de la page (s'ajoute à ../style.css)
+├── images/                        # Maquettes provisoires (etape-1..3.svg, badge-engage.svg)
 ├── js/
 │   ├── calculs.js                 # Logique métier pure (testable sous Node)
 │   └── app.js                     # Interface : saisie, URL, mises à jour temps réel
@@ -87,6 +98,15 @@ sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
 marge commerciale est < 15 %, `suggestionResultatNegatif` — deux pistes
 affichées quand le solde net est négatif).
 
+Textes de la page (hors simulateur) dans `textes` : `heroSousTitre`,
+`accroche` ({titre, texte}), `commentCaMarche` (3 étapes {image, alt, titre,
+texte}), `engagement` ({titre, stat, statLegende, texte, badgeImage,
+badgeAlt}), `tarification` ({titre, alignement, commission, frais,
+marketingTitre, marketing}). Dans `tarification.frais`, les placeholders
+`{fraisParPassage}` et `{cap}` sont remplacés à l'affichage par
+`parametres.fraisServiceParPassage` et `parametres.capFraisServiceMensuel`
+(aucune valeur en dur dans le code).
+
 ## Scénarios (use cases)
 
 Le carrousel en haut de page propose « Simuler sur mon commerce » (par défaut)
@@ -147,9 +167,10 @@ commerce », aucun badge ni reset.
 # Tests unitaires du moteur de calcul (28 tests, cas de référence du tableur)
 node tests/test-calculs.js
 
-# Test d'intégration de l'interface (jsdom, serveur local requis)
+# Tests d'intégration de l'interface (jsdom, serveur local requis)
 python3 -m http.server 8765        # depuis la racine du dépôt
-node tests/test-ui.js
+cd /tmp && npm install jsdom whatwg-fetch
+NODE_PATH=/tmp/node_modules node tests/test-ui.js
 ```
 
 Le cas de référence validé est celui du tableur « Commerces v3 simplif » :

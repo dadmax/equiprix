@@ -909,3 +909,250 @@ select:focus-visible {
     color: var(--resultat-negatif);
     font-weight: 700;
 }
+
+/* ============================================================
+   PAGE POUR LES COMMERÇANTS (au-delà du simulateur)
+   ============================================================ */
+
+/* ---------- En-tête : sous-titre + CTA ---------- */
+.sim-hero {
+    padding: 56px 0 44px;
+}
+
+.sim-hero .sim-title {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 16px;
+}
+
+.sim-hero-sous-titre {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    color: var(--dark-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.sim-hero-cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-secondaire {
+    display: inline-block;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: var(--white);
+    padding: 10px 22px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-secondaire:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* ---------- Sections de page génériques ---------- */
+.page-section {
+    padding: 56px 0;
+}
+
+/* Accroche « La tarification solidaire, c'est quoi ? » (avant le simulateur) */
+.page-accroche {
+    padding-bottom: 8px;
+}
+
+.page-accroche .section-intro {
+    margin-bottom: 0;
+}
+
+/* ---------- Bloc simulateur ---------- */
+.sim-bloc-simulateur {
+    padding-top: 40px;
+}
+
+.sim-bloc-simulateur .sim-scenarios {
+    margin-bottom: 20px;
+}
+
+.sim-bloc-simulateur .sim-narratif-bloc {
+    margin-bottom: 8px;
+}
+
+/* ---------- Sources : <details> replié, à l'intérieur du simulateur ---------- */
+.sim-sources-details {
+    max-width: 800px;
+    margin: 16px auto 0;
+    padding: 0 0 24px;
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+.sim-sources-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    display: inline-block;
+}
+
+.sim-sources-details summary:hover {
+    text-decoration: underline;
+}
+
+.sim-sources-details[open] summary {
+    margin-bottom: 10px;
+}
+
+.sim-sources-details .sim-sources {
+    margin: 0 0 8px;
+    text-align: left;
+}
+
+.sim-sources-details .sim-note {
+    text-align: left;
+}
+
+/* ---------- Comment ça marche : 3 étapes (maquettes d'appli) ---------- */
+.ccm-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+    .ccm-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 points de gauche à droite */
+        gap: 24px;
+    }
+}
+
+.ccm-etape {
+    text-align: center;
+}
+
+.ccm-etape img {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    background: var(--white);
+    border: 1px solid #EAECF0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+}
+
+.ccm-etape h3 {
+    color: var(--primary-color);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.ccm-etape p {
+    color: var(--dark-gray);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+/* ---------- Engagement ---------- */
+.page-engagement {
+    background-color: var(--bg-commercants);
+    border-top: 1px solid #EAECF0;
+    border-bottom: 1px solid #EAECF0;
+}
+
+.engagement-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+    .engagement-grid {
+        grid-template-columns: 1.3fr 1fr; /* texte à gauche, badge à droite */
+    }
+}
+
+.engagement-stat {
+    font-size: 1.05rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.engagement-stat strong {
+    display: block;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.engagement-texte > p:last-child {
+    line-height: 1.6;
+    color: var(--dark-gray);
+}
+
+.engagement-visuel img {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* ---------- Tarification ---------- */
+.tar-blocs {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tar-alignement {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.tar-ligne {
+    font-size: 1.02rem;
+    color: var(--dark-gray);
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+.tar-marketing {
+    background: var(--bg-why);
+    border: 1px solid #D6E8FF;
+    border-radius: var(--border-radius);
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.tar-marketing h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.tar-marketing p {
+    color: var(--dark-gray);
+    line-height: 1.6;
+}

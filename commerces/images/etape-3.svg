@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" role="img">
+  <rect x="10" y="10" width="280" height="400" rx="28" fill="#FFFFFF" stroke="#1E90FF" stroke-width="3"/>
+  <rect x="110" y="22" width="80" height="10" rx="5" fill="#EAECF0"/>
+  <rect x="30" y="48" width="240" height="36" rx="8" fill="#F0F7FF"/>
+  <text x="150" y="71" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#1E90FF" text-anchor="middle">equiprix</text>
+  <circle cx="150" cy="130" r="34" fill="#E8F5E9" stroke="#388E3C" stroke-width="3"/>
+  <path d="M134 130 l11 11 l22 -22" stroke="#388E3C" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="192" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" fill="#333" text-anchor="middle">Vente validée : 1,44 €</text>
+  <rect x="30" y="215" width="240" height="130" rx="10" fill="#F8F9FA" stroke="#EAECF0"/>
+  <text x="45" y="240" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E90FF">Tableau de bord — octobre</text>
+  <rect x="45" y="255" width="18" height="70" rx="4" fill="#1E90FF"/>
+  <rect x="75" y="270" width="18" height="55" rx="4" fill="#1E90FF" opacity="0.75"/>
+  <rect x="105" y="285" width="18" height="40" rx="4" fill="#1E90FF" opacity="0.55"/>
+  <rect x="135" y="265" width="18" height="60" rx="4" fill="#FF6B35"/>
+  <text x="170" y="300" font-family="Inter, Arial, sans-serif" font-size="11" fill="#333">+134 clients</text>
+  <text x="170" y="318" font-family="Inter, Arial, sans-serif" font-size="11" fill="#2E7D32">+334 € de marge</text>
+  <rect x="30" y="380" width="240" height="6" rx="3" fill="#EAECF0"/>
+</svg>

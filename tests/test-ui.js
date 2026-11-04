@@ -190,6 +190,79 @@ async function main() {
         dom.window.location.search.includes("cp=78700")
         && dom.window.location.search.includes("type=commerceBouche"));
 
+    // ================= Structure de la page (canevas « page pour les commerces ») =================
+    console.log("Structure de la page (canevas)");
+    const F = 4; // Node.DOCUMENT_POSITION_FOLLOWING
+    verifier("Title SEO = « equiprix, la tarification solidaire dans votre commerce »",
+        d.title === "equiprix, la tarification solidaire dans votre commerce", d.title);
+    const h1 = d.querySelector("h1");
+    verifier("H1 hero = slogan (proposition de valeur)",
+        h1 && h1.textContent.includes("Des réductions qui font du bien à vos clients"), h1 && h1.textContent);
+    verifier("Sous-titre hero rempli depuis le JSON",
+        d.getElementById("hero-sous-titre").textContent.length > 40,
+        d.getElementById("hero-sous-titre").textContent);
+    verifier("CTA hero « Lancer la simulation » vers #simulateur",
+        !!d.querySelector('.sim-hero-cta a.btn-primary[href="#simulateur"]'));
+    verifier("CTA secondaire vers #comment-ca-marche",
+        !!d.querySelector('.sim-hero-cta a[href="#comment-ca-marche"]'));
+
+    const secAccroche = d.getElementById("accroche");
+    const secSim = d.getElementById("simulateur");
+    verifier("Accroche présente et AVANT le simulateur",
+        !!secAccroche && !!secSim && (secAccroche.compareDocumentPosition(secSim) & F) === F);
+    verifier("Accroche : titre + texte remplis depuis le JSON",
+        d.getElementById("titre-accroche").textContent.includes("tarification solidaire")
+        && d.getElementById("accroche-texte").textContent.length > 80);
+    verifier("Scénarios + narratif DANS le bloc simulateur",
+        secSim.contains(d.getElementById("scenarios-liste")) && secSim.contains(d.getElementById("narratif")));
+    verifier("Bloc simulateur englobe « Votre commerce » et « Simulation »",
+        secSim.contains(d.getElementById("titre-commerce")) && secSim.contains(d.getElementById("titre-simulation")));
+
+    const det = d.getElementById("bloc-sources");
+    verifier("Sources en <details> replié, sans H2, à l'intérieur du simulateur",
+        !!det && det.tagName === "DETAILS" && !det.open && !det.querySelector("h2") && secSim.contains(det));
+    verifier("Sources : summary « Sources et données utilisées »",
+        det.querySelector("summary").textContent.includes("Sources et données"));
+    verifier("Sources : sondage renseigné dans le <details>",
+        det.contains(d.getElementById("source-sondage"))
+        && d.getElementById("source-sondage").textContent.includes("septembre 2026"));
+
+    const etapes = d.querySelectorAll("#ccm-etapes .ccm-etape");
+    verifier("Comment ça marche : 3 étapes avec maquettes d'appli",
+        etapes.length === 3
+        && d.getElementById("ccm-img-0").getAttribute("src").includes("images/etape-1")
+        && d.getElementById("ccm-img-2").getAttribute("src").includes("images/etape-3"));
+    verifier("Comment ça marche : titres/textes/alt remplis depuis le JSON",
+        d.getElementById("ccm-titre-0").textContent.length > 5
+        && d.getElementById("ccm-texte-2").textContent.length > 40
+        && d.getElementById("ccm-img-1").alt.length > 10);
+    verifier("Comment ça marche vient APRÈS le simulateur",
+        (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F);
+
+    verifier("Engagement : titre « …faites-le rayonner »",
+        d.getElementById("titre-engagement").textContent.includes("rayonner"));
+    verifier("Engagement : stat 90 % + légende + paragraphe",
+        d.getElementById("engagement-stat").textContent.includes("90")
+        && d.getElementById("engagement-stat-legende").textContent.length > 30
+        && d.getElementById("engagement-texte").textContent.length > 80);
+    verifier("Engagement : badge visuel (image + alt)",
+        d.getElementById("engagement-badge").getAttribute("src").includes("badge-engage")
+        && d.getElementById("engagement-badge").alt.length > 10);
+
+    verifier("Tarification : message d'alignement",
+        d.getElementById("tar-alignement").textContent.includes("aligné"));
+    const fraisTxt = d.getElementById("tar-frais").textContent;
+    verifier("Tarification : {fraisParPassage}/{cap} remplacés depuis parametres (0,50 € / 100 €)",
+        fraisTxt.includes("0,50") && fraisTxt.includes("100")
+        && !fraisTxt.includes("{cap}") && !fraisTxt.includes("{fraisParPassage}"), fraisTxt);
+    verifier("Tarification : sous-bloc marketing (vitrine vs milliers de ménages)",
+        d.getElementById("tar-marketing-titre").textContent.length > 5
+        && d.getElementById("tar-marketing-texte").textContent.includes("vitrine"));
+    verifier("Ordre de page : simulateur → comment-ça-marche → engagement → tarification",
+        (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F
+        && (d.getElementById("comment-ca-marche").compareDocumentPosition(d.getElementById("engagement")) & F) === F
+        && (d.getElementById("engagement").compareDocumentPosition(d.getElementById("tarification")) & F) === F);
+
     // ================= Interaction : réduction éligibles 10 % → 5 % =================
     console.log("Interaction : réduction éligibles 10 % → 5 %");
     const select = d.getElementById("red-eligibles");

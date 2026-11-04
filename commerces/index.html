@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Estimez ce que la tarification solidaire equiprix peut apporter à votre commerce : clients supplémentaires, marge, frais de service et solde net mensuel, à partir de votre code postal et de votre activité.">
+    <meta name="description" content="Des réductions qui font du bien à vos clients et à votre commerce : avec la tarification solidaire equiprix, estimez en quelques clics l'impact sur votre marge mensuelle (clients attirés, pertes, frais de service).">
     <meta property="og:image" content="https://equiprix.fr/images/OG_equiprix_adapter_les_tarifs_pour_les_commerces.jpg" />
-    <title>Simulateur equiprix pour les commerces</title>
+    <title>equiprix, la tarification solidaire dans votre commerce</title>
     <script defer src="https://cloud.umami.is/script.js" data-website-id="9e775384-e8e4-40e0-8134-9203e52e551f"></script>
     <link rel="shortcut icon" type="image/png" href="../images/favico-equiprix-32px.png" />
 
@@ -41,10 +41,30 @@
         </div>
     </nav>
 
-    <!-- En-tête : titre + choix du scénario + narratif -->
+    <!-- En-tête : proposition de valeur -->
     <header class="sim-hero">
         <div class="sim-container">
-            <h1 class="sim-title">Que peut m'apporter equiprix&nbsp;?</h1>
+            <h1 class="sim-title">Des réductions qui font du bien à vos clients et à votre commerce</h1>
+            <p class="sim-hero-sous-titre" id="hero-sous-titre">Avec equiprix, chaque client paie selon ses moyens : les foyers aux niveaux de vie les plus bas bénéficient d'une réduction en caisse, et de nouveaux clients franchissent la porte de votre commerce. Estimez l'impact sur votre marge avec le simulateur ci-dessous.</p>
+            <div class="sim-hero-cta">
+                <a class="btn-primary" href="#simulateur">Lancer la simulation</a>
+                <a class="btn-secondaire" href="#comment-ca-marche">Comment ça marche ?</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="sim-container">
+
+        <!-- ================= ACCROCHE : LA TARIFICATION SOLIDAIRE ================= -->
+        <section class="page-section page-accroche" id="accroche" aria-labelledby="titre-accroche">
+            <h2 class="section-title" id="titre-accroche">La tarification solidaire, c'est quoi ?</h2>
+            <p class="section-intro" id="accroche-texte">La tarification solidaire, c'est adapter le prix à la capacité financière de chacun : avec equiprix, vous pouvez proposer des réductions aux clients aux niveaux de vie les plus bas. Cela permet de cibler les réductions sur les clients qui en ont le plus besoin pour passer la porte de votre commerce.</p>
+        </section>
+
+        <!-- ================= SIMULATEUR ================= -->
+        <section class="page-section sim-bloc-simulateur" id="simulateur" aria-labelledby="titre-simulateur">
+            <h2 class="sim-section-titre" id="titre-simulateur">Simuler sur mon commerce, ou s'inspirer d'exemples concrets</h2>
+            <p class="sim-section-intro">Choisissez un exemple préconfiguré, ou simulez directement sur votre commerce.</p>
 
             <!-- Carrousel de scénarios (use cases alimentés par data/commerces.json) -->
             <div class="sim-scenarios-liste" id="scenarios-liste" role="radiogroup" aria-label="Scénarios de simulation"></div>
@@ -54,10 +74,6 @@
                 <p class="sim-narratif" id="narratif"></p>
                 <img class="sim-narratif-image" id="narratif-image" alt="" hidden>
             </div>
-        </div>
-    </header>
-
-    <main class="sim-container">
 
         <!-- ================= SECTION HAUTE : VOTRE COMMERCE (hypothèses statiques) ================= -->
         <section class="sim-section-haute" aria-labelledby="titre-commerce">
@@ -278,20 +294,69 @@
                 </div>
             </div>
         </section>
-    </main>
 
-    <!-- Sources -->
-    <section class="sim-section sim-section-sources" aria-labelledby="titre-sources">
-        <div class="sim-container">
-            <h2 class="section-title" id="titre-sources">Sources</h2>
+        <!-- Sources : petit bloc replié à l'intérieur du simulateur (pas de titre H2) -->
+        <details class="sim-sources-details" id="bloc-sources">
+            <summary>Sources et données utilisées</summary>
             <ul class="sim-sources">
                 <li>Répartition des populations communales par niveau de vie&nbsp;: Insee, Filosofi 2021 (publication 2024) — <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation" target="_blank" rel="noopener noreferrer">https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation</a></li>
                 <li>Revenu disponible des diverses catégories&nbsp;: Insee, Filosofi 2023 (publication 2026) — <a href="https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation" target="_blank" rel="noopener noreferrer">https://www.insee.fr/fr/metadonnees/source/operation/s2286/presentation</a></li>
                 <li id="source-sondage"></li>
             </ul>
             <p class="sim-note">Résultats estimatifs à visée pédagogique, basés sur les hypothèses affichées en mode expert.</p>
-        </div>
-    </section>
+        </details>
+        </section><!-- /#simulateur -->
+
+        <!-- ================= COMMENT ÇA MARCHE ================= -->
+        <section class="page-section" id="comment-ca-marche" aria-labelledby="titre-ccm">
+            <h2 class="section-title" id="titre-ccm">Comment ça marche ?</h2>
+            <div class="ccm-grid" id="ccm-etapes">
+                <article class="ccm-etape">
+                    <img id="ccm-img-0" src="images/etape-1.svg" alt="" loading="lazy">
+                    <h3 id="ccm-titre-0">Le client scanne le QR code</h3>
+                    <p id="ccm-texte-0">En caisse, le client présente le QR code de son compte equiprix. Aucun document à fournir : son niveau de vie est déjà renseigné, en toute confidentialité.</p>
+                </article>
+                <article class="ccm-etape">
+                    <img id="ccm-img-1" src="images/etape-2.svg" alt="" loading="lazy">
+                    <h3 id="ccm-titre-1">Le prix s'affine automatiquement</h3>
+                    <p id="ccm-texte-1">Le prix affiché s'adapte à la catégorie de niveau de vie du client : prix plein pour les clients non éligibles, prix réduit pour les foyers éligibles. La réduction est appliquée d'elle-même, sans calcul en caisse.</p>
+                </article>
+                <article class="ccm-etape">
+                    <img id="ccm-img-2" src="images/etape-3.svg" alt="" loading="lazy">
+                    <h3 id="ccm-titre-2">Vous validez, equiprix s'occupe du reste</h3>
+                    <p id="ccm-texte-2">L'encaissement se fait comme d'habitude. equiprix calcule les frais de service et vous détaille chaque mois les clients attirés et l'impact sur votre marge, comme dans le simulateur ci-dessus.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= ENGAGEMENT ================= -->
+        <section class="page-section page-engagement" id="engagement" aria-labelledby="titre-engagement">
+            <h2 class="section-title" id="titre-engagement">Engagez votre commerce et faites-le rayonner</h2>
+            <div class="engagement-grid">
+                <div class="engagement-texte">
+                    <p class="engagement-stat"><strong id="engagement-stat">90&nbsp;%</strong> <span id="engagement-stat-legende">des clients ont une réaction de soutien envers un commerce qui pratique la tarification solidaire</span></p>
+                    <p id="engagement-texte">Afficher votre engagement solidaire, c'est le faire rayonner : auprès de vos clients, qui en parlent autour d'eux, et auprès de vos employés, fiers de travailler pour un commerce engagé. Le badge « Commerce engagé equiprix » vous est fourni pour votre vitrine et votre fiche dans l'appli : les ménages qui cherchent des commerces engagés vous trouvent directement, sans surcoût.</p>
+                </div>
+                <div class="engagement-visuel">
+                    <img id="engagement-badge" src="images/badge-engage.svg" alt="Badge « Commerce engagé equiprix » à afficher en vitrine" loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TARIFICATION ================= -->
+        <section class="page-section" id="tarification" aria-labelledby="titre-tarification">
+            <h2 class="section-title" id="titre-tarification">Tarification</h2>
+            <div class="tar-blocs">
+                <p class="tar-alignement" id="tar-alignement">equiprix est aligné avec vos intérêts et avec l'intérêt général.</p>
+                <p class="tar-ligne" id="tar-commission">equiprix ne prélève de commission que lorsque votre commerce attire des clients grâce à la tarification solidaire : aucun client attiré, aucun frais.</p>
+                <p class="tar-ligne" id="tar-frais">Un frais de service de 0,50&nbsp;€ s'applique à chaque passage en caisse, client existant ou client attiré. Lors des premiers mois, l'impact est faible et les frais restent faibles ; une fois la tarification bien mise en œuvre, l'impact est plus fort et les frais augmentent, mais ils sont capés à 100&nbsp;€ par mois pour ne pas représenter une ligne de budget trop importante.</p>
+                <div class="tar-marketing">
+                    <h3 id="tar-marketing-titre">equiprix gère le marketing pour vous</h3>
+                    <p id="tar-marketing-texte">Votre vitrine parle dans la rue devant chez vous ; une réduction diffusée sur equiprix parle à des milliers de ménages autour de chez vous. equiprix assure la visibilité de votre commerce et l'acquisition de clients, sans surcoût supplémentaire : uniquement sur la base des réductions que vous mettez en œuvre.</p>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer (cohérent avec le site) -->
     <footer class="footer">
