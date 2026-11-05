@@ -168,7 +168,7 @@
     "capFraisServiceMensuel": 100
   },
   "textes": {
-    "narratifDefaut": "La tarification solidaire, c’est adapter le prix à la capacité financière de chacun : avec equiprix, vous pouvez proposer des réductions aux clients aux niveaux de vie les plus bas. Cela permet de cibler les réductions sur les clients qui en ont le plus besoin pour passer la porte de votre commerce. Utilisez le simulateur ci-dessous pour trouver la tarification solidaire qui améliore la performance de votre enseigne, ou entrez directement dans l’un des cas ci-dessus.",
+    "narratifDefaut": "Utilisez le simulateur ci-dessous pour trouver la tarification solidaire qui améliore la performance de votre enseigne, ou entrez directement dans l'un des cas ci-dessus.",
     "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
     "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français",
     "legendesCategories": {

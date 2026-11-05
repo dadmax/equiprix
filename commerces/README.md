@@ -13,8 +13,21 @@ replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli,
 3 colonnes sur desktop / empilées sur mobile) → « Engagement » (stat + badge
 « Commerce engagé equiprix ») → « Tarification » (alignement, commission
 conditionnelle, frais capés lus dans `parametres`, sous-bloc marketing).
-Textes marketing éditables dans `textes.*` de `data/commerces.json` ;
-maquettes provisoires dans `commerces/images/` (à remplacer par les vraies).
+Textes marketing **en dur dans `index.html`** ; maquettes provisoires dans
+`commerces/images/` (à remplacer par les vraies).
+
+Rythme des fonds pleine largeur : hero bleu clair (`--bg-why`), accroche
+blanche, **simulateur bleu clair pleine largeur**, « Comment ça marche ? »
+blanche, **« Engagement » bleu clair pleine largeur**, « Tarification »
+blanche. Chaque section de `main` embarque son propre `.sim-container`.
+
+CTA « Nous contacter » (lien du bouton « Contactez-moi » de la section
+`#commercants` de la page d'accueil) : en bleu dans le hero, et en bleu dans
+les résultats du simulateur (au-dessus, « Sauver cette simulation » est en
+blanc). Le toggle « Sources et données utilisées » a une flèche ▾ pivotante
+(comme les accordéons de `/particuliers/`). Le narratif par défaut
+(`textes.narratifDefaut`) ne contient plus que la phrase « Utilisez le
+simulateur ci-dessous… » (le reste est dans l'accroche en HTML).
 
 ## Structure
 

@@ -176,9 +176,10 @@ async function main() {
     verifier("Boutons scénarios sans radio native (button aria-pressed)",
         d.querySelectorAll('input[name="scenario"]').length === 0
         && d.querySelectorAll('button.sim-scenario').length === 5);
-    verifier("Narratif par défaut affiché (nouveau texte : cibler ceux qui en ont le plus besoin)",
-        d.getElementById("narratif").textContent.includes("tarification solidaire")
-        && d.getElementById("narratif").textContent.includes("le plus besoin"));
+    verifier("Narratif par défaut = phrase courte « Utilisez le simulateur ci-dessous… »",
+        d.getElementById("narratif").textContent.includes("améliore la performance de votre enseigne")
+        && d.getElementById("narratif").textContent.includes("l'un des cas ci-dessus"),
+        d.getElementById("narratif").textContent);
 
     // Source sondage
     verifier("Source sondage affichée (septembre 2026, 60 ménages)",
@@ -201,10 +202,24 @@ async function main() {
     verifier("Sous-titre hero EN DUR dans le HTML",
         d.getElementById("hero-sous-titre").textContent.includes("chaque client paie selon ses moyens"),
         d.getElementById("hero-sous-titre").textContent);
-    verifier("CTA hero « Lancer la simulation » vers #simulateur",
-        !!d.querySelector('.sim-hero-cta a.btn-primary[href="#simulateur"]'));
-    verifier("CTA secondaire vers #comment-ca-marche",
-        !!d.querySelector('.sim-hero-cta a[href="#comment-ca-marche"]'));
+    const ctaContact = d.querySelector('.sim-hero-cta a.btn-primary');
+    verifier("CTA hero principal bleu = « Nous contacter » (lien section Commerçants de l'accueil)",
+        !!ctaContact && ctaContact.textContent.includes("Nous contacter")
+        && (ctaContact.getAttribute("href") || "").includes("sibforms.com"),
+        ctaContact && ctaContact.getAttribute("href"));
+    const ctaSim = d.querySelector('.sim-hero-cta a.btn-secondaire[href="#simulateur"]');
+    verifier("CTA hero secondaire blanc = « Lancer la simulation » vers #simulateur",
+        !!ctaSim && ctaSim.textContent.includes("Lancer la simulation"));
+    verifier("Plus de CTA « Comment ça marche ? » dans le hero",
+        !d.querySelector('.sim-hero-cta a[href="#comment-ca-marche"]'));
+    verifier("Résultats : « Sauver cette simulation » en blanc + « Nous contacter » bleu en dessous",
+        d.getElementById("btn-sauver").classList.contains("btn-secondaire")
+        && !d.getElementById("btn-sauver").classList.contains("btn-primary")
+        && (() => { const c = d.getElementById("btn-contact"); return !!c
+            && c.classList.contains("btn-primary")
+            && (c.getAttribute("href") || "").includes("sibforms.com")
+            && c.textContent.includes("Nous contacter")
+            && d.querySelector(".sim-actions").contains(c); })());
 
     const secAccroche = d.getElementById("accroche");
     const secSim = d.getElementById("simulateur");
@@ -221,8 +236,10 @@ async function main() {
     const det = d.getElementById("bloc-sources");
     verifier("Sources en <details> replié, sans H2, à l'intérieur du simulateur",
         !!det && det.tagName === "DETAILS" && !det.open && !det.querySelector("h2") && secSim.contains(det));
-    verifier("Sources : summary « Sources et données utilisées »",
-        det.querySelector("summary").textContent.includes("Sources et données"));
+    verifier("Sources : summary « Sources et données utilisées » + flèche ▾ (toggle visible)",
+        det.querySelector("summary").textContent.includes("Sources et données")
+        && !!det.querySelector("summary .sim-sources-fleche")
+        && det.querySelector("summary .sim-sources-fleche").textContent.includes("▾"));
     verifier("Sources : sondage renseigné dans le <details>",
         det.contains(d.getElementById("source-sondage"))
         && d.getElementById("source-sondage").textContent.includes("septembre 2026"));
@@ -270,6 +287,22 @@ async function main() {
         (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F
         && (d.getElementById("comment-ca-marche").compareDocumentPosition(d.getElementById("engagement")) & F) === F
         && (d.getElementById("engagement").compareDocumentPosition(d.getElementById("tarification")) & F) === F);
+
+    // Fonds pleine largeur : main n'est plus un conteneur, chaque section embarque son .sim-container
+    verifier("Fonds pleine largeur : main sans .sim-container, chaque section a son propre conteneur",
+        !d.querySelector("main").classList.contains("sim-container")
+        && ["accroche", "simulateur", "comment-ca-marche", "engagement", "tarification"].every((id) => {
+            const el = d.getElementById(id).firstElementChild;
+            return el && el.classList.contains("sim-container");
+        }));
+    const css = fs.readFileSync("commerces/css/commerces.css", "utf-8");
+    verifier("CSS : #simulateur et #engagement en bleu (--bg-why) pleine largeur, section basse transparente",
+        /\.sim-bloc-simulateur\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && /\.page-engagement\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && !/\.page-engagement\s*\{[^}]*bg-commercants/.test(css)
+        && /\.sim-section-basse\s*\{[^}]*transparent/.test(css));
+    verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
+        css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
 
     // ================= Interaction : réduction éligibles 10 % → 5 % =================
     console.log("Interaction : réduction éligibles 10 % → 5 %");

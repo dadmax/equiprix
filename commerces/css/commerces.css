@@ -132,14 +132,12 @@
 }
 
 .sim-section-basse {
-    background-color: var(--bg-commercants);
-    border-top: 1px solid #EAECF0;
+    background-color: transparent; /* le fond bleu pleine largeur vient du bloc #simulateur */
+    border-top: 1px solid #D6E8FF;
 }
 
-/* La section basse occupe toute la largeur : on sort du conteneur étroit */
-main.sim-container {
-    max-width: 1200px;
-}
+/* main n'est plus un conteneur : chaque section de page embarque son propre
+   .sim-container, ce qui permet des fonds pleine largeur (#simulateur, #engagement) */
 
 .sim-section-titre {
     color: var(--primary-color);
@@ -942,7 +940,9 @@ select:focus-visible {
     flex-wrap: wrap;
 }
 
-.btn-secondaire {
+a.btn-secondaire,
+button.btn-secondaire {
+    font-family: inherit;
     display: inline-block;
     border: 2px solid var(--primary-color);
     color: var(--primary-color);
@@ -977,6 +977,7 @@ select:focus-visible {
 /* ---------- Bloc simulateur ---------- */
 .sim-bloc-simulateur {
     padding-top: 40px;
+    background-color: var(--bg-why); /* tout le simulateur en bleu clair, pleine largeur */
 }
 
 .sim-bloc-simulateur .sim-scenarios {
@@ -1067,9 +1068,7 @@ select:focus-visible {
 
 /* ---------- Engagement ---------- */
 .page-engagement {
-    background-color: var(--bg-commercants);
-    border-top: 1px solid #EAECF0;
-    border-bottom: 1px solid #EAECF0;
+    background-color: var(--bg-why); /* bleu clair pleine largeur, comme le hero et le simulateur */
 }
 
 .engagement-grid {
@@ -1155,4 +1154,17 @@ select:focus-visible {
 .tar-marketing p {
     color: var(--dark-gray);
     line-height: 1.6;
+}
+
+/* ---------- Flèche du toggle « Sources et données utilisées » ----------
+   Même principe que les accordéons de /particuliers/ : ▾ qui pivote à -90° replié */
+.sim-sources-fleche {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.sim-sources-details:not([open]) .sim-sources-fleche {
+    transform: rotate(-90deg);
 }
