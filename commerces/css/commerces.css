@@ -132,8 +132,8 @@
 }
 
 .sim-section-basse {
-    background-color: transparent; /* le fond bleu pleine largeur vient du bloc #simulateur */
-    border-top: 1px solid #D6E8FF;
+    background-color: transparent; /* le fond pleine largeur vient du bloc #simulateur */
+    border-top: 1px solid #EAECF0;
 }
 
 /* main n'est plus un conteneur : chaque section de page embarque son propre
@@ -749,10 +749,11 @@
     margin-bottom: 12px;
 }
 
-/* Actions */
+/* Actions : boutons centrés (le « Nous contacter » ne colle pas à gauche) */
 .sim-actions {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 8px;
 }
 
@@ -773,6 +774,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     margin: 0;
+    text-align: center;
 }
 
 /* ---------- Mode expert ---------- */
@@ -965,19 +967,11 @@ button.btn-secondaire {
     padding: 56px 0;
 }
 
-/* Accroche « La tarification solidaire, c'est quoi ? » (avant le simulateur) */
-.page-accroche {
-    padding-bottom: 8px;
-}
-
-.page-accroche .section-intro {
-    margin-bottom: 0;
-}
-
 /* ---------- Bloc simulateur ---------- */
 .sim-bloc-simulateur {
     padding-top: 40px;
-    background-color: var(--bg-why); /* tout le simulateur en bleu clair, pleine largeur */
+    /* fond blanc : le rythme de couleurs est inversé (hero bleu, simulateur blanc,
+       comment-ça-marche bleu, engagement blanc, tarification bleue) */
 }
 
 .sim-bloc-simulateur .sim-scenarios {
@@ -1023,6 +1017,10 @@ button.btn-secondaire {
 }
 
 /* ---------- Comment ça marche : 3 étapes (maquettes d'appli) ---------- */
+#comment-ca-marche {
+    background-color: var(--bg-why); /* bleu clair pleine largeur */
+}
+
 .ccm-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1068,7 +1066,7 @@ button.btn-secondaire {
 
 /* ---------- Engagement ---------- */
 .page-engagement {
-    background-color: var(--bg-why); /* bleu clair pleine largeur, comme le hero et le simulateur */
+    /* fond blanc (rythme inversé) ; le bloc marketing ci-dessous reprend le bleu */
 }
 
 .engagement-grid {
@@ -1116,17 +1114,51 @@ button.btn-secondaire {
 }
 
 /* ---------- Tarification ---------- */
-.tar-blocs {
-    max-width: 800px;
-    margin: 0 auto;
+.page-tarification {
+    background-color: var(--bg-why); /* bleu clair pleine largeur */
 }
 
-.tar-alignement {
+.page-tarification .section-intro {
+    margin-bottom: 32px;
+}
+
+/* Grille : gros KPI « 0,50 € » à gauche sur desktop, en premier sur mobile */
+.tar-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+@media (min-width: 992px) {
+    .tar-grid {
+        grid-template-columns: 260px 1fr; /* KPI à gauche, texte à droite */
+        gap: 40px;
+    }
+}
+
+.tar-kpi {
     text-align: center;
+}
+
+.tar-kpi strong {
+    display: block;
+    font-size: 3.5rem;
     font-weight: 700;
-    font-size: 1.2rem;
     color: var(--primary-color);
-    margin-bottom: 20px;
+    line-height: 1.1;
+}
+
+.tar-kpi span {
+    display: block;
+    max-width: 260px;
+    margin: 8px auto 0;
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
 }
 
 .tar-ligne {
@@ -1136,9 +1168,9 @@ button.btn-secondaire {
     margin-bottom: 14px;
 }
 
-/* Bloc marketing « equiprix gère le marketing pour vous » — remonté dans #engagement (fond bleu) */
+/* Bloc marketing « equiprix gère le marketing pour vous » — dans #engagement (fond blanc) */
 .marketing-bloc {
-    background: var(--white);
+    background: var(--bg-why);
     border: 1px solid #D6E8FF;
     border-radius: var(--border-radius);
     padding: 24px;

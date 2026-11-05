@@ -83,7 +83,7 @@
       "source": "sondage",
       "margeDefaut": 0.175,
       "passagesDefaut": 8000,
-      "panierDefaut": 50
+      "panierDefaut": 30
     },
     "barRestaurant": {
       "nom": "Bar / restaurant",

@@ -221,13 +221,15 @@ async function main() {
             && c.textContent.includes("Nous contacter")
             && d.querySelector(".sim-actions").contains(c); })());
 
-    const secAccroche = d.getElementById("accroche");
     const secSim = d.getElementById("simulateur");
-    verifier("Accroche présente et AVANT le simulateur",
-        !!secAccroche && !!secSim && (secAccroche.compareDocumentPosition(secSim) & F) === F);
-    verifier("Accroche : titre + texte EN DUR dans le HTML",
-        d.getElementById("titre-accroche").textContent.includes("tarification solidaire")
-        && d.getElementById("accroche-texte").textContent.includes("capacité financière"));
+    verifier("Section #accroche supprimée (son texte est concaténé dans le sous-titre du hero)",
+        !d.getElementById("accroche") && !d.getElementById("titre-accroche") && !d.getElementById("accroche-texte"));
+    verifier("Hero : sous-titre = accroche concaténée (paie selon ses moyens + tarification solidaire + simulateur)",
+        d.getElementById("hero-sous-titre").textContent.includes("chaque client paie selon ses moyens")
+        && d.getElementById("hero-sous-titre").textContent.includes("tarification solidaire")
+        && d.getElementById("hero-sous-titre").textContent.includes("capacité financière")
+        && d.getElementById("hero-sous-titre").textContent.includes("simulateur ci-dessous"),
+        d.getElementById("hero-sous-titre").textContent);
     verifier("Scénarios + narratif DANS le bloc simulateur",
         secSim.contains(d.getElementById("scenarios-liste")) && secSim.contains(d.getElementById("narratif")));
     verifier("Bloc simulateur englobe « Votre commerce » et « Simulation »",
@@ -275,12 +277,22 @@ async function main() {
         d.getElementById("engagement-badge").getAttribute("src").includes("badge-engage")
         && d.getElementById("engagement-badge").alt.length > 10);
 
-    verifier("Tarification : message d'alignement",
-        d.getElementById("tar-alignement").textContent.includes("aligné"));
+    verifier("Tarification : sous-titre « Aligné avec vos intérêts, aligné avec l'intérêt général » en .section-intro",
+        d.getElementById("tar-alignement").textContent.includes("Aligné avec vos intérêts")
+        && d.getElementById("tar-alignement").textContent.includes("intérêt général")
+        && d.getElementById("tar-alignement").classList.contains("section-intro"));
+    const kpi = d.getElementById("tar-frais-par-passage");
+    verifier("Tarification : gros KPI 0,50 € dans .tar-kpi, lui-même dans le .tar-grid de #tarification",
+        !!kpi.closest(".tar-kpi") && !!kpi.closest(".tar-grid")
+        && d.getElementById("tarification").contains(kpi.closest(".tar-grid"))
+        && kpi.textContent.includes("0,50")
+        && d.getElementById("tar-frais-legende").textContent.includes("frais de service")
+        && d.getElementById("tar-frais-legende").textContent.includes("par passage"),
+        kpi.closest(".tar-kpi") ? kpi.closest(".tar-kpi").textContent : "KPI absent");
     const fraisTxt = d.getElementById("tar-frais").textContent;
-    verifier("Tarification : texte en dur + valeurs injectées depuis parametres (0,50 € / 100 €)",
-        fraisTxt.includes("frais de service") && fraisTxt.includes("capés")
-        && d.getElementById("tar-frais-par-passage").textContent.includes("0,50")
+    verifier("Tarification : commission conditionnelle + plafond 100 € pensé pour les petits commerces (valeurs injectées)",
+        d.getElementById("tar-commission").textContent.includes("attire des clients")
+        && fraisTxt.includes("capés") && fraisTxt.includes("petits commerces")
         && d.getElementById("tar-cap-mensuel").textContent.includes("100"), fraisTxt);
     const jsonMaitre = JSON.parse(fs.readFileSync("commerces/data/commerces.json", "utf-8"));
     verifier("Textes marketing HORS du JSON (heroSousTitre/accroche/commentCaMarche/engagement/tarification absents)",
@@ -300,16 +312,23 @@ async function main() {
     // Fonds pleine largeur : main n'est plus un conteneur, chaque section embarque son .sim-container
     verifier("Fonds pleine largeur : main sans .sim-container, chaque section a son propre conteneur",
         !d.querySelector("main").classList.contains("sim-container")
-        && ["accroche", "simulateur", "comment-ca-marche", "engagement", "tarification"].every((id) => {
+        && ["simulateur", "comment-ca-marche", "engagement", "tarification"].every((id) => {
             const el = d.getElementById(id).firstElementChild;
             return el && el.classList.contains("sim-container");
         }));
     const css = fs.readFileSync("commerces/css/commerces.css", "utf-8");
-    verifier("CSS : #simulateur et #engagement en bleu (--bg-why) pleine largeur, section basse transparente",
-        /\.sim-bloc-simulateur\s*\{[^}]*var\(--bg-why\)/.test(css)
-        && /\.page-engagement\s*\{[^}]*var\(--bg-why\)/.test(css)
-        && !/\.page-engagement\s*\{[^}]*bg-commercants/.test(css)
+    verifier("CSS : rythme inversé : simulateur BLANC, #comment-ca-marche bleu, engagement BLANC, tarification bleue, bloc marketing bleu",
+        !/\.sim-bloc-simulateur\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && /#comment-ca-marche\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && !/\.page-engagement\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && /\.page-tarification\s*\{[^}]*var\(--bg-why\)/.test(css)
+        && /\.marketing-bloc\s*\{[^}]*var\(--bg-why\)/.test(css)
         && /\.sim-section-basse\s*\{[^}]*transparent/.test(css));
+    verifier("CSS : KPI tarification en grille (1fr mobile, 260px 1fr desktop, 3,5rem) + .sim-actions centré",
+        /\.tar-grid\s*\{[^}]*grid-template-columns:\s*1fr/.test(css)
+        && /@media \(min-width: 992px\)[\s\S]*?\.tar-grid\s*\{[^}]*260px 1fr/.test(css)
+        && /\.tar-kpi strong\s*\{[^}]*3\.5rem/.test(css)
+        && /\.sim-actions\s*\{[^}]*align-items:\s*center/.test(css));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
 
@@ -420,14 +439,14 @@ async function main() {
 
     dom2.window.close();
 
-    // Défauts du type supermarché (17,5 % / 8 000 / 50 €) + label/aide marge
+    // Défauts du type supermarché (17,5 % / 8 000 / 30 € HT) + label/aide marge
     const domT = await charger(`${BASE}/commerces/`);
     const dT = domT.window.document;
     dT.querySelector('.sim-carte-type[data-type="supermarche"]').click();
     await attendre(200);
-    verifier("Carte supermarché : préremplit marge 17,5 % (champ 18 ou 17 selon arrondi), 8 000 passages, 50 €",
+    verifier("Carte supermarché : préremplit marge 17,5 % (champ 18 ou 17 selon arrondi), 8 000 passages, 30 € HT",
         dT.getElementById("passages").value === "8000"
-        && dT.getElementById("panier").value === "50"
+        && dT.getElementById("panier").value === "30"
         && ["17", "18"].includes(dT.getElementById("marge").value),
         [dT.getElementById("marge").value, dT.getElementById("passages").value, dT.getElementById("panier").value].join("/"));
     verifier("Label marge = « Marge sur produit (%) » + aide formule (prix vente − coût achat) / prix vente",
@@ -552,7 +571,7 @@ async function main() {
         && d9.querySelector('.sim-carte-type[data-type="supermarche"]').getAttribute("aria-checked") === "true"
         && ["17", "18"].includes(d9.getElementById("marge").value)
         && d9.getElementById("passages").value === "8000"
-        && d9.getElementById("panier").value === "50"
+        && d9.getElementById("panier").value === "30"
         && d9.getElementById("badge-modifie").hidden === false,
         d9.getElementById("marge").value + "/" + d9.getElementById("passages").value + "/" + d9.getElementById("panier").value);
     dom9.window.close();

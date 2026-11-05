@@ -4,8 +4,8 @@
    temps réel et met à jour le DOM de façon ciblée.
 
    Structure de la page (page pour les commerces, avec un simulateur) :
-   - en-tête : proposition de valeur (slogan) + CTA ;
-   - accroche « La tarification solidaire, c'est quoi ? » ;
+   - en-tête : proposition de valeur (slogan + accroche tarification solidaire
+     concaténée dans le sous-titre) + CTA ;
    - bloc #simulateur : scénarios + narratif, puis « Votre commerce »
      (Commune + Activité) et « Simulation » (Vos réductions + Résultats,
      badge « paramètres modifiés » + reset, toggle « Mode expert »), puis

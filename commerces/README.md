@@ -6,23 +6,27 @@ réductions envisagées par catégorie equiprix, le simulateur estime l'impact
 mensuel sur la marge (clients supplémentaires, perte sur clients existants,
 frais de service, solde net rapporté au chiffre d'affaires).
 
-Ordre de la page : en-tête (proposition de valeur + CTA) → accroche
-« La tarification solidaire, c'est quoi ? » → bloc `#simulateur` (scénarios +
+Ordre de la page : en-tête (proposition de valeur + CTA, sous-titre qui
+concatène l'accroche « chaque client paie selon ses moyens » + définition de la
+tarification solidaire) → bloc `#simulateur` (scénarios +
 narratif, « Votre commerce », « Simulation », puis **sources en `<details>`
 replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli,
 3 colonnes sur desktop / empilées sur mobile : 1. « Configurez vos réductions »,
 2. « Vérifiez les réductions en caisse » (QR + catégorie/revenu certifié),
 3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % +
 badge « Commerce engagé equiprix » + **bloc marketing « equiprix gère le
-marketing pour vous »**) → « Tarification » (alignement, commission
-conditionnelle, frais capés lus dans `parametres`).
+marketing pour vous »**) → « Tarification » (sous-titre « Aligné avec vos intérêts, aligné avec
+l'intérêt général », gros KPI 0,50 €/passage à gauche sur desktop / en premier
+sur mobile, commission conditionnelle, plafond 100 €/mois précisé « pensé pour
+les petits commerces » ; valeurs lues dans `parametres`).
 Textes marketing **en dur dans `index.html`** ; maquettes provisoires dans
 `commerces/images/` (à remplacer par les vraies).
 
-Rythme des fonds pleine largeur : hero bleu clair (`--bg-why`), accroche
-blanche, **simulateur bleu clair pleine largeur**, « Comment ça marche ? »
-blanche, **« Engagement » bleu clair pleine largeur**, « Tarification »
-blanche. Chaque section de `main` embarque son propre `.sim-container`.
+Rythme des fonds pleine largeur (inversé) : hero bleu clair (`--bg-why`),
+**simulateur blanc**, « Comment ça marche ? » **bleu clair pleine largeur**,
+« Engagement » **blanc** (son bloc marketing reprend le bleu clair),
+« Tarification » **bleu clair pleine largeur**. Chaque section de `main`
+embarque son propre `.sim-container`.
 
 CTA « Nous contacter » (lien du bouton « Contactez-moi » de la section
 `#commercants` de la page d'accueil) : en bleu dans le hero, et en bleu dans
@@ -30,13 +34,13 @@ les résultats du simulateur (au-dessus, « Sauver cette simulation » est en
 blanc). Le toggle « Sources et données utilisées » a une flèche ▾ pivotante
 (comme les accordéons de `/particuliers/`). Le narratif par défaut
 (`textes.narratifDefaut`) ne contient plus que la phrase « Utilisez le
-simulateur ci-dessous… » (le reste est dans l'accroche en HTML).
+simulateur ci-dessous… » (le reste est dans le sous-titre du hero, en HTML).
 
 ## Structure
 
 ```
 commerces/
-├── index.html                     # Page commerçants (hero, accroche, simulateur, ccm, engagement, tarification)
+├── index.html                     # Page commerçants (hero, simulateur, ccm, engagement, tarification)
 ├── css/
 │   └── commerces.css              # Styles de la page (s'ajoute à ../style.css)
 ├── images/                        # Maquettes provisoires (etape-1..3.svg, badge-engage.svg)
@@ -114,7 +118,7 @@ sont dans `textes` (`titreBarreSecteur`, `titreBarreFrance`,
 marge commerciale est < 15 %, `suggestionResultatNegatif` — deux pistes
 affichées quand le solde net est négatif).
 
-**Textes marketing de la page (hero, accroche, comment ça marche,
+**Textes marketing de la page (hero, comment ça marche,
 engagement, tarification) : en dur dans `index.html`** — éditables directement,
 avec balisage HTML possible. Seules les **valeurs chiffrées** de la
 tarification sont injectées depuis le JSON maître : `parametres.fraisServiceParPassage`
