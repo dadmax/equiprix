@@ -10,9 +10,12 @@ Ordre de la page : en-tête (proposition de valeur + CTA) → accroche
 « La tarification solidaire, c'est quoi ? » → bloc `#simulateur` (scénarios +
 narratif, « Votre commerce », « Simulation », puis **sources en `<details>`
 replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli,
-3 colonnes sur desktop / empilées sur mobile) → « Engagement » (stat + badge
-« Commerce engagé equiprix ») → « Tarification » (alignement, commission
-conditionnelle, frais capés lus dans `parametres`, sous-bloc marketing).
+3 colonnes sur desktop / empilées sur mobile : 1. « Configurez vos réductions »,
+2. « Vérifiez les réductions en caisse » (QR + catégorie/revenu certifié),
+3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % +
+badge « Commerce engagé equiprix » + **bloc marketing « equiprix gère le
+marketing pour vous »**) → « Tarification » (alignement, commission
+conditionnelle, frais capés lus dans `parametres`).
 Textes marketing **en dur dans `index.html`** ; maquettes provisoires dans
 `commerces/images/` (à remplacer par les vraies).
 

@@ -1136,22 +1136,24 @@ button.btn-secondaire {
     margin-bottom: 14px;
 }
 
-.tar-marketing {
-    background: var(--bg-why);
+/* Bloc marketing « equiprix gère le marketing pour vous » — remonté dans #engagement (fond bleu) */
+.marketing-bloc {
+    background: var(--white);
     border: 1px solid #D6E8FF;
     border-radius: var(--border-radius);
     padding: 24px;
-    margin-top: 24px;
+    max-width: 1000px;
+    margin: 32px auto 0;
 }
 
-.tar-marketing h3 {
+.marketing-bloc h3 {
     color: var(--primary-color);
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 8px;
 }
 
-.tar-marketing p {
+.marketing-bloc p {
     color: var(--dark-gray);
     line-height: 1.6;
 }

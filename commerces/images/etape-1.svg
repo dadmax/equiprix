@@ -3,17 +3,34 @@
   <rect x="110" y="22" width="80" height="10" rx="5" fill="#EAECF0"/>
   <rect x="30" y="48" width="240" height="36" rx="8" fill="#F0F7FF"/>
   <text x="150" y="71" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#1E90FF" text-anchor="middle">equiprix</text>
-  <text x="150" y="112" font-family="Inter, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle">Scannez ce QR code en caisse</text>
-  <rect x="85" y="130" width="130" height="130" rx="10" fill="#FFFFFF" stroke="#333" stroke-width="3"/>
-  <g fill="#333">
-    <rect x="95" y="140" width="24" height="24"/><rect x="166" y="140" width="24" height="24"/><rect x="95" y="211" width="24" height="24"/>
-    <rect x="131" y="140" width="8" height="8"/><rect x="147" y="156" width="8" height="8"/><rect x="131" y="172" width="8" height="8"/>
-    <rect x="147" y="188" width="8" height="8"/><rect x="163" y="204" width="8" height="8"/><rect x="179" y="140" width="8" height="8"/>
-    <rect x="195" y="156" width="8" height="8"/><rect x="131" y="220" width="8" height="8"/><rect x="147" y="236" width="8" height="8"/>
-    <rect x="179" y="220" width="24" height="24"/><rect x="211" y="188" width="8" height="8"/><rect x="211" y="236" width="8" height="8"/>
+  <text x="150" y="106" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#333" text-anchor="middle">Vos réductions</text>
+  <g font-family="Inter, Arial, sans-serif" font-size="12" fill="#333">
+    <rect x="30" y="120" width="240" height="44" rx="8" fill="#FDECEA"/>
+    <circle cx="48" cy="142" r="7" fill="#D32F2F"/>
+    <text x="62" y="146">Rouge (0–20 %)</text>
+    <rect x="212" y="130" width="48" height="24" rx="12" fill="#D32F2F"/>
+    <text x="236" y="146" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">−15 %</text>
+    <rect x="30" y="172" width="240" height="44" rx="8" fill="#FFF3E0"/>
+    <circle cx="48" cy="194" r="7" fill="#F57C00"/>
+    <text x="62" y="198">Orange (20–40 %)</text>
+    <rect x="212" y="182" width="48" height="24" rx="12" fill="#F57C00"/>
+    <text x="236" y="198" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">−15 %</text>
+    <rect x="30" y="224" width="240" height="44" rx="8" fill="#FFF8E1"/>
+    <circle cx="48" cy="246" r="7" fill="#F9A825"/>
+    <text x="62" y="250">Jaune (40–60 %)</text>
+    <rect x="212" y="234" width="48" height="24" rx="12" fill="#F9A825"/>
+    <text x="236" y="250" font-size="11" font-weight="700" fill="#333" text-anchor="middle">−10 %</text>
   </g>
-  <rect x="60" y="285" width="180" height="40" rx="20" fill="#1E90FF"/>
-  <text x="150" y="310" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">Mon niveau de vie est à jour</text>
-  <text x="150" y="352" font-family="Inter, Arial, sans-serif" font-size="11" fill="#667085" text-anchor="middle">Aucun document demandé</text>
+  <text x="30" y="292" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#333">Produits éligibles</text>
+  <g font-family="Inter, Arial, sans-serif" font-size="11" fill="#667085">
+    <rect x="30" y="300" width="14" height="14" rx="3" fill="#1E90FF"/>
+    <path d="M33 307 l3 3 l5 -6" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <text x="52" y="311">Pain, viennoiseries</text>
+    <rect x="30" y="322" width="14" height="14" rx="3" fill="#1E90FF"/>
+    <path d="M33 329 l3 3 l5 -6" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <text x="52" y="333">Épicerie de base</text>
+    <rect x="30" y="344" width="14" height="14" rx="3" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="2"/>
+    <text x="52" y="355">Boissons alcoolisées</text>
+  </g>
   <rect x="30" y="380" width="240" height="6" rx="3" fill="#EAECF0"/>
 </svg>

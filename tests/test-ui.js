@@ -249,12 +249,19 @@ async function main() {
         etapes.length === 3
         && d.getElementById("ccm-img-0").getAttribute("src").includes("images/etape-1")
         && d.getElementById("ccm-img-2").getAttribute("src").includes("images/etape-3"));
-    verifier("Comment ça marche : titres/textes EN DUR dans le HTML",
-        d.getElementById("ccm-titre-0").textContent.includes("QR code")
-        && d.getElementById("ccm-texte-2").textContent.length > 40,
+    verifier("Comment ça marche : étape 1 « Configurez vos réductions » (texte en dur HTML)",
+        d.getElementById("ccm-titre-0").textContent.includes("Configurez vos réductions")
+        && d.getElementById("ccm-texte-0").textContent.includes("catégorie de population")
+        && d.getElementById("ccm-texte-0").textContent.includes("produits éligibles"),
         d.getElementById("ccm-titre-0").textContent);
-    verifier("Comment ça marche : alt des maquettes en dur dans le HTML",
-        d.getElementById("ccm-img-1").alt.includes("prix plein"));
+    verifier("Comment ça marche : étape 2 « Vérifiez les réductions en caisse » (QR + revenu certifié)",
+        d.getElementById("ccm-titre-1").textContent.includes("Vérifiez les réductions en caisse")
+        && d.getElementById("ccm-texte-1").textContent.includes("QR code")
+        && d.getElementById("ccm-texte-1").textContent.includes("niveau de revenu certifié"));
+    verifier("Comment ça marche : étape 3 conservée + alt des maquettes en dur dans le HTML",
+        d.getElementById("ccm-titre-2").textContent.includes("occupe du reste")
+        && d.getElementById("ccm-img-0").alt.includes("configuration")
+        && d.getElementById("ccm-img-1").alt.includes("QR code"));
     verifier("Comment ça marche vient APRÈS le simulateur",
         (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F);
 
@@ -280,9 +287,11 @@ async function main() {
         !jsonMaitre.textes.heroSousTitre && !jsonMaitre.textes.accroche
         && !jsonMaitre.textes.commentCaMarche && !jsonMaitre.textes.engagement
         && !jsonMaitre.textes.tarification);
-    verifier("Tarification : sous-bloc marketing (vitrine vs milliers de ménages)",
-        d.getElementById("tar-marketing-titre").textContent.length > 5
-        && d.getElementById("tar-marketing-texte").textContent.includes("vitrine"));
+    verifier("Bloc marketing « equiprix gère le marketing pour vous » remonté DANS #engagement (plus dans #tarification)",
+        d.getElementById("engagement").contains(d.getElementById("marketing-texte"))
+        && !d.getElementById("tarification").querySelector(".marketing-bloc")
+        && d.getElementById("marketing-titre").textContent.includes("marketing")
+        && d.getElementById("marketing-texte").textContent.includes("vitrine"));
     verifier("Ordre de page : simulateur → comment-ça-marche → engagement → tarification",
         (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F
         && (d.getElementById("comment-ca-marche").compareDocumentPosition(d.getElementById("engagement")) & F) === F
