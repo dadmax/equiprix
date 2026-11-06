@@ -1016,118 +1016,14 @@ button.btn-secondaire {
     text-align: left;
 }
 
-/* ---------- Comment ça marche : 3 étapes (maquettes d'appli) ---------- */
+/* ---------- Comment ça marche ---------- */
 #comment-ca-marche {
     background-color: var(--bg-why); /* bleu clair pleine largeur */
 }
 
-/* Mobile d'abord : carrousel horizontal — une seule maquette visible,
-   scroll sur le côté + aperçu de la suivante + pastilles (voir .ccm-dots) */
-.ccm-grid {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    margin: 0 -24px;          /* le carrousel va jusqu'au bord de l'écran */
-    padding: 4px 24px 12px;   /* marge pour l'ombre + l'aperçu */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;    /* barre masquée : pastilles + aperçu indiquent la suite */
-}
-
-.ccm-grid::-webkit-scrollbar {
-    display: none;
-}
-
-.ccm-etape {
-    flex: 0 0 80%;            /* 80 % : la maquette suivante dépasse un peu */
-    max-width: 80%;
-    scroll-snap-align: center;
-    text-align: center;
-}
-
-/* Desktop : les 3 étapes côte à côte, carrousel et pastilles désactivés */
-@media (min-width: 992px) {
-    .ccm-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 points de gauche à droite */
-        gap: 24px;
-        overflow: visible;
-        scroll-snap-type: none;
-        margin: 0 auto;
-        padding: 0;
-        max-width: 1000px;
-    }
-
-    .ccm-etape {
-        flex: none;
-        max-width: none;
-    }
-
-    .ccm-dots {
-        display: none;
-    }
-}
-
-/* Cadre « téléphone » autour des maquettes (captures app-commercant-*.jpg nues) :
-   contour noir d'environ 4 % de la hauteur, angles arrondis à 5 % */
-.ccm-phone {
-    background: #111;
-    padding: 9.5%;            /* ~4 % de la hauteur totale (écrans 390×844) */
-    border-radius: 5%;
-    max-width: 250px;
-    margin: 0 auto 16px;
-    box-shadow: var(--shadow);
-}
-
-.ccm-phone img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 3.5%;       /* coins de l'écran, un peu plus petits que le cadre */
-    background: var(--white);
-}
-
-/* Pastilles du carrousel (visibles sur mobile uniquement) */
-.ccm-dots {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.ccm-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: none;
-    padding: 0;
-    background: #C7D9F2;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.ccm-dot.actif {
-    background: var(--primary-color);
-    transform: scale(1.25);
-}
-
-.ccm-dot:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 3px;
-}
-
-.ccm-etape h3 {
-    color: var(--primary-color);
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.ccm-etape p {
-    color: var(--dark-gray);
-    font-size: 0.92rem;
-    line-height: 1.55;
-}
+/* Le carrousel de maquettes (.ccm-carousel/.ccm-grid/.ccm-phone/.ccm-dots/.ccm-arrow)
+   et le cadre « téléphone » sont dans ../style.css (partagés avec l'accueil
+   et /particuliers/) ; le JS est dans ../js/carrousel.js. */
 
 /* ---------- Engagement ---------- */
 .page-engagement {

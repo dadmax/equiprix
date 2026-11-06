@@ -308,6 +308,14 @@
         <section class="page-section" id="comment-ca-marche" aria-labelledby="titre-ccm">
             <div class="sim-container">
             <h2 class="section-title" id="titre-ccm">Comment ça marche ?</h2>
+            <div class="ccm-carousel">
+            <!-- Pastilles AU-DESSUS : visibles même si la maquette est haute (étape X sur 3) -->
+            <div class="ccm-dots" role="group" aria-label="Aller à l'étape">
+                <button type="button" class="ccm-dot actif" data-cible="0" aria-label="Étape 1 sur 3 : Configurez vos réductions" aria-current="true"></button>
+                <button type="button" class="ccm-dot" data-cible="1" aria-label="Étape 2 sur 3 : Vérifiez les réductions en caisse"></button>
+                <button type="button" class="ccm-dot" data-cible="2" aria-label="Étape 3 sur 3 : Vous validez, equiprix s'occupe du reste"></button>
+            </div>
+            <button type="button" class="ccm-arrow ccm-prev" aria-label="Étape précédente">‹</button>
             <div class="ccm-grid" id="ccm-etapes" aria-roledescription="carrousel" aria-label="Les 3 étapes, faites défiler sur le côté">
                 <article class="ccm-etape">
                     <div class="ccm-phone"><img id="ccm-img-0" src="images/app-commercant-1.jpg" alt="Maquette de l'appli equiprix : écran de configuration des réductions par catégorie de population, avec produits éligibles" loading="lazy"></div>
@@ -325,11 +333,7 @@
                     <p id="ccm-texte-2">L'encaissement se fait comme d'habitude. equiprix calcule les frais de service et vous détaille chaque mois les clients attirés et l'impact sur votre marge, comme dans le simulateur ci-dessus.</p>
                 </article>
             </div>
-            <!-- Pastilles du carrousel (mobile) : 3 étapes, celle affichée est pleine -->
-            <div class="ccm-dots" role="group" aria-label="Aller à l'étape">
-                <button type="button" class="ccm-dot actif" data-cible="0" aria-label="Étape 1 sur 3 : Configurez vos réductions" aria-current="true"></button>
-                <button type="button" class="ccm-dot" data-cible="1" aria-label="Étape 2 sur 3 : Vérifiez les réductions en caisse"></button>
-                <button type="button" class="ccm-dot" data-cible="2" aria-label="Étape 3 sur 3 : Vous validez, equiprix s'occupe du reste"></button>
+            <button type="button" class="ccm-arrow ccm-next" aria-label="Étape suivante">›</button>
             </div>
             </div>
         </section>
@@ -393,6 +397,7 @@
     <div class="sim-tooltip" id="tooltip" role="tooltip" hidden></div>
 
     <!-- JavaScript : calculs métier puis application -->
+    <script src="../js/carrousel.js"></script>
     <script src="js/calculs.js"></script>
     <script src="js/app.js"></script>
 </body>

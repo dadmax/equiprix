@@ -597,6 +597,13 @@
     border-radius: var(--border-radius);
 }
 
+/* La maquette est présentée « dans un mobile » : cadre .ccm-phone (défini dans
+   ../style.css, partagé avec l'accueil et /commerces/) */
+.sim-ajustement-cols .ccm-phone {
+    max-width: 280px;
+    margin: 0 auto;
+}
+
 @media (min-width: 992px) {
     /* Grand écran : titre + texte à gauche (largeur plafonnée pour des
        lignes de lecture confortables), maquette à droite. La colonne
@@ -623,6 +630,13 @@
     .sim-ajustement-img {
         flex-shrink: 0;
         align-self: center;
+    }
+
+    /* Sur grand écran, c'est le cadre (et non plus l'img seule) qui est l'item flex */
+    .sim-ajustement-cols .ccm-phone {
+        flex-shrink: 0;
+        align-self: center;
+        margin: 0;
     }
 }
 

@@ -58,6 +58,21 @@ async function charger(url) {
     return dom;
 }
 
+// Chargement simple (sans attendre #impact-net) pour les pages d'accueil et /particuliers/
+async function chargerBrut(url) {
+    const dom = await JSDOM.fromURL(url, {
+        resources: "usable",
+        runScripts: "dangerously",
+        pretendToBeVisual: true,
+        beforeParse(window) {
+            window.eval(FETCH_POLYFILL);
+            window.addEventListener("error", (e) => console.error("JS ERROR:", e.message));
+        },
+    });
+    await attendre(400);
+    return dom;
+}
+
 let echecs = 0;
 function verifier(nom, cond, detail) {
     if (cond) {
@@ -287,6 +302,27 @@ async function main() {
         && !d.querySelectorAll(".ccm-dot")[0].classList.contains("actif")
         && d.querySelectorAll(".ccm-dot")[0].getAttribute("aria-current") === null);
     d.querySelectorAll(".ccm-dot")[0].click(); // on remet la 1re active
+    const fleches = d.querySelectorAll("#comment-ca-marche .ccm-arrow");
+    verifier("Carrousel mobile : flèches latérales ‹ › autour de la piste + pastilles AU-DESSUS de la piste",
+        fleches.length === 2
+        && !!d.querySelector("#comment-ca-marche .ccm-prev") && !!d.querySelector("#comment-ca-marche .ccm-next")
+        && d.querySelector("#comment-ca-marche .ccm-prev").textContent.includes("‹")
+        && d.querySelector("#comment-ca-marche .ccm-next").textContent.includes("›")
+        && d.getElementById("ccm-etapes").parentElement.classList.contains("ccm-carousel")
+        && (d.querySelector("#comment-ca-marche .ccm-dots").compareDocumentPosition(d.getElementById("ccm-etapes")) & F) === F);
+    d.querySelector("#comment-ca-marche .ccm-next").click();
+    verifier("Carrousel : flèche › → pastille 2 active",
+        d.querySelectorAll(".ccm-dot")[1].classList.contains("actif"));
+    d.querySelector("#comment-ca-marche .ccm-next").click();
+    d.querySelector("#comment-ca-marche .ccm-next").click(); // boucle : 3e étape puis retour à la 1re
+    verifier("Carrousel : flèche › en boucle (après la 3e, retour à la 1re)",
+        d.querySelectorAll(".ccm-dot")[0].classList.contains("actif"));
+    d.querySelector("#comment-ca-marche .ccm-prev").click();
+    verifier("Carrousel : flèche ‹ depuis la 1re → boucle sur la dernière (pastille 3)",
+        d.querySelectorAll(".ccm-dot")[2].classList.contains("actif"));
+    d.querySelectorAll(".ccm-dot")[0].click(); // reset
+    verifier("Page /commerces/ : script partagé ../js/carrousel.js inclus",
+        !!d.querySelector('script[src="../js/carrousel.js"]'));
 
     verifier("Footer : la mention « en cours de constitution… non lucratif » est retirée (crédits flaticon conservés)",
         !d.querySelector("footer").textContent.includes("en cours de constitution")
@@ -344,6 +380,7 @@ async function main() {
             return el && el.classList.contains("sim-container");
         }));
     const css = fs.readFileSync("commerces/css/commerces.css", "utf-8");
+    const cssSite = fs.readFileSync("style.css", "utf-8");
     verifier("CSS : rythme inversé : simulateur BLANC, #comment-ca-marche bleu, engagement BLANC, tarification bleue, bloc marketing bleu",
         !/\.sim-bloc-simulateur\s*\{[^}]*var\(--bg-why\)/.test(css)
         && /#comment-ca-marche\s*\{[^}]*var\(--bg-why\)/.test(css)
@@ -356,16 +393,20 @@ async function main() {
         && /@media \(min-width: 992px\)[\s\S]*?\.tar-grid\s*\{[^}]*260px 1fr/.test(css)
         && /\.tar-kpi strong\s*\{[^}]*3\.5rem/.test(css)
         && /\.sim-actions\s*\{[^}]*align-items:\s*center/.test(css));
-    verifier("CSS : cadre téléphone .ccm-phone (contour #111, padding 9,5 %, radius 5 %) + carrousel mobile scroll-snap + pastilles cachées sur desktop",
-        /\.ccm-phone\s*\{[^}]*background:\s*#111/.test(css)
-        && /\.ccm-phone\s*\{[^}]*padding:\s*9\.5%/.test(css)
-        && /\.ccm-phone\s*\{[^}]*border-radius:\s*5%/.test(css)
-        && /\.ccm-phone img\s*\{[^}]*border-radius/.test(css)
-        && /\.ccm-grid\s*\{[^}]*overflow-x:\s*auto/.test(css)
-        && /\.ccm-grid\s*\{[^}]*scroll-snap-type:\s*x mandatory/.test(css)
-        && /\.ccm-etape\s*\{[^}]*flex:\s*0 0 80%/.test(css)
-        && /@media \(min-width: 992px\)[\s\S]*?\.ccm-dots\s*\{\s*display:\s*none/.test(css)
-        && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(css));
+    verifier("CSS partagé (style.css) : cadre .ccm-phone (#111, padding 3,5 %, VRAI radius 20px, img 12px) + carrousel scroll-snap + flèches ‹ › + pastilles/flèches masquées >= 992px ; plus rien dans commerces.css",
+        /\.ccm-phone\s*\{[^}]*background:\s*#111/.test(cssSite)
+        && /\.ccm-phone\s*\{[^}]*padding:\s*3\.5%/.test(cssSite)
+        && /\.ccm-phone\s*\{[^}]*border-radius:\s*20px/.test(cssSite)
+        && /\.ccm-phone img\s*\{[^}]*border-radius:\s*12px/.test(cssSite)
+        && /\.ccm-grid\s*\{[^}]*overflow-x:\s*auto/.test(cssSite)
+        && /\.ccm-grid\s*\{[^}]*scroll-snap-type:\s*x mandatory/.test(cssSite)
+        && /\.ccm-etape\s*\{[^}]*flex:\s*0 0 80%/.test(cssSite)
+        && /\.ccm-arrow\s*\{[^}]*position:\s*absolute/.test(cssSite)
+        && /\.ccm-prev\s*\{\s*left:/.test(cssSite)
+        && /\.ccm-next\s*\{\s*right:/.test(cssSite)
+        && /\.ccm-dots,\s*\.ccm-arrow\s*\{\s*display:\s*none/.test(cssSite)
+        && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(cssSite)
+        && !/\.ccm-phone\s*\{/.test(css));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
 
@@ -754,6 +795,44 @@ async function main() {
     verifier("Bouton « Optimiser » retiré de la page",
         d7.body.textContent.includes("Optimiser") === false);
     dom7.window.close();
+
+    // ================= Accueil + /particuliers/ : maquettes encadrées, carrousel partagé =================
+    console.log("Accueil et /particuliers/ : cadre téléphone + carrousel partagés (style.css + js/carrousel.js)");
+    const domA = await chargerBrut(`${BASE}/`);
+    const dA = domA.window.document;
+    verifier("Accueil : script js/carrousel.js inclus",
+        !!dA.querySelector('script[src="js/carrousel.js"]'));
+    verifier("Accueil #particuliers : 1 carrousel (.ccm-carousel > .ccm-grid) avec 3 étapes",
+        dA.querySelectorAll(".ccm-carousel").length === 1
+        && dA.querySelectorAll("#particuliers .ccm-grid .ccm-etape").length === 3);
+    verifier("Accueil : chaque maquette app-particulier-*.jpg est dans un .ccm-phone",
+        [...dA.querySelectorAll("#particuliers .ccm-etape img")].length === 3
+        && [...dA.querySelectorAll("#particuliers .ccm-etape img")].every((img) => img.parentElement.classList.contains("ccm-phone")));
+    const dotsA = dA.querySelectorAll("#particuliers .ccm-dot");
+    verifier("Accueil : 3 pastilles + 2 flèches ‹ ›, pastilles AVANT la piste",
+        dotsA.length === 3
+        && dA.querySelectorAll("#particuliers .ccm-arrow").length === 2
+        && !!dA.querySelector("#particuliers .ccm-prev") && !!dA.querySelector("#particuliers .ccm-next")
+        && (dotsA[0].parentElement.compareDocumentPosition(dA.querySelector("#particuliers .ccm-grid")) & F) === F);
+    dA.querySelector("#particuliers .ccm-next").click();
+    verifier("Accueil : flèche › fonctionnelle (pastille 2 active) — carrousel.js bien chargé et exécuté",
+        dA.querySelectorAll("#particuliers .ccm-dot")[1].classList.contains("actif"));
+    dA.querySelector("#particuliers .ccm-prev").click();
+    verifier("Accueil : flèche ‹ ramène à la pastille 1",
+        dA.querySelectorAll("#particuliers .ccm-dot")[0].classList.contains("actif"));
+    verifier("Accueil : les illustrations .commercants-intro (PNG paysage) ne sont PAS encadrées en téléphone",
+        [...dA.querySelectorAll(".commercants-intro img")].every((img) => !img.closest(".ccm-phone")));
+    domA.window.close();
+
+    const domPart = await chargerBrut(`${BASE}/particuliers/`);
+    const dPart = domPart.window.document;
+    const imgP = dPart.querySelector("img.sim-ajustement-img");
+    verifier("/particuliers/ : la maquette est dans un .ccm-phone (cadre partagé style.css)",
+        !!imgP && imgP.parentElement.classList.contains("ccm-phone")
+        && imgP.getAttribute("src").includes("app-particulier-2.jpg"));
+    verifier("/particuliers/ : pas de carrousel (une seule maquette à encadrer)",
+        dPart.querySelectorAll(".ccm-grid").length === 0);
+    domPart.window.close();
 
     console.log(echecs === 0 ? "\nTous les tests UI passent" : `\n${echecs} test(s) UI en échec`);
     process.exit(echecs === 0 ? 0 : 1);

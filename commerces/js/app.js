@@ -103,7 +103,6 @@
 
     // ---------- Initialisation ----------
     async function init() {
-        initialiserCarrousel();
         try {
             const [rMaitre, rCp] = await Promise.all([
                 fetch("data/commerces.json"),
@@ -1025,67 +1024,6 @@
             etat.expert = true;
             els.toggleExpert.checked = true;
         }
-    }
-
-    // ---------- Carrousel « Comment ça marche ? » ----------
-    // Sur mobile, une seule maquette est visible : scroll horizontal (scroll-snap)
-    // + pastilles .ccm-dot cliquables. Sur desktop la grille affiche les 3 étapes
-    // et les pastilles sont masquées en CSS.
-    function initialiserCarrousel() {
-        const grille = document.getElementById("ccm-etapes");
-        const dots = Array.from(document.querySelectorAll(".ccm-dot"));
-        if (!grille || dots.length === 0) return;
-        const etapes = Array.from(grille.querySelectorAll(".ccm-etape"));
-
-        function activerDot(i) {
-            dots.forEach((dot, k) => {
-                const actif = k === i;
-                dot.classList.toggle("actif", actif);
-                if (actif) dot.setAttribute("aria-current", "true");
-                else dot.removeAttribute("aria-current");
-            });
-        }
-
-        function indiceLePlusProche() {
-            const centre = grille.scrollLeft + grille.clientWidth / 2;
-            let meilleur = 0, meilleureDist = Infinity;
-            etapes.forEach((etape, i) => {
-                const c = etape.offsetLeft + etape.offsetWidth / 2;
-                const dist = Math.abs(c - centre);
-                if (dist < meilleureDist) { meilleureDist = dist; meilleur = i; }
-            });
-            return meilleur;
-        }
-
-        dots.forEach((dot, i) => {
-            dot.addEventListener("click", () => {
-                const etape = etapes[i];
-                if (!etape) return;
-                activerDot(i);
-                const cible = Math.max(0, etape.offsetLeft - (grille.clientWidth - etape.offsetWidth) / 2);
-                try {
-                    if (typeof grille.scrollTo === "function") {
-                        grille.scrollTo({ left: cible, behavior: "smooth" });
-                    } else {
-                        grille.scrollLeft = cible;
-                    }
-                } catch (e) {
-                    grille.scrollLeft = cible;
-                }
-            });
-        });
-
-        // Pastille active = étape la plus proche du centre pendant le scroll
-        const raf = window.requestAnimationFrame || ((f) => setTimeout(f, 16));
-        let enAttente = false;
-        grille.addEventListener("scroll", () => {
-            if (enAttente) return;
-            enAttente = true;
-            raf(() => {
-                enAttente = false;
-                activerDot(indiceLePlusProche());
-            });
-        }, { passive: true });
     }
 
     // ---------- Démarrage ----------

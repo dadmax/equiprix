@@ -11,10 +11,13 @@ concatène l'accroche « chaque client paie selon ses moyens » + définition de
 tarification solidaire) → bloc `#simulateur` (scénarios +
 narratif, « Votre commerce », « Simulation », puis **sources en `<details>`
 replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli `app-commercant-1..3.jpg`,
-présentées « dans un mobile » grâce au cadre CSS `.ccm-phone` — contour noir
-~4 % de la hauteur, angles à 5 % ; 3 colonnes sur desktop / **carrousel
-horizontal à scroll-snap sur mobile** (une maquette à la fois + aperçu de la
-suivante + 3 pastilles `.ccm-dot` cliquables, masquées sur desktop) :
+présentées « dans un mobile » grâce au cadre `.ccm-phone` — contour noir
+padding 3,5 %, vrais arrondis `border-radius: 20px` (les captures sont plus
+hautes que larges, un radius en % resterait quasi droit) ; 3 colonnes sur
+desktop / **carrousel horizontal à scroll-snap sur mobile** : une maquette à
+la fois + aperçu de la suivante + **pastilles `.ccm-dot` au-dessus** (visibles
+même maquette haute) + **flèches latérales ‹ ›** `.ccm-arrow` ; tout est
+masqué sur desktop) :
 1. « Configurez vos réductions »,
 2. « Vérifiez les réductions en caisse » (QR + catégorie/revenu certifié),
 3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % +
@@ -26,6 +29,14 @@ les petits commerces » ; valeurs lues dans `parametres`).
 Textes marketing **en dur dans `index.html`** ; vraies maquettes d'appli dans
 `commerces/images/` (`app-commercant-1..3.jpg`). Le footer de la page ne reprend
 pas la mention « en cours de constitution… non lucratif » (ligne retirée).
+
+**Cadre téléphone + carrousel partagés avec tout le site** : les règles
+`.ccm-phone` / `.ccm-carousel` / `.ccm-grid` / `.ccm-dots` / `.ccm-arrow` vivent
+dans `../style.css` et le JS dans `../js/carrousel.js` (auto-init sur chaque
+`.ccm-grid`). Ils sont aussi appliqués sur l'accueil (les 3 maquettes
+`images/app-particulier-1..3.jpg` de la section `#particuliers`) et sur
+`/particuliers/` (la maquette unique `sim-ajustement-img`, encadrée sans
+carrousel).
 
 Rythme des fonds pleine largeur (inversé) : hero bleu clair (`--bg-why`),
 **simulateur blanc**, « Comment ça marche ? » **bleu clair pleine largeur**,

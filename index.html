@@ -90,25 +90,34 @@
         <div class="container">
             <h2 class="section-title">Pour les particuliers</h2>
             <p class="section-intro">Bénéficiez de réductions adaptées à vos revenus dans les commerces partenaires.</p>
-            
-            <div class="steps">
-                <div class="step">
+            <div class="ccm-carousel">
+            <!-- Pastilles au-dessus : visibles même si la maquette est haute (étape X sur 3) -->
+            <div class="ccm-dots" role="group" aria-label="Aller à l’étape">
+                <button type="button" class="ccm-dot actif" aria-label="Étape 1 sur 3 : Téléchargez l’app" aria-current="true"></button>
+                <button type="button" class="ccm-dot" aria-label="Étape 2 sur 3 : Certification instantanée"></button>
+                <button type="button" class="ccm-dot" aria-label="Étape 3 sur 3 : Scannez dans les magasins partenaires"></button>
+            </div>
+            <button type="button" class="ccm-arrow ccm-prev" aria-label="Étape précédente">‹</button>
+            <div class="steps ccm-grid" id="etapes-app" aria-roledescription="carrousel" aria-label="Les 3 étapes de l’application, faites défiler sur le côté">
+                <div class="step ccm-etape">
                     <div class="step-icon">📱</div>
                     <h3>Téléchargez l’app</h3>
                     <p>Envoyez vos justificatifs.</p>
-                    <img src="images/app-particulier-1.jpg" alt="Maquette application - Téléchargement" class="maquette-image">
+                    <div class="ccm-phone"><img src="images/app-particulier-1.jpg" alt="Maquette application - Téléchargement" class="maquette-image"></div>
                 </div>
-                <div class="step">
+                <div class="step ccm-etape">
                     <div class="step-icon">✅</div>
                     <h3>Certification instantanée</h3>
                     <p>Et calcul des réductions.</p>
-                    <img src="images/app-particulier-2.jpg" alt="Maquette application - Certification" class="maquette-image">
+                    <div class="ccm-phone"><img src="images/app-particulier-2.jpg" alt="Maquette application - Certification" class="maquette-image"></div>
                 </div>
-                <div class="step">
+                <div class="step ccm-etape">
                     <div class="step-icon">📲</div>
                     <h3>Scannez dans les magasins partenaires</h3>
-                    <img src="images/app-particulier-3.jpg" alt="Maquette application - Scan" class="maquette-image">
+                    <div class="ccm-phone"><img src="images/app-particulier-3.jpg" alt="Maquette application - Scan" class="maquette-image"></div>
                 </div>
+            </div>
+            <button type="button" class="ccm-arrow ccm-next" aria-label="Étape suivante">›</button>
             </div>
             
             <div class="section-cta">
@@ -226,6 +235,7 @@
     </footer>
 
     <!-- JavaScript -->
+    <script src="js/carrousel.js"></script>
     <script>
         // Menu mobile
         document.querySelector(".hamburger").addEventListener("click", function() {
