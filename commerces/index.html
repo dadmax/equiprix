@@ -45,7 +45,7 @@
     <header class="sim-hero">
         <div class="sim-container">
             <h1 class="sim-title">Des réductions qui font du bien à vos clients et à votre commerce</h1>
-            <p class="sim-hero-sous-titre" id="hero-sous-titre">Avec equiprix, chaque client paie selon ses moyens : la tarification solidaire, c'est adapter le prix à la capacité financière de chacun. Vous pouvez ainsi proposer des réductions aux clients aux niveaux de vie les plus bas, ciblées sur ceux qui en ont le plus besoin pour passer la porte de votre commerce. Estimez l'impact sur votre marge avec le simulateur ci-dessous.</p>
+            <p class="sim-hero-sous-titre" id="hero-sous-titre">Avec equiprix, chaque client paie selon ses moyens : la tarification solidaire, c'est adapter le prix à la capacité financière de chacun. Vous pouvez ainsi proposer des réductions aux clients aux niveaux de vie les plus bas, ciblées sur ceux qui en ont le plus besoin pour passer la porte de votre commerce.</p>
             <div class="sim-hero-cta">
                 <a class="btn-primary" href="https://c1b33ef6.sibforms.com/v2/serve/MUIFABoTZAZm2nLkI3qmS4YKz4ecgIgfSjTbg6z3r9_NhE0LCttr4qDRNaJEpaOPooFHmjxNwJdeMuVmBa86L92YWlIfDMuz-t8eUv_U9rqaxfqF2fSHhb-FX09HCGnTXw00hTysgGqMnyxIT38PNlghrPkGulsAqRVaZwKMykCud6SpN1ZHzfqtq38_xld0kPmk3ibYCSYWg1P7Rg==" target="_blank" rel="noopener noreferrer">Nous contacter</a>
                 <a class="btn-secondaire" href="#simulateur">Lancer la simulation</a>
@@ -308,22 +308,28 @@
         <section class="page-section" id="comment-ca-marche" aria-labelledby="titre-ccm">
             <div class="sim-container">
             <h2 class="section-title" id="titre-ccm">Comment ça marche ?</h2>
-            <div class="ccm-grid" id="ccm-etapes">
+            <div class="ccm-grid" id="ccm-etapes" aria-roledescription="carrousel" aria-label="Les 3 étapes, faites défiler sur le côté">
                 <article class="ccm-etape">
-                    <img id="ccm-img-0" src="images/app-commercant-1.jpg" alt="Maquette de l'appli equiprix : écran de configuration des réductions par catégorie de population, avec produits éligibles" loading="lazy">
+                    <div class="ccm-phone"><img id="ccm-img-0" src="images/app-commercant-1.jpg" alt="Maquette de l'appli equiprix : écran de configuration des réductions par catégorie de population, avec produits éligibles" loading="lazy"></div>
                     <h3 id="ccm-titre-0">Configurez vos réductions</h3>
                     <p id="ccm-texte-0">Choisissez, pour chaque catégorie de population, le niveau de réduction que vous appliquez en caisse et les produits éligibles.</p>
                 </article>
                 <article class="ccm-etape">
-                    <img id="ccm-img-1" src="images/app-commercant-2.jpg" alt="Maquette de l'appli equiprix : en caisse, le client scanne le QR code, equiprix vérifie sa catégorie et calcule le prix réduit" loading="lazy">
+                    <div class="ccm-phone"><img id="ccm-img-1" src="images/app-commercant-2.jpg" alt="Maquette de l'appli equiprix : en caisse, le client scanne le QR code, equiprix vérifie sa catégorie et calcule le prix réduit" loading="lazy"></div>
                     <h3 id="ccm-titre-1">Vérifiez les réductions en caisse</h3>
                     <p id="ccm-texte-1">En caisse, le client scanne un QR code sur votre application equiprix : equiprix vérifie directement sa catégorie et son niveau de revenu certifié, puis calcule le prix avec réduction.</p>
                 </article>
                 <article class="ccm-etape">
-                    <img id="ccm-img-2" src="images/app-commercant-3.jpg" alt="Maquette de l'appli equiprix : validation de la vente et tableau de bord mensuel du commerçant" loading="lazy">
+                    <div class="ccm-phone"><img id="ccm-img-2" src="images/app-commercant-3.jpg" alt="Maquette de l'appli equiprix : validation de la vente et tableau de bord mensuel du commerçant" loading="lazy"></div>
                     <h3 id="ccm-titre-2">Vous validez, equiprix s'occupe du reste</h3>
                     <p id="ccm-texte-2">L'encaissement se fait comme d'habitude. equiprix calcule les frais de service et vous détaille chaque mois les clients attirés et l'impact sur votre marge, comme dans le simulateur ci-dessus.</p>
                 </article>
+            </div>
+            <!-- Pastilles du carrousel (mobile) : 3 étapes, celle affichée est pleine -->
+            <div class="ccm-dots" role="group" aria-label="Aller à l'étape">
+                <button type="button" class="ccm-dot actif" data-cible="0" aria-label="Étape 1 sur 3 : Configurez vos réductions" aria-current="true"></button>
+                <button type="button" class="ccm-dot" data-cible="1" aria-label="Étape 2 sur 3 : Vérifiez les réductions en caisse"></button>
+                <button type="button" class="ccm-dot" data-cible="2" aria-label="Étape 3 sur 3 : Vous validez, equiprix s'occupe du reste"></button>
             </div>
             </div>
         </section>
@@ -378,7 +384,6 @@
                     <a href="mailto:contact@equiprix.fr" class="footer-link">Nous contacter</a>
                 </div>
                 <p class="copyright">&reg; 2026 equiprix</p>
-                <p class="footer-mentions">equiprix est en cours de constitution et sera une structure à but non lucratif.</p>
                 <p class="footer-mentions">Illustrations libres de droit glanées sur flaticon.com — Merci à bqlqn, smashicons, Magnific &amp; monkik !</p>
             </div>
         </div>

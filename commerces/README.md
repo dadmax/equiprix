@@ -10,8 +10,12 @@ Ordre de la page : en-tête (proposition de valeur + CTA, sous-titre qui
 concatène l'accroche « chaque client paie selon ses moyens » + définition de la
 tarification solidaire) → bloc `#simulateur` (scénarios +
 narratif, « Votre commerce », « Simulation », puis **sources en `<details>`
-replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli,
-3 colonnes sur desktop / empilées sur mobile : 1. « Configurez vos réductions »,
+replié, sans titre H2**) → « Comment ça marche ? » (3 maquettes d'appli `app-commercant-1..3.jpg`,
+présentées « dans un mobile » grâce au cadre CSS `.ccm-phone` — contour noir
+~4 % de la hauteur, angles à 5 % ; 3 colonnes sur desktop / **carrousel
+horizontal à scroll-snap sur mobile** (une maquette à la fois + aperçu de la
+suivante + 3 pastilles `.ccm-dot` cliquables, masquées sur desktop) :
+1. « Configurez vos réductions »,
 2. « Vérifiez les réductions en caisse » (QR + catégorie/revenu certifié),
 3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % +
 badge « Commerce engagé equiprix » + **bloc marketing « equiprix gère le
@@ -19,8 +23,9 @@ marketing pour vous »**) → « Tarification » (sous-titre « Aligné avec vos
 l'intérêt général », gros KPI 0,50 €/passage à gauche sur desktop / en premier
 sur mobile, commission conditionnelle, plafond 100 €/mois précisé « pensé pour
 les petits commerces » ; valeurs lues dans `parametres`).
-Textes marketing **en dur dans `index.html`** ; maquettes provisoires dans
-`commerces/images/` (à remplacer par les vraies).
+Textes marketing **en dur dans `index.html`** ; vraies maquettes d'appli dans
+`commerces/images/` (`app-commercant-1..3.jpg`). Le footer de la page ne reprend
+pas la mention « en cours de constitution… non lucratif » (ligne retirée).
 
 Rythme des fonds pleine largeur (inversé) : hero bleu clair (`--bg-why`),
 **simulateur blanc**, « Comment ça marche ? » **bleu clair pleine largeur**,
@@ -43,7 +48,7 @@ commerces/
 ├── index.html                     # Page commerçants (hero, simulateur, ccm, engagement, tarification)
 ├── css/
 │   └── commerces.css              # Styles de la page (s'ajoute à ../style.css)
-├── images/                        # Maquettes provisoires (etape-1..3.svg, badge-engage.svg)
+├── images/                        # Maquettes d'appli (app-commercant-1..3.jpg, badge-engage.svg)
 ├── js/
 │   ├── calculs.js                 # Logique métier pure (testable sous Node)
 │   └── app.js                     # Interface : saisie, URL, mises à jour temps réel

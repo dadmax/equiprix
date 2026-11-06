@@ -224,12 +224,14 @@ async function main() {
     const secSim = d.getElementById("simulateur");
     verifier("Section #accroche supprimée (son texte est concaténé dans le sous-titre du hero)",
         !d.getElementById("accroche") && !d.getElementById("titre-accroche") && !d.getElementById("accroche-texte"));
-    verifier("Hero : sous-titre = accroche concaténée (paie selon ses moyens + tarification solidaire + simulateur)",
+    verifier("Hero : sous-titre = accroche concaténée (paie selon ses moyens + tarification solidaire)",
         d.getElementById("hero-sous-titre").textContent.includes("chaque client paie selon ses moyens")
         && d.getElementById("hero-sous-titre").textContent.includes("tarification solidaire")
-        && d.getElementById("hero-sous-titre").textContent.includes("capacité financière")
-        && d.getElementById("hero-sous-titre").textContent.includes("simulateur ci-dessous"),
+        && d.getElementById("hero-sous-titre").textContent.includes("capacité financière"),
         d.getElementById("hero-sous-titre").textContent);
+    verifier("Hero : la phrase « Estimez l'impact… simulateur ci-dessous » est retirée (le CTA « Lancer la simulation » suffit)",
+        !d.getElementById("hero-sous-titre").textContent.includes("simulateur ci-dessous")
+        && !d.getElementById("hero-sous-titre").textContent.includes("Estimez l'impact"));
     verifier("Scénarios + narratif DANS le bloc simulateur",
         secSim.contains(d.getElementById("scenarios-liste")) && secSim.contains(d.getElementById("narratif")));
     verifier("Bloc simulateur englobe « Votre commerce » et « Simulation »",
@@ -247,10 +249,23 @@ async function main() {
         && d.getElementById("source-sondage").textContent.includes("septembre 2026"));
 
     const etapes = d.querySelectorAll("#ccm-etapes .ccm-etape");
-    verifier("Comment ça marche : 3 étapes avec maquettes d'appli",
+    verifier("Comment ça marche : 3 étapes avec maquettes d'appli (app-commercant-*.jpg)",
         etapes.length === 3
-        && d.getElementById("ccm-img-0").getAttribute("src").includes("images/etape-1")
-        && d.getElementById("ccm-img-2").getAttribute("src").includes("images/etape-3"));
+        && d.getElementById("ccm-img-0").getAttribute("src").includes("images/app-commercant-1")
+        && d.getElementById("ccm-img-2").getAttribute("src").includes("images/app-commercant-3"));
+    verifier("Maquettes affichées « dans un mobile » : chaque img dans un .ccm-phone (cadre)",
+        etapes.length === 3 && [...etapes].every((e) => {
+            const img = e.querySelector("img");
+            return !!img && img.parentElement.classList.contains("ccm-phone");
+        }));
+    const dots = d.querySelectorAll("#comment-ca-marche .ccm-dot");
+    verifier("Carrousel mobile : 3 pastilles .ccm-dot, la 1re active (aria-current), libellés « Étape X sur 3 »",
+        dots.length === 3
+        && dots[0].classList.contains("actif") && dots[0].getAttribute("aria-current") === "true"
+        && !dots[1].classList.contains("actif") && !dots[2].classList.contains("actif")
+        && dots[1].getAttribute("aria-label").includes("Étape 2 sur 3")
+        && dots[2].getAttribute("aria-label").includes("Étape 3 sur 3")
+        && d.getElementById("ccm-etapes").getAttribute("aria-roledescription") === "carrousel");
     verifier("Comment ça marche : étape 1 « Configurez vos réductions » (texte en dur HTML)",
         d.getElementById("ccm-titre-0").textContent.includes("Configurez vos réductions")
         && d.getElementById("ccm-texte-0").textContent.includes("catégorie de population")
@@ -264,6 +279,18 @@ async function main() {
         d.getElementById("ccm-titre-2").textContent.includes("occupe du reste")
         && d.getElementById("ccm-img-0").alt.includes("configuration")
         && d.getElementById("ccm-img-1").alt.includes("QR code"));
+    // Clic sur une pastille : elle devient active (le scroll horizontal suit en navigateur réel)
+    d.querySelectorAll(".ccm-dot")[2].click();
+    verifier("Carrousel : clic pastille 3 → pastille 3 active (aria-current), la 1re ne l'est plus",
+        d.querySelectorAll(".ccm-dot")[2].classList.contains("actif")
+        && d.querySelectorAll(".ccm-dot")[2].getAttribute("aria-current") === "true"
+        && !d.querySelectorAll(".ccm-dot")[0].classList.contains("actif")
+        && d.querySelectorAll(".ccm-dot")[0].getAttribute("aria-current") === null);
+    d.querySelectorAll(".ccm-dot")[0].click(); // on remet la 1re active
+
+    verifier("Footer : la mention « en cours de constitution… non lucratif » est retirée (crédits flaticon conservés)",
+        !d.querySelector("footer").textContent.includes("en cours de constitution")
+        && d.querySelector("footer").textContent.includes("flaticon"));
     verifier("Comment ça marche vient APRÈS le simulateur",
         (secSim.compareDocumentPosition(d.getElementById("comment-ca-marche")) & F) === F);
 
@@ -329,6 +356,16 @@ async function main() {
         && /@media \(min-width: 992px\)[\s\S]*?\.tar-grid\s*\{[^}]*260px 1fr/.test(css)
         && /\.tar-kpi strong\s*\{[^}]*3\.5rem/.test(css)
         && /\.sim-actions\s*\{[^}]*align-items:\s*center/.test(css));
+    verifier("CSS : cadre téléphone .ccm-phone (contour #111, padding 9,5 %, radius 5 %) + carrousel mobile scroll-snap + pastilles cachées sur desktop",
+        /\.ccm-phone\s*\{[^}]*background:\s*#111/.test(css)
+        && /\.ccm-phone\s*\{[^}]*padding:\s*9\.5%/.test(css)
+        && /\.ccm-phone\s*\{[^}]*border-radius:\s*5%/.test(css)
+        && /\.ccm-phone img\s*\{[^}]*border-radius/.test(css)
+        && /\.ccm-grid\s*\{[^}]*overflow-x:\s*auto/.test(css)
+        && /\.ccm-grid\s*\{[^}]*scroll-snap-type:\s*x mandatory/.test(css)
+        && /\.ccm-etape\s*\{[^}]*flex:\s*0 0 80%/.test(css)
+        && /@media \(min-width: 992px\)[\s\S]*?\.ccm-dots\s*\{\s*display:\s*none/.test(css)
+        && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(css));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
 
