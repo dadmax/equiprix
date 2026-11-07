@@ -205,7 +205,7 @@
     {
       "id": "coiffeur-pessac",
       "nom": "Coiffeur à Pessac",
-      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Sur les coupes supplémentaires, la marge est marginale : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
+      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Les coupes supplémentaires sont essentiellement de la marge en plus : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
       "params": {
         "cp": "33600",
         "type": "autre",
@@ -244,7 +244,7 @@
         "cp": "93100",
         "type": "supermarche",
         "marge": 0.2,
-        "passages": 2000,
+        "passages": 20000,
         "panier": 16,
         "profil": "unPeuAisee",
         "attr": 8,

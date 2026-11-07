@@ -1035,8 +1035,8 @@ button.btn-secondaire {
     grid-template-columns: 1fr;
     gap: 32px;
     align-items: center;
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: none; /* le bloc Engagement reprend toute la largeur en desktop */
+    margin: 0;
 }
 
 /* Badge « Commerce engagé » retiré de la page : une seule colonne, même en desktop */

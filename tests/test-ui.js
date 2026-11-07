@@ -336,9 +336,13 @@ async function main() {
 
     verifier("Engagement : titre « …faites-le rayonner »",
         d.getElementById("titre-engagement").textContent.includes("rayonner"));
-    verifier("Engagement : stat 90 % + légende + paragraphe EN DUR dans le HTML",
+    verifier("Engagement : stat 90 % + légende complétée (26 % y vont davantage, 32 % recommandent) + paragraphe EN DUR",
         d.getElementById("engagement-stat").textContent.includes("90")
         && d.getElementById("engagement-stat-legende").textContent.includes("réaction de soutien")
+        && d.getElementById("engagement-stat-legende").textContent.includes("26")
+        && d.getElementById("engagement-stat-legende").textContent.includes("y aller davantage pour soutenir le modèle")
+        && d.getElementById("engagement-stat-legende").textContent.includes("32")
+        && d.getElementById("engagement-stat-legende").textContent.includes("recommander le commerce à leur entourage")
         && d.getElementById("engagement-texte").textContent.includes("bouche"));
     verifier("Engagement : le badge « Commerce engagé » est retiré (plus d'image badge-engage dans la page)",
         !d.getElementById("engagement-badge")
@@ -433,9 +437,11 @@ async function main() {
         && /@media \(min-width: 992px\)[\s\S]*?\.sim-ajustement-cols \.ccm-phone\s*\{[^}]*padding:\s*8px[^}]*border-radius:\s*20px/.test(cssPart));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
-    verifier("CSS : #engagement en 1 colonne même en desktop (badge « Commerce engagé » retiré)",
+    verifier("CSS : #engagement en 1 colonne même en desktop (badge « Commerce engagé » retiré) + bloc pleine largeur (max-width: none)",
         /@media \(min-width: 992px\)\s*\{[^}]*\.engagement-grid\s*\{[^}]*grid-template-columns:\s*1fr/.test(css)
-        && !/\.engagement-visuel/.test(css));
+        && !/\.engagement-visuel/.test(css)
+        && /\.engagement-grid\s*\{[^}]*max-width:\s*none/.test(css)
+        && !/\.engagement-grid\s*\{[^}]*max-width:\s*1000px/.test(css));
 
     // ================= Interaction : réduction éligibles 10 % → 5 % =================
     console.log("Interaction : réduction éligibles 10 % → 5 %");
@@ -600,12 +606,14 @@ async function main() {
         d6.getElementById("cp-nom").textContent.includes("33600")
         && d6.getElementById("cp-nom").textContent.includes("Pessac"),
         d6.getElementById("cp-nom").textContent);
-    verifier("Clic coiffeur : narratif mis à jour (mentionne Pessac)",
-        d6.getElementById("narratif").textContent.includes("Pessac"));
+    verifier("Clic coiffeur : narratif mis à jour (mentionne Pessac + « essentiellement de la marge en plus »)",
+        d6.getElementById("narratif").textContent.includes("Pessac")
+        && d6.getElementById("narratif").textContent.includes("Les coupes supplémentaires sont essentiellement de la marge en plus")
+        && !d6.getElementById("narratif").textContent.includes("la marge est marginale"));
     verifier("Clic coiffeur : URL contient uc=coiffeur-pessac",
         dom6.window.location.search.includes("uc=coiffeur-pessac"));
     const impactCoiffeur = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase coiffeur Pessac ≈ +270 € (panier 25 €, marge marginale 90 %)",
+    verifier("Impact usecase coiffeur Pessac ≈ +270 € (panier 25 €, ~90 % de marge sur les coupes en plus)",
         impactCoiffeur !== null && Math.abs(impactCoiffeur - 270.36) < 1.5, `lu ${impactCoiffeur}`);
     dom6.window.close();
 
@@ -734,9 +742,9 @@ async function main() {
         && dS.getElementById("cp-nom").textContent.includes("93100")
         && dS.getElementById("cp-nom").textContent.includes("Montreuil"),
         dS.getElementById("cp-nom").textContent);
-    verifier("Supérette préconfigurée : marge 20 %, 2000 passages, panier 16 €, un peu aisée, attr ×8",
+    verifier("Supérette préconfigurée : marge 20 %, 20 000 passages, panier 16 €, un peu aisée, attr ×8",
         dS.getElementById("marge").value === "20"
-        && dS.getElementById("passages").value === "2000"
+        && dS.getElementById("passages").value === "20000"
         && dS.getElementById("panier").value === "16"
         && domS.window.location.search.includes("profil=unPeuAisee")
         && domS.window.location.search.includes("attr=8"));
@@ -746,8 +754,8 @@ async function main() {
         && domS.window.location.search.includes("rj=0"),
         domS.window.location.search);
     const impactSup = lireEuro(dS.getElementById("impact-net").textContent);
-    verifier("Impact usecase supérette ≈ +194 € (10 % sur rouge/orange uniquement)",
-        impactSup !== null && Math.abs(impactSup - 194.44) < 1.5, `lu ${impactSup}`);
+    verifier("Impact usecase supérette ≈ +2 844 € à 20 000 passages (10 % sur rouge/orange uniquement, frais capés à 100 €)",
+        impactSup !== null && Math.abs(impactSup - 2844.40) < 1.5, `lu ${impactSup}`);
     verifier("Narratif supérette : histoire seule (pas de résultat en €/mois)",
         !/\d[\d\s ]*,?\d*\s*€\s*\/\s*mois/.test(dS.getElementById("narratif").textContent)
         && dS.getElementById("narratif").textContent.includes("Montreuil"));
