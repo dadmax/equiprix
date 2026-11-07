@@ -32,11 +32,18 @@ pas la mention « en cours de constitution… non lucratif » (ligne retirée).
 
 **Cadre téléphone + carrousel partagés avec tout le site** : les règles
 `.ccm-phone` / `.ccm-carousel` / `.ccm-grid` / `.ccm-dots` / `.ccm-arrow` vivent
-dans `../style.css` et le JS dans `../js/carrousel.js` (auto-init sur chaque
-`.ccm-grid`). Ils sont aussi appliqués sur l'accueil (les 3 maquettes
-`images/app-particulier-1..3.jpg` de la section `#particuliers`) et sur
-`/particuliers/` (la maquette unique `sim-ajustement-img`, encadrée sans
-carrousel).
+dans `../style.css` (les correctifs de cascade — masquage desktop des
+pastilles/flèches, étapes pleine largeur centrées en mobile — sont placés en
+fin de fichier, après les règles de base) et le JS dans `../js/carrousel.js`
+(auto-init sur chaque `.ccm-grid`). Ils sont aussi appliqués sur l'accueil
+(les 3 maquettes `images/app-particulier-1..3.jpg` de la section `#particuliers`,
+alignées en bas en desktop via `.step .ccm-phone { margin-top: auto }`) et sur
+`/particuliers/` (maquette unique `sim-ajustement-img`, encadrée sans carrousel,
+valeurs du cadre redéfinies dans `css/simulateur.css`).
+
+**Footer** : la mention « equiprix est en cours de constitution et sera une
+structure à but non lucratif » est retirée des 3 pages (accueil, /particuliers/,
+/commerces/) ; les crédits flaticon sont conservés.
 
 Rythme des fonds pleine largeur (inversé) : hero bleu clair (`--bg-why`),
 **simulateur blanc**, « Comment ça marche ? » **bleu clair pleine largeur**,

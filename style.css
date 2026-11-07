@@ -789,3 +789,43 @@ body {
     margin: 0;
     max-width: none;
 }
+
+/* ============================================
+   CORRECTIFS carrousel (placés exprès EN FIN de fichier :
+   une règle de base située après un @media de même spécificité gagnerait
+   sinon la cascade — c'est ce qui affichait pastilles/flèches en desktop)
+   ============================================ */
+/* Desktop (>= 992px) : grille 3 colonnes, pastilles et flèches masquées */
+@media (min-width: 992px) {
+    .ccm-dots,
+    .ccm-arrow {
+        display: none;
+    }
+}
+
+/* Mobile : une seule étape, pleine largeur de la piste (donc bien centrée
+   entre les 24px de padding) + aperçu de la suivante via les flèches/pastilles */
+@media (max-width: 991.98px) {
+    .ccm-etape {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Blocs « étapes » centrés horizontalement (maquette + titre + texte) */
+.ccm-carousel .ccm-etape {
+    align-items: center;
+    text-align: center;
+}
+
+.ccm-etape h3,
+.ccm-etape p {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Accueil : les maquettes des étapes sont alignées en bas (desktop) */
+.step .ccm-phone {
+    margin-top: auto;
+}

@@ -598,10 +598,20 @@
 }
 
 /* La maquette est présentée « dans un mobile » : cadre .ccm-phone (défini dans
-   ../style.css, partagé avec l'accueil et /commerces/) */
+   ../style.css, partagé avec l'accueil et /commerces/). Valeurs explicites ici
+   (cette feuille est chargée après ../style.css) : contour 3,5 %, arrondis 20px */
 .sim-ajustement-cols .ccm-phone {
     max-width: 280px;
     margin: 0 auto;
+}
+
+.sim-ajustement-phone {
+    padding: 3.5%;
+    border-radius: 20px;
+}
+
+.sim-ajustement-phone img {
+    border-radius: 12px;
 }
 
 @media (min-width: 992px) {

@@ -249,6 +249,9 @@ async function main() {
         && !d.getElementById("hero-sous-titre").textContent.includes("Estimez l'impact"));
     verifier("Scénarios + narratif DANS le bloc simulateur",
         secSim.contains(d.getElementById("scenarios-liste")) && secSim.contains(d.getElementById("narratif")));
+    verifier("Simulateur : la phrase « Choisissez un exemple préconfiguré, ou simulez directement… » est retirée",
+        !d.getElementById("simulateur").textContent.includes("Choisissez un exemple")
+        && !d.getElementById("simulateur").textContent.includes("simulez directement sur votre commerce"));
     verifier("Bloc simulateur englobe « Votre commerce » et « Simulation »",
         secSim.contains(d.getElementById("titre-commerce")) && secSim.contains(d.getElementById("titre-simulation")));
 
@@ -350,7 +353,9 @@ async function main() {
         && d.getElementById("tarification").contains(kpi.closest(".tar-grid"))
         && kpi.textContent.includes("0,50")
         && d.getElementById("tar-frais-legende").textContent.includes("frais de service")
-        && d.getElementById("tar-frais-legende").textContent.includes("par passage"),
+        && d.getElementById("tar-frais-legende").textContent.includes("par passage")
+        && !d.getElementById("tar-frais-legende").textContent.includes("client existant")
+        && !d.getElementById("tar-frais-legende").textContent.includes("client attiré"),
         kpi.closest(".tar-kpi") ? kpi.closest(".tar-kpi").textContent : "KPI absent");
     const fraisTxt = d.getElementById("tar-frais").textContent;
     verifier("Tarification : commission conditionnelle + plafond 100 € pensé pour les petits commerces (valeurs injectées)",
@@ -400,13 +405,26 @@ async function main() {
         && /\.ccm-phone img\s*\{[^}]*border-radius:\s*12px/.test(cssSite)
         && /\.ccm-grid\s*\{[^}]*overflow-x:\s*auto/.test(cssSite)
         && /\.ccm-grid\s*\{[^}]*scroll-snap-type:\s*x mandatory/.test(cssSite)
-        && /\.ccm-etape\s*\{[^}]*flex:\s*0 0 80%/.test(cssSite)
         && /\.ccm-arrow\s*\{[^}]*position:\s*absolute/.test(cssSite)
         && /\.ccm-prev\s*\{\s*left:/.test(cssSite)
         && /\.ccm-next\s*\{\s*right:/.test(cssSite)
-        && /\.ccm-dots,\s*\.ccm-arrow\s*\{\s*display:\s*none/.test(cssSite)
         && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(cssSite)
         && !/\.ccm-phone\s*\{/.test(css));
+    verifier("CSS : pastilles/flèches masquées en desktop >= 992px — la règle display:none est placée APRÈS les règles de base (sinon la cascade les laisserait visibles)",
+        /\.ccm-dots,\s*\.ccm-arrow\s*\{\s*display:\s*none/.test(cssSite)
+        && cssSite.lastIndexOf(".ccm-dots,") > cssSite.indexOf(".ccm-dots {")
+        && cssSite.lastIndexOf(".ccm-arrow {") > cssSite.indexOf(".ccm-arrow {"));
+    verifier("CSS : mobile — étape pleine largeur bien centrée (flex 0 0 100% en max-width 991,98px) + blocs étapes centrés + maquettes alignées en bas sur accueil",
+        /@media \(max-width: 991\.98px\)[\s\S]*?\.ccm-etape\s*\{[^}]*flex:\s*0 0 100%/.test(cssSite)
+        && /\.ccm-carousel \.ccm-etape\s*\{[^}]*align-items:\s*center/.test(cssSite)
+        && /\.ccm-carousel \.ccm-etape\s*\{[^}]*text-align:\s*center/.test(cssSite)
+        && /\.ccm-etape h3,\s*\.ccm-etape p\s*\{[^}]*text-align:\s*center/.test(cssSite)
+        && /\.step \.ccm-phone\s*\{[^}]*margin-top:\s*auto/.test(cssSite));
+    const cssPart = fs.readFileSync("particuliers/css/simulateur.css", "utf-8");
+    verifier("CSS /particuliers/ : cadre .sim-ajustement-phone avec valeurs explicites (padding 3,5 %, radius 20px, img 12px)",
+        /\.sim-ajustement-phone\s*\{[^}]*padding:\s*3\.5%/.test(cssPart)
+        && /\.sim-ajustement-phone\s*\{[^}]*border-radius:\s*20px/.test(cssPart)
+        && /\.sim-ajustement-phone img\s*\{[^}]*border-radius:\s*12px/.test(cssPart));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
 
@@ -822,6 +840,9 @@ async function main() {
         dA.querySelectorAll("#particuliers .ccm-dot")[0].classList.contains("actif"));
     verifier("Accueil : les illustrations .commercants-intro (PNG paysage) ne sont PAS encadrées en téléphone",
         [...dA.querySelectorAll(".commercants-intro img")].every((img) => !img.closest(".ccm-phone")));
+    verifier("Accueil : footer sans la mention « en cours de constitution… non lucratif » (crédits flaticon conservés)",
+        !dA.querySelector("footer").textContent.includes("en cours de constitution")
+        && dA.querySelector("footer").textContent.includes("flaticon"));
     domA.window.close();
 
     const domPart = await chargerBrut(`${BASE}/particuliers/`);
@@ -832,6 +853,9 @@ async function main() {
         && imgP.getAttribute("src").includes("app-particulier-2.jpg"));
     verifier("/particuliers/ : pas de carrousel (une seule maquette à encadrer)",
         dPart.querySelectorAll(".ccm-grid").length === 0);
+    verifier("/particuliers/ : footer sans la mention « en cours de constitution… non lucratif » (crédits flaticon conservés)",
+        !dPart.querySelector("footer").textContent.includes("en cours de constitution")
+        && dPart.querySelector("footer").textContent.includes("flaticon"));
     domPart.window.close();
 
     console.log(echecs === 0 ? "\nTous les tests UI passent" : `\n${echecs} test(s) UI en échec`);
