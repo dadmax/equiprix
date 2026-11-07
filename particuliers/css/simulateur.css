@@ -603,10 +603,12 @@
 .sim-ajustement-cols .ccm-phone {
     max-width: 280px;
     margin: 0 auto;
+    padding: 8px;              /* bordure fine, en px fixe (plus fine que 3,5 % de 280px) */
+    border-radius: 20px;       /* vrai arrondi */
 }
 
 .sim-ajustement-phone {
-    padding: 3.5%;
+    padding: 8px;
     border-radius: 20px;
 }
 
@@ -642,11 +644,14 @@
         align-self: center;
     }
 
-    /* Sur grand écran, c'est le cadre (et non plus l'img seule) qui est l'item flex */
+    /* Sur grand écran, c'est le cadre (et non plus l'img seule) qui est l'item flex.
+       Padding/radius répétés ici pour être sûr qu'ils s'appliquent en desktop. */
     .sim-ajustement-cols .ccm-phone {
         flex-shrink: 0;
         align-self: center;
         margin: 0;
+        padding: 8px;
+        border-radius: 20px;
     }
 }
 

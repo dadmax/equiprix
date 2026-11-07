@@ -20,9 +20,8 @@ même maquette haute) + **flèches latérales ‹ ›** `.ccm-arrow` ; tout est
 masqué sur desktop) :
 1. « Configurez vos réductions »,
 2. « Vérifiez les réductions en caisse » (QR + catégorie/revenu certifié),
-3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % +
-badge « Commerce engagé equiprix » + **bloc marketing « equiprix gère le
-marketing pour vous »**) → « Tarification » (sous-titre « Aligné avec vos intérêts, aligné avec
+3. « Vous validez, equiprix s'occupe du reste ») → « Engagement » (stat 90 % + **bloc marketing « equiprix gère le
+marketing pour vous »** ; le badge « Commerce engagé » a été retiré de la page) → « Tarification » (sous-titre « Aligné avec vos intérêts, aligné avec
 l'intérêt général », gros KPI 0,50 €/passage à gauche sur desktop / en premier
 sur mobile, commission conditionnelle, plafond 100 €/mois précisé « pensé pour
 les petits commerces » ; valeurs lues dans `parametres`).
@@ -66,7 +65,7 @@ commerces/
 ├── index.html                     # Page commerçants (hero, simulateur, ccm, engagement, tarification)
 ├── css/
 │   └── commerces.css              # Styles de la page (s'ajoute à ../style.css)
-├── images/                        # Maquettes d'appli (app-commercant-1..3.jpg, badge-engage.svg)
+├── images/                        # Maquettes d'appli (app-commercant-1..3.jpg)
 ├── js/
 │   ├── calculs.js                 # Logique métier pure (testable sous Node)
 │   └── app.js                     # Interface : saisie, URL, mises à jour temps réel

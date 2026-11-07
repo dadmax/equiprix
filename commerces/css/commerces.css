@@ -1039,9 +1039,10 @@ button.btn-secondaire {
     margin: 0 auto;
 }
 
+/* Badge « Commerce engagé » retiré de la page : une seule colonne, même en desktop */
 @media (min-width: 992px) {
     .engagement-grid {
-        grid-template-columns: 1.3fr 1fr; /* texte à gauche, badge à droite */
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1064,14 +1065,6 @@ button.btn-secondaire {
 .engagement-texte > p:last-child {
     line-height: 1.6;
     color: var(--dark-gray);
-}
-
-.engagement-visuel img {
-    display: block;
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    margin: 0 auto;
 }
 
 /* ---------- Tarification ---------- */

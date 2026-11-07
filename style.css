@@ -744,7 +744,7 @@ body {
    défiler (même quand les pastilles sont hors écran) */
 .ccm-arrow {
     position: absolute;
-    top: 40%;                 /* centré sur la maquette (partie haute de l'étape) */
+    top: 295px;                /* ≈ mi-hauteur de la maquette (250px de large, ratio 390×844, padding 3,5 %) */
     transform: translateY(-50%);
     z-index: 2;
     width: 40px;
@@ -828,4 +828,17 @@ body {
 /* Accueil : les maquettes des étapes sont alignées en bas (desktop) */
 .step .ccm-phone {
     margin-top: auto;
+}
+
+/* Mobile : la maquette passe EN HAUT de l'étape (comme sur /commerces/), pour que
+   les flèches ‹ › (top: 295px) tombent bien à mi-hauteur de la maquette sur les
+   deux pages. En desktop, la maquette reste en bas de l'étape (margin-top: auto). */
+@media (max-width: 991.98px) {
+    .ccm-etape .ccm-phone {
+        order: -1;
+    }
+
+    .step .ccm-phone {
+        margin-top: 0; /* sinon le margin-top:auto (alignement bas desktop) la rejette en bas */
+    }
 }

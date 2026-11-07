@@ -293,8 +293,9 @@ async function main() {
         d.getElementById("ccm-titre-1").textContent.includes("Vérifiez les réductions en caisse")
         && d.getElementById("ccm-texte-1").textContent.includes("QR code")
         && d.getElementById("ccm-texte-1").textContent.includes("niveau de revenu certifié"));
-    verifier("Comment ça marche : étape 3 conservée + alt des maquettes en dur dans le HTML",
+    verifier("Comment ça marche : étape 3 conservée, SANS « comme dans le simulateur ci-dessus » + alt des maquettes en dur",
         d.getElementById("ccm-titre-2").textContent.includes("occupe du reste")
+        && !d.getElementById("ccm-texte-2").textContent.includes("simulateur ci-dessus")
         && d.getElementById("ccm-img-0").alt.includes("configuration")
         && d.getElementById("ccm-img-1").alt.includes("QR code"));
     // Clic sur une pastille : elle devient active (le scroll horizontal suit en navigateur réel)
@@ -339,9 +340,10 @@ async function main() {
         d.getElementById("engagement-stat").textContent.includes("90")
         && d.getElementById("engagement-stat-legende").textContent.includes("réaction de soutien")
         && d.getElementById("engagement-texte").textContent.includes("bouche"));
-    verifier("Engagement : badge visuel (image + alt)",
-        d.getElementById("engagement-badge").getAttribute("src").includes("badge-engage")
-        && d.getElementById("engagement-badge").alt.length > 10);
+    verifier("Engagement : le badge « Commerce engagé » est retiré (plus d'image badge-engage dans la page)",
+        !d.getElementById("engagement-badge")
+        && !d.getElementById("engagement").querySelector(".engagement-visuel")
+        && !d.getElementById("engagement").innerHTML.includes("badge-engage"));
 
     verifier("Tarification : sous-titre « Aligné avec vos intérêts, aligné avec l'intérêt général » en .section-intro",
         d.getElementById("tar-alignement").textContent.includes("Aligné avec vos intérêts")
@@ -406,6 +408,8 @@ async function main() {
         && /\.ccm-grid\s*\{[^}]*overflow-x:\s*auto/.test(cssSite)
         && /\.ccm-grid\s*\{[^}]*scroll-snap-type:\s*x mandatory/.test(cssSite)
         && /\.ccm-arrow\s*\{[^}]*position:\s*absolute/.test(cssSite)
+        && /\.ccm-arrow\s*\{[^}]*top:\s*295px/.test(cssSite)
+        && /@media \(max-width: 991\.98px\)[\s\S]*?\.ccm-etape \.ccm-phone\s*\{[^}]*order:\s*-1/.test(cssSite)
         && /\.ccm-prev\s*\{\s*left:/.test(cssSite)
         && /\.ccm-next\s*\{\s*right:/.test(cssSite)
         && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(cssSite)
@@ -421,12 +425,17 @@ async function main() {
         && /\.ccm-etape h3,\s*\.ccm-etape p\s*\{[^}]*text-align:\s*center/.test(cssSite)
         && /\.step \.ccm-phone\s*\{[^}]*margin-top:\s*auto/.test(cssSite));
     const cssPart = fs.readFileSync("particuliers/css/simulateur.css", "utf-8");
-    verifier("CSS /particuliers/ : cadre .sim-ajustement-phone avec valeurs explicites (padding 3,5 %, radius 20px, img 12px)",
-        /\.sim-ajustement-phone\s*\{[^}]*padding:\s*3\.5%/.test(cssPart)
+    verifier("CSS /particuliers/ : bordure fine en px fixe (padding 8px) + vrai radius 20px, en base ET en desktop (>= 992px), img 12px",
+        /\.sim-ajustement-phone\s*\{[^}]*padding:\s*8px/.test(cssPart)
         && /\.sim-ajustement-phone\s*\{[^}]*border-radius:\s*20px/.test(cssPart)
-        && /\.sim-ajustement-phone img\s*\{[^}]*border-radius:\s*12px/.test(cssPart));
+        && /\.sim-ajustement-phone img\s*\{[^}]*border-radius:\s*12px/.test(cssPart)
+        && /\.sim-ajustement-cols \.ccm-phone\s*\{[^}]*padding:\s*8px/.test(cssPart)
+        && /@media \(min-width: 992px\)[\s\S]*?\.sim-ajustement-cols \.ccm-phone\s*\{[^}]*padding:\s*8px[^}]*border-radius:\s*20px/.test(cssPart));
     verifier("CSS : flèche du toggle sources (▾ pivotée à -90° replié, comme /particuliers/)",
         css.includes("sim-sources-fleche") && css.includes("rotate(-90deg)"));
+    verifier("CSS : #engagement en 1 colonne même en desktop (badge « Commerce engagé » retiré)",
+        /@media \(min-width: 992px\)\s*\{[^}]*\.engagement-grid\s*\{[^}]*grid-template-columns:\s*1fr/.test(css)
+        && !/\.engagement-visuel/.test(css));
 
     // ================= Interaction : réduction éligibles 10 % → 5 % =================
     console.log("Interaction : réduction éligibles 10 % → 5 %");
