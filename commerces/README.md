@@ -129,6 +129,16 @@ Toutes les évolutions métier se font **uniquement** par édition de
 - **Ajuster les paramètres** : bloc `parametres` (taux de capture, frais de
   service par passage, cap mensuel des frais).
 
+Règles des frais de service (décision métier, dans `js/calculs.js`) :
+- la **catégorie verte n'est jamais facturée** (`fraisBrut = 0`) ;
+- les frais portent sur rouge/orange/jaune :
+  `fraisServiceParPassage × (passages réels + clients en plus)` ;
+- **cap global** `capFraisServiceMensuel` (100 €/mois) : si le brut dépasse le
+  cap, le plafond est **ventilé au pro-rata des frais bruts entre
+  rouge/orange/jaune** (`parCategorie[c].frais`) - c'est ce montant `frais`
+  (et non `fraisBrut`) qui est affiché par catégorie, notamment en mode expert,
+  pour ne jamais afficher plus de 100 € au total.
+
 Les bornes de catégories (`bornesCategories`) et les revenus médians
 (`revenusCategories`) y figurent également, à titre de référence (le découpage
 en catégories est porté par la base codes postaux ; les revenus médians
@@ -218,7 +228,8 @@ Le cas de référence validé est celui du tableur « Commerces v3 simplif » :
 Conflans-Sainte-Honorine, commerce de bouche, clientèle « un peu plus aisée »,
 attractivité moyenne (×8), 1 000 passages, panier 30 €, marge 30 %,
 réductions 10 % partout → pertes 55,81 €, marges supplémentaires 489,59 €,
-frais capés 100 €, **impact net 333,78 €/mois** (+3,7 % de la marge mensuelle,
+frais capés 100 € (brut 213,23 € hors verte, ventilé 28,84/32,62/38,55 €),
+**impact net 333,78 €/mois** (+3,7 % de la marge mensuelle,
 +1,11 pt de CA). L'implémentation en virgule flottante produit 334,43 €
 (écart de 0,65 €, dû aux arrondis intermédiaires du tableur) : les tests
 valident à ±1 € près et vérifient la cohérence interne exacte

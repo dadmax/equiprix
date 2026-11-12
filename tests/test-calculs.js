@@ -247,6 +247,29 @@ test("Frais de service capés à 100 €", () => {
     assert.ok(r.fraisTotalBrut > 100, `brut ${r.fraisTotalBrut}`);
 });
 
+test("Catégorie verte : jamais de frais (brut = 0, montant affiché = 0)", () => {
+    const r = casReference();
+    assert.strictEqual(r.parCategorie.verte.fraisBrut, 0);
+    assert.strictEqual(r.parCategorie.verte.frais, 0);
+    // Le brut ne porte plus que sur les foyers éligibles :
+    // 0,50 € × (292,5 passages éligibles + ~134 clients+) ≈ 213 € (et non 500 €)
+    assert.ok(Math.abs(r.fraisTotalBrut - 213.23) < 0.5, `brut ${r.fraisTotalBrut}`);
+});
+
+test("Cap atteint : le plafond de 100 € est ventilé au pro-rata entre rouge/orange/jaune", () => {
+    const r = casReference();
+    assert.strictEqual(r.fraisCapes, true);
+    const somme = CATEGORIES.reduce((acc, c) => acc + r.parCategorie[c].frais, 0);
+    assert.ok(Math.abs(somme - 100) < 1e-9, `Σ frais ${somme}`);
+    for (const c of CATEGORIES_REDUITES) {
+        const attendu = 100 * r.parCategorie[c].fraisBrut / r.fraisTotalBrut;
+        assert.ok(Math.abs(r.parCategorie[c].frais - attendu) < 1e-9,
+            `${c} : ventilé ${r.parCategorie[c].frais} vs attendu ${attendu}`);
+        assert.ok(r.parCategorie[c].frais <= r.parCategorie[c].fraisBrut + 1e-9,
+            `${c} : montant ventilé ≤ brut`);
+    }
+});
+
 test("Impact net ≈ 333,78 €/mois (±1 €)", () => {
     const r = casReference();
     assert.ok(Math.abs(r.impactNet - 333.78) < 1.0, `impact ${r.impactNet}`);
@@ -321,6 +344,8 @@ test("Réductions 0 % partout : impact = −frais (négatif ou nul)", () => {
     assert.strictEqual(r.totalPertes, 0);
     assert.strictEqual(r.totalClientsPlus, 0);
     assert.ok(r.impactNet < 0, `impact ${r.impactNet} doit être négatif (frais seuls)`);
+    assert.strictEqual(r.parCategorie.verte.fraisBrut, 0); // la verte n'est jamais facturée
+    assert.strictEqual(r.fraisTotal, 100); // brut 146,25 € (passages éligibles seuls) > cap
 });
 
 test("Marge nulle : impactRelatif = null (garde-fou)", () => {
@@ -367,10 +392,15 @@ test("Frais sous le cap pour un petit commerce", () => {
         parametres: maître.parametres,
         matrice: maître.matriceUplift,
     });
-    // ~100 passages + ~5 clients+ × 0,50 € ≈ 52 € < 100 €
+    // ~44 passages éligibles + clients+ × 0,50 € ≈ 22 € < 100 € (la verte n'est pas facturée)
     assert.ok(r.fraisTotal < 100, `frais ${r.fraisTotal}`);
     assert.strictEqual(r.fraisCapes, false);
     assert.ok(Math.abs(r.fraisTotal - r.fraisTotalBrut) < 1e-9);
+    // Sous le cap : le montant affiché par catégorie = le brut ; la verte = 0 €
+    assert.strictEqual(r.parCategorie.verte.fraisBrut, 0);
+    for (const c of CATEGORIES) {
+        assert.strictEqual(r.parCategorie[c].frais, r.parCategorie[c].fraisBrut, `${c} : frais = brut sous le cap`);
+    }
 });
 
 // ---------------------------------------------------------------

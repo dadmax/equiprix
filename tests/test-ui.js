@@ -360,13 +360,14 @@ async function main() {
         && kpi.textContent.includes("0,50")
         && d.getElementById("tar-frais-legende").textContent.includes("frais de service")
         && d.getElementById("tar-frais-legende").textContent.includes("par passage")
+        && d.getElementById("tar-frais-legende").textContent.includes("éligible")
         && !d.getElementById("tar-frais-legende").textContent.includes("client existant")
         && !d.getElementById("tar-frais-legende").textContent.includes("client attiré"),
         kpi.closest(".tar-kpi") ? kpi.closest(".tar-kpi").textContent : "KPI absent");
     const fraisTxt = d.getElementById("tar-frais").textContent;
     verifier("Tarification : commission conditionnelle + plafond 100 € pensé pour les petits commerces (valeurs injectées)",
         d.getElementById("tar-commission").textContent.includes("attire des clients")
-        && fraisTxt.includes("capés") && fraisTxt.includes("petits commerces")
+        && fraisTxt.includes("capés") && fraisTxt.includes("petits commerces") && fraisTxt.includes("verte")
         && d.getElementById("tar-cap-mensuel").textContent.includes("100"), fraisTxt);
     const jsonMaitre = JSON.parse(fs.readFileSync("commerces/data/commerces.json", "utf-8"));
     verifier("Textes marketing HORS du JSON (heroSousTitre/accroche/commentCaMarche/engagement/tarification absents)",
@@ -472,6 +473,20 @@ async function main() {
     verifier("Détail par catégorie affiché SANS clic (4 lignes)",
         !d.getElementById("detail-categories").hidden
         && d.getElementById("detail-categories-body").children.length === 4);
+    // Frais par catégorie en mode expert : la verte affiche 0,00 € et le total
+    // affiché reste plafonné (Σ = 100 € ventilés au pro-rata, jamais le brut)
+    const fraisExpert = [...d.querySelectorAll("#detail-categories-body tr")].map((tr) => ({
+        nom: tr.children[0].textContent.trim(),
+        frais: lireEuro(tr.children[3].textContent),
+    }));
+    const sommeFraisExpert = fraisExpert.reduce((a, l) => a + (l.frais || 0), 0);
+    const ligneVerteExpert = fraisExpert.find((l) => l.nom === "Verte");
+    verifier("Expert : catégorie Verte = 0,00 € de frais (jamais facturée)",
+        !!ligneVerteExpert && ligneVerteExpert.frais === 0,
+        JSON.stringify(fraisExpert));
+    verifier("Expert : frais affichés plafonnés à 100 € au total (ventilés au pro-rata, chaque cellule ≤ 100 €)",
+        Math.abs(sommeFraisExpert - 100) < 0.1 && fraisExpert.every((l) => l.frais <= 100),
+        `Σ = ${sommeFraisExpert} ` + JSON.stringify(fraisExpert));
     verifier("Réduction appliquée aux 3 catégories (selects = 5 %)",
         ["red-rouge", "red-orange", "red-jaune"].every((id) =>
             d.getElementById(id).selectedOptions[0].textContent.replace(/\s/g, "") === "5%"),
@@ -540,6 +555,19 @@ async function main() {
         d4.getElementById("impact-ratio").hidden && d4.getElementById("impact-net").textContent !== "-");
     dom4.window.close();
 
+    // Mode expert via ?expert=1, petit volume : pas de cap
+    const domE = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=100&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10&expert=1`);
+    const dE = domE.window.document;
+    const lignesE = [...dE.querySelectorAll("#detail-categories-body tr")];
+    const fraisE = lignesE.map((tr) => lireEuro(tr.children[3].textContent));
+    const sommeE = fraisE.reduce((a, v) => a + (v || 0), 0);
+    verifier("Expert, petit volume : détail affiché, frais = brut < 100 € (Σ ≈ 21 €) et Verte = 0,00 €",
+        !dE.getElementById("detail-categories").hidden && lignesE.length === 4
+        && sommeE > 15 && sommeE < 100
+        && lireEuro(lignesE.find((tr) => tr.children[0].textContent.includes("Verte")).children[3].textContent) === 0,
+        lignesE.map((tr) => tr.children[3].textContent).join(" | "));
+    domE.window.close();
+
     const dom5 = await charger(`${BASE}/commerces/?cp=78700&type=autre&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
     const d5 = dom5.window.document;
     verifier("Type « Autre commerce » : uplift = estimation prudente ≈ 17 %",
@@ -585,8 +613,8 @@ async function main() {
         d6.getElementById("red-eligibles").selectedOptions[0].textContent.replace(/\s/g, "") === "15%",
         d6.getElementById("red-eligibles").value);
     const impactUC = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase boulangerie ≈ +146 € (marge 40 % sur gâteaux, clientèle aisée, 40 achats, réduc 15 %)",
-        impactUC !== null && Math.abs(impactUC - 146.28) < 1.5,
+    verifier("Impact usecase boulangerie ≈ +162 € (marge 40 % sur gâteaux, clientèle aisée, 40 achats, réduc 15 % ; frais 26,39 €, non capés)",
+        impactUC !== null && Math.abs(impactUC - 161.55) < 1.5,
         `lu ${impactUC} | brut ${d6.getElementById("impact-net").textContent}`);
     verifier("Boulangerie préconfigurée selon le texte : marge 40 %, 40 passages, panier 30, clientèle essentiellement aisée, attr ×20",
         d6.getElementById("marge").value === "40"
@@ -613,8 +641,8 @@ async function main() {
     verifier("Clic coiffeur : URL contient uc=coiffeur-pessac",
         dom6.window.location.search.includes("uc=coiffeur-pessac"));
     const impactCoiffeur = lireEuro(d6.getElementById("impact-net").textContent);
-    verifier("Impact usecase coiffeur Pessac ≈ +270 € (panier 25 €, ~90 % de marge sur les coupes en plus)",
-        impactCoiffeur !== null && Math.abs(impactCoiffeur - 270.36) < 1.5, `lu ${impactCoiffeur}`);
+    verifier("Impact usecase coiffeur Pessac ≈ +307 € (panier 25 €, ~90 % de marge sur les coupes en plus ; frais 63,64 €, non capés, verte non facturée)",
+        impactCoiffeur !== null && Math.abs(impactCoiffeur - 306.72) < 1.5, `lu ${impactCoiffeur}`);
     dom6.window.close();
 
     // ================= Usecase restaurant + bascule sur saisie manuelle =================

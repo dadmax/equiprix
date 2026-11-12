@@ -859,7 +859,9 @@
             th.innerHTML = `<span class="cat-nom"><span class="sim-dot sim-dot-${cat}" aria-hidden="true"></span>${noms[cat]}</span>`;
             tr.appendChild(th);
             // Colonne « Marge suppl. » : signe − et rouge si négative (réduction > marge)
-            const vals = [r.margeSup, r.perte, r.fraisBrut];
+            // Colonne « Frais » : montant réellement facturé par catégorie
+            // (0 € pour la verte ; plafond ventilé au pro-rata si cap atteint)
+            const vals = [r.margeSup, r.perte, r.frais];
             vals.forEach((val, i) => {
                 const td = document.createElement("td");
                 if (i === 0 && val < -0.005) {
@@ -933,8 +935,11 @@
             }
         } else if (kind === "frais") {
             const p = maître.parametres;
-            texte = `Frais = ${formaterEuros(p.fraisServiceParPassage, 2)} × (passages réels + clients en plus), toutes catégories, plafonnés à ${formaterEuros(p.capFraisServiceMensuel)} par mois.`;
+            texte = `Frais = ${formaterEuros(p.fraisServiceParPassage, 2)} × (passages réels + clients en plus), uniquement sur les foyers éligibles (rouge, orange, jaune) : la catégorie verte n'est jamais facturée. Plafonnés à ${formaterEuros(p.capFraisServiceMensuel)} par mois.`;
             texte += ` Total avant cap : ${formaterEuros(resultat.fraisTotalBrut, 2)}.`;
+            if (resultat.fraisCapes) {
+                texte += ` Plafond atteint : il est ventilé au pro-rata entre rouge, orange et jaune dans le détail par catégorie.`;
+            }
         } else if (kind === "passages") {
             texte = maître.textes.alertePassages || "";
         }

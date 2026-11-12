@@ -157,8 +157,11 @@ function simulerMois(entree) {
             margeSup = clientsPlus * paniers[c] * (marge - reductions[c]);
         }
 
-        // Frais de service par catégorie (avant cap global)
-        const fraisBrut = parametres.fraisServiceParPassage * (passagesReels[c] + clientsPlus);
+        // Frais de service par catégorie (avant cap global).
+        // Décision métier : la catégorie verte n'est JAMAIS facturée.
+        const fraisBrut = CATEGORIES_REDUITES.includes(c)
+            ? parametres.fraisServiceParPassage * (passagesReels[c] + clientsPlus)
+            : 0;
 
         parCategorie[c] = {
             partClientele: partsClient[c],
@@ -180,6 +183,15 @@ function simulerMois(entree) {
     const fraisTotalBrut = CATEGORIES.reduce((acc, c) => acc + parCategorie[c].fraisBrut, 0);
     const fraisTotal = Math.min(fraisTotalBrut, parametres.capFraisServiceMensuel);
     const fraisCapes = fraisTotalBrut > parametres.capFraisServiceMensuel;
+
+    // 9b. Plafond atteint : on ventile le cap au pro-rata des frais bruts entre
+    // rouge/orange/jaune. C'est `frais` (et non `fraisBrut`) qui est affiché par
+    // catégorie, notamment en mode expert : jamais plus de 100 € au total.
+    for (const c of CATEGORIES) {
+        parCategorie[c].frais = fraisCapes && fraisTotalBrut > 0
+            ? parametres.capFraisServiceMensuel * parCategorie[c].fraisBrut / fraisTotalBrut
+            : parCategorie[c].fraisBrut;
+    }
 
     // 10. Agrégats
     const totalPertes = CATEGORIES_REDUITES.reduce((acc, c) => acc + parCategorie[c].perte, 0);
