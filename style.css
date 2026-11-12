@@ -793,7 +793,7 @@ body {
 /* ============================================
    CORRECTIFS carrousel (placés exprès EN FIN de fichier :
    une règle de base située après un @media de même spécificité gagnerait
-   sinon la cascade — c'est ce qui affichait pastilles/flèches en desktop)
+   sinon la cascade - c'est ce qui affichait pastilles/flèches en desktop)
    ============================================ */
 /* Desktop (>= 992px) : grille 3 colonnes, pastilles et flèches masquées */
 @media (min-width: 992px) {

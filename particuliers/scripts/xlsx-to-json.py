@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-xlsx-to-json.py — Convertit le fichier Insee Filosofi (xlsx ou csv) en
+xlsx-to-json.py - Convertit le fichier Insee Filosofi (xlsx ou csv) en
 `data/niveaux-vie-dep-2023.json` pour le simulateur equiprix.
 
 Fichier source attendu : téléchargement Insee « FILOSOFI_CC_2023_FR » (ou

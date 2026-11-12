@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-precalc-codes-postaux.py — Génère `data/codes-postaux-precalc.json` pour le
+precalc-codes-postaux.py - Génère `data/codes-postaux-precalc.json` pour le
 simulateur commerçants (equiprix.fr/commerces).
 
 Sources (placées dans `data/source/`, non servies côté navigateur) :
@@ -53,7 +53,7 @@ PERS_PAR_MENAGE = 2.21
 PARTS_NATIONALES = {"rouge": 0.20, "orange": 0.20, "jaune": 0.20, "verte": 0.40}
 
 # Tranches de population du découpage fin (déciles + quartiles) :
-# (borne inf, borne sup, part de population) — total = 100 %
+# (borne inf, borne sup, part de population) - total = 100 %
 TRANCHES_FIN = [
     (None, "D1", 0.10), ("D1", "D2", 0.10), ("D2", "Q1", 0.05),
     ("Q1", "D3", 0.05), ("D3", "D4", 0.10), ("D4", "Q2", 0.10),

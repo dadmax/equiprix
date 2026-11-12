@@ -48,31 +48,31 @@
   "attractivite": [
     {
       "id": "tresFaible",
-      "nom": "Très faible — j'attire très peu mes clients potentiels, concurrence énorme",
+      "nom": "Très faible - j'attire très peu mes clients potentiels, concurrence énorme",
       "court": "Très faible",
       "facteur": 20
     },
     {
       "id": "faible",
-      "nom": "Faible — j'attire une part faible des clients potentiels, forte concurrence",
+      "nom": "Faible - j'attire une part faible des clients potentiels, forte concurrence",
       "court": "Faible",
       "facteur": 12
     },
     {
       "id": "moyenne",
-      "nom": "Moyenne — j'attire une part des clients potentiels, concurrence moyenne",
+      "nom": "Moyenne - j'attire une part des clients potentiels, concurrence moyenne",
       "court": "Moyenne",
       "facteur": 8
     },
     {
       "id": "forte",
-      "nom": "Forte — j'attire la majorité des clients potentiels, peu de concurrence",
+      "nom": "Forte - j'attire la majorité des clients potentiels, peu de concurrence",
       "court": "Forte",
       "facteur": 5
     },
     {
       "id": "tresForte",
-      "nom": "Très forte — j'attire déjà tous mes clients potentiels, concurrence inexistante",
+      "nom": "Très forte - j'attire déjà tous mes clients potentiels, concurrence inexistante",
       "court": "Très forte",
       "facteur": 2
     }
@@ -172,10 +172,10 @@
     "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
     "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français",
     "legendesCategories": {
-      "rouge": "Rouge — ménages sous ou proches du seuil de pauvreté",
-      "orange": "Orange — ménages modestes",
-      "jaune": "Jaune — classe moyenne",
-      "verte": "Verte — ménages aisés"
+      "rouge": "Rouge - ménages sous ou proches du seuil de pauvreté",
+      "orange": "Orange - ménages modestes",
+      "jaune": "Jaune - classe moyenne",
+      "verte": "Verte - ménages aisés"
     },
     "titreBarreSecteur": "Votre secteur",
     "titreBarreFrance": "France entière (comparatif)",
@@ -205,7 +205,7 @@
     {
       "id": "coiffeur-pessac",
       "nom": "Coiffeur à Pessac",
-      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Les coupes supplémentaires sont essentiellement de la marge en plus : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing — environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
+      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Les coupes supplémentaires sont essentiellement de la marge en plus : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing - environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
       "params": {
         "cp": "33600",
         "type": "autre",
@@ -222,7 +222,7 @@
     {
       "id": "restaurant-lyon",
       "nom": "Restaurant à Lyon",
-      "narratif": "Ce restaurant lyonnais du 1er arrondissement sert des repas du midi à 20 €. Le midi, 20 % des tables restent vides. La marge totale du restaurant est faible, mais sur chaque repas supplémentaire vendu, elle se mesure au coût des ingrédients : environ 50 % du prix du repas. Ici, le choix n'est pas la réduction qui rapporte le plus de marge tout de suite, mais une réduction agressive de 30 % — hors alcool, avec un repas par personne — pour faire découvrir la table et fidéliser à long terme.",
+      "narratif": "Ce restaurant lyonnais du 1er arrondissement sert des repas du midi à 20 €. Le midi, 20 % des tables restent vides. La marge totale du restaurant est faible, mais sur chaque repas supplémentaire vendu, elle se mesure au coût des ingrédients : environ 50 % du prix du repas. Ici, le choix n'est pas la réduction qui rapporte le plus de marge tout de suite, mais une réduction agressive de 30 % - hors alcool, avec un repas par personne - pour faire découvrir la table et fidéliser à long terme.",
       "params": {
         "cp": "69001",
         "type": "barRestaurant",
@@ -239,7 +239,7 @@
     {
       "id": "supérette-montreuil",
       "nom": "Supérette à Montreuil",
-      "narratif": "Cette supérette de proximité à Montreuil pratique des prix supérieurs à la grande distribution. Sa clientèle est un peu plus aisée que la commune : ceux qui surveillent leur budget groupent leurs achats ailleurs. La concurrence est forte — d’autres supérettes à 150-200 m. Panier moyen 16 €, marge 20 %. Elle applique une réduction modeste de 10 %, uniquement sur les catégories rouge et orange. La clientèle supplémentaire ainsi attirée reste absorbable, même aux pics de caisse, et améliore sa performance économique.",
+      "narratif": "Cette supérette de proximité à Montreuil pratique des prix supérieurs à la grande distribution. Sa clientèle est un peu plus aisée que la commune : ceux qui surveillent leur budget groupent leurs achats ailleurs. La concurrence est forte - d’autres supérettes à 150-200 m. Panier moyen 16 €, marge 20 %. Elle applique une réduction modeste de 10 %, uniquement sur les catégories rouge et orange. La clientèle supplémentaire ainsi attirée reste absorbable, même aux pics de caisse, et améliore sa performance économique.",
       "params": {
         "cp": "93100",
         "type": "supermarche",

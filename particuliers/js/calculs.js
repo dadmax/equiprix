@@ -1,5 +1,5 @@
 /* ============================================================
-   calculs.js — Logique métier du simulateur de niveau de vie.
+   calculs.js - Logique métier du simulateur de niveau de vie.
    Toutes les bornes (déciles, quartiles) proviennent du JSON,
    rien n'est codé en dur ici.
    ============================================================ */
@@ -68,7 +68,7 @@ function calculerPercentile(niveauDeVie, bornes) {
  * Bornes étendues D0 = 0 € et D10 virtuel = MAX_JAUGE : l'utilisateur
  * au-dessus de D9 ou sous D1 est placé entre la borne et l'extrémité,
  * plutôt que collé en butée.
- * @returns {number} pourcentage 0–100 (non arrondi)
+ * @returns {number} pourcentage 0-100 (non arrondi)
  */
 function calculerPositionJauge(niveauDeVie, bornes) {
     const MAX_JAUGE = 100000; // D10 virtuel : max de la jauge en euros
@@ -85,7 +85,7 @@ function calculerPositionJauge(niveauDeVie, bornes) {
 
 /**
  * Catégorie equiprix, toujours définie sur les bornes France :
- * rouge (< D2), orange (D2–D4), jaune (D4–D6, autour de la médiane),
+ * rouge (< D2), orange (D2-D4), jaune (D4-D6, autour de la médiane),
  * verte (>= D6).
  * @returns {{cle: string, libelle: string}}
  */

@@ -1,5 +1,5 @@
 /* ============================================================
-   app.js — Application du simulateur de niveau de vie.
+   app.js - Application du simulateur de niveau de vie.
    Charge le JSON de bornes, gère la saisie et met à jour
    les résultats en temps réel (mises à jour ciblées, pas de
    re-render complet).
@@ -68,7 +68,7 @@ function remplirDepartements() {
     for (const dep of tries) {
         const option = document.createElement("option");
         option.value = dep.code;
-        option.textContent = dep.code + " – " + dep.nom;
+        option.textContent = dep.code + " - " + dep.nom;
         dom.selectDepartement.appendChild(option);
     }
 }
@@ -83,8 +83,8 @@ function remplirDepartements() {
 function construireJauge() {
     dom.jauge.innerHTML = "";
 
-    // Bandes de couleurs : une par catégorie (rouge 0–20, orange 20–40,
-    // jaune 40–60 autour de la médiane, verte 60–100)
+    // Bandes de couleurs : une par catégorie (rouge 0-20, orange 20-40,
+    // jaune 40-60 autour de la médiane, verte 60-100)
     const segments = [
         { de: 0, a: 20, couleur: "rouge" },
         { de: 20, a: 40, couleur: "orange" },
@@ -151,8 +151,8 @@ function positionnerMarker(pourcentage) {
 /* ---------- Libellés ---------- */
 
 /** Libellé contextuel du positionnement, en français courant.
- *  Cas 1 : > D9 → top 10 %. Cas 2 : médiane–D9 → top X %.
- *  Cas 3 : D1–médiane → les X % les plus bas. Cas 4 : < D1 → les 10 % les plus bas. */
+ *  Cas 1 : > D9 → top 10 %. Cas 2 : médiane-D9 → top X %.
+ *  Cas 3 : D1-médiane → les X % les plus bas. Cas 4 : < D1 → les 10 % les plus bas. */
 function libellePercentile(resultat) {
     const p = resultat.percentile;
     const suffixeSeuil =

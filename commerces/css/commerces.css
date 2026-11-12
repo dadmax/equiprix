@@ -1,9 +1,9 @@
 /* ============================================================
-   commerces.css — Simulateur commerçants (equiprix.fr/commerces)
+   commerces.css - Simulateur commerçants (equiprix.fr/commerces)
    S'ajoute au style global ../style.css (palette, header, footer).
 
    Structure : en-tête (titre + scénarios + narratif), puis deux
-   sections — « Votre commerce » (Commune + Activité) et
+   sections - « Votre commerce » (Commune + Activité) et
    « Simulation » (Vos réductions + Résultats, toggle expert en haut).
    ============================================================ */
 
@@ -1122,7 +1122,7 @@ button.btn-secondaire {
     margin-bottom: 14px;
 }
 
-/* Bloc marketing « equiprix gère le marketing pour vous » — dans #engagement (fond blanc) */
+/* Bloc marketing « equiprix gère le marketing pour vous » - dans #engagement (fond blanc) */
 .marketing-bloc {
     background: var(--bg-why);
     border: 1px solid #D6E8FF;

@@ -1,5 +1,5 @@
 /* ============================================
-   SIMULATEUR NIVEAU DE VIE — /particuliers/
+   SIMULATEUR NIVEAU DE VIE - /particuliers/
    S'ajoute au style global du site (style.css).
    ============================================ */
 
@@ -304,8 +304,8 @@
 /* ---------- JAUGE DE DISTRIBUTION ----------
    La jauge représente la population : 10 % de hauteur = 10 % de la
    population. Les bandes de couleurs marquent les catégories equiprix
-   (rouge 0–20 %, orange 20–40 %, jaune 40–60 % autour de la médiane,
-   verte 60–100 %), les pointillés matérialisent les déciles à leur
+   (rouge 0-20 %, orange 20-40 %, jaune 40-60 % autour de la médiane,
+   verte 60-100 %), les pointillés matérialisent les déciles à leur
    hauteur exacte de percentile. */
 .sim-jauge-wrap {
     position: relative;

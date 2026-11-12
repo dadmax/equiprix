@@ -1,5 +1,5 @@
 /* ============================================================
-   app.js — Interface du simulateur commerçants.
+   app.js - Interface du simulateur commerçants.
    Charge les JSON, gère l'état (URL uniquement), recalcule en
    temps réel et met à jour le DOM de façon ciblée.
 
@@ -367,7 +367,7 @@
         els.attractiviteReperes.innerHTML = "";
         maître.attractivite.forEach((a) => {
             const span = document.createElement("span");
-            span.textContent = a.court || a.nom.split(" — ")[0]; // libellés courts
+            span.textContent = a.court || a.nom.split(" - ")[0]; // libellés courts
             els.attractiviteReperes.appendChild(span);
         });
         els.attractivite.max = String(maître.attractivite.length - 1);
@@ -407,7 +407,7 @@
             div.innerHTML = `
                 <p class="sim-couloir-titre">
                     <span class="sim-couloir-dot" aria-hidden="true"></span>
-                    ${cat.charAt(0).toUpperCase() + cat.slice(1)} — ${plage}
+                    ${cat.charAt(0).toUpperCase() + cat.slice(1)} - ${plage}
                 </p>
                 <div class="sim-field">
                     <label class="sim-label" for="red-${cat}">Réduction</label>
@@ -415,11 +415,11 @@
                 </div>
                 <p class="sim-uplift" id="uplift-${cat}"></p>
                 <dl class="sim-couloir-infos">
-                    <div><dt>Part de votre clientèle</dt><dd id="info-part-${cat}">—</dd></div>
-                    <div><dt>Passages mensuels actuels</dt><dd id="info-passages-${cat}">—</dd></div>
-                    <div><dt>Potentiel de passage mensuel</dt><dd id="info-potentiel-${cat}">—</dd></div>
-                    <div><dt>Panier moyen (proportionnel au revenu médian&nbsp;: <span id="rev-${cat}"></span>)</dt><dd id="info-panier-${cat}">—</dd></div>
-                    <div><dt>Clients mensuels en plus</dt><dd id="info-clients-${cat}">—</dd></div>
+                    <div><dt>Part de votre clientèle</dt><dd id="info-part-${cat}">-</dd></div>
+                    <div><dt>Passages mensuels actuels</dt><dd id="info-passages-${cat}">-</dd></div>
+                    <div><dt>Potentiel de passage mensuel</dt><dd id="info-potentiel-${cat}">-</dd></div>
+                    <div><dt>Panier moyen (proportionnel au revenu médian&nbsp;: <span id="rev-${cat}"></span>)</dt><dd id="info-panier-${cat}">-</dd></div>
+                    <div><dt>Clients mensuels en plus</dt><dd id="info-clients-${cat}">-</dd></div>
                 </dl>`;
             if (precedent) {
                 conteneur.insertBefore(div, precedent.nextSibling);
@@ -662,9 +662,9 @@
         els.cpInput.value = "";
         els.cpSelectionne.hidden = false;
         // Le nombre de ménages du secteur suit directement le nom de la commune :
-        // « 73200 — Albertville (14 255 ménages) »
+        // « 73200 - Albertville (14 255 ménages) »
         const menages = e.donneesDispo && e.nbMenages ? ` (${formaterNombre(e.nbMenages)} ménages)` : "";
-        els.cpNom.textContent = `${cp} — ${e.communes[0]}${menages}`;
+        els.cpNom.textContent = `${cp} - ${e.communes[0]}${menages}`;
         if (e.communes.length > 1) {
             els.cpDetail.textContent = `et ${e.communes.length - 1} autre${e.communes.length > 2 ? "s" : ""} commune${e.communes.length > 2 ? "s" : ""}`;
             els.cpDetail.title = e.communes.join(", ");

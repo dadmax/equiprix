@@ -1,5 +1,5 @@
 /* ============================================================
-   carrousel.js — Carrousel de maquettes d'appli (partagé :
+   carrousel.js - Carrousel de maquettes d'appli (partagé :
    accueil, /particuliers/, /commerces/).
 
    Sur mobile (< 992px, géré en CSS dans style.css) :

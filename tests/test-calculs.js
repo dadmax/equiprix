@@ -1,5 +1,5 @@
 /* ============================================================
-   test-calculs.js — Tests unitaires du moteur de calcul.
+   test-calculs.js - Tests unitaires du moteur de calcul.
    Cas de référence : Conflans-Sainte-Honorine (78700), commerce
    de bouche, clientèle « un peu plus aisée », attractivité ×8,
    1 000 passages, panier 30 €, marge 30 %, réductions 10/10/10.
@@ -210,7 +210,7 @@ test("upliftEffectifMoyen : réductions identiques -> uplift de la catégorie", 
 });
 
 // ---------------------------------------------------------------
-console.log("Simulation complète — cas de référence du tableur");
+console.log("Simulation complète - cas de référence du tableur");
 // ---------------------------------------------------------------
 function casReference() {
     const profil = maître.profilsClientele.find((p) => p.id === "unPeuAisee");

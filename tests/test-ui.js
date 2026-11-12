@@ -1,5 +1,5 @@
 /* ============================================================
-   test-ui.js — Tests d'intégration de l'interface (jsdom).
+   test-ui.js - Tests d'intégration de l'interface (jsdom).
    Charge la page /commerces/ depuis le serveur local, attend le
    chargement des JSON, puis vérifie le cas de référence du tableur
    via l'URL partagée + les nouveautés de structure (scénarios,
@@ -53,7 +53,7 @@ async function charger(url) {
     for (let i = 0; i < 100; i++) {
         await attendre(100);
         const t = dom.window.document.getElementById("impact-net").textContent;
-        if (t && t !== "—") break;
+        if (t && t !== "-") break;
     }
     return dom;
 }
@@ -78,7 +78,7 @@ function verifier(nom, cond, detail) {
     if (cond) {
         console.log(`  ✓ ${nom}`);
     } else {
-        console.error(`  ✗ ${nom}${detail ? " — " + detail : ""}`);
+        console.error(`  ✗ ${nom}${detail ? " - " + detail : ""}`);
         echecs++;
     }
 }
@@ -94,11 +94,11 @@ async function main() {
     const dom = await charger(URL_REF);
     const d = dom.window.document;
 
-    verifier("Commune affichée (78700 — Conflans-Sainte-Honorine)",
+    verifier("Commune affichée (78700 - Conflans-Sainte-Honorine)",
         d.getElementById("cp-nom").textContent.includes("78700")
         && d.getElementById("cp-nom").textContent.includes("Conflans-Sainte-Honorine"),
         d.getElementById("cp-nom").textContent);
-    verifier("Ménages dans la ligne CP : « 78700 — Conflans-Sainte-Honorine (14 515 ménages) »",
+    verifier("Ménages dans la ligne CP : « 78700 - Conflans-Sainte-Honorine (14 515 ménages) »",
         d.getElementById("cp-nom").textContent.includes("14") && d.getElementById("cp-nom").textContent.includes("ménages"),
         d.getElementById("cp-nom").textContent);
 
@@ -418,11 +418,11 @@ async function main() {
         && /\.ccm-next\s*\{\s*right:/.test(cssSite)
         && /\.ccm-dot\.actif\s*\{[^}]*var\(--primary-color\)/.test(cssSite)
         && !/\.ccm-phone\s*\{/.test(css));
-    verifier("CSS : pastilles/flèches masquées en desktop >= 992px — la règle display:none est placée APRÈS les règles de base (sinon la cascade les laisserait visibles)",
+    verifier("CSS : pastilles/flèches masquées en desktop >= 992px - la règle display:none est placée APRÈS les règles de base (sinon la cascade les laisserait visibles)",
         /\.ccm-dots,\s*\.ccm-arrow\s*\{\s*display:\s*none/.test(cssSite)
         && cssSite.lastIndexOf(".ccm-dots,") > cssSite.indexOf(".ccm-dots {")
         && cssSite.lastIndexOf(".ccm-arrow {") > cssSite.indexOf(".ccm-arrow {"));
-    verifier("CSS : mobile — étape pleine largeur bien centrée (flex 0 0 100% en max-width 991,98px) + blocs étapes centrés + maquettes alignées en bas sur accueil",
+    verifier("CSS : mobile - étape pleine largeur bien centrée (flex 0 0 100% en max-width 991,98px) + blocs étapes centrés + maquettes alignées en bas sur accueil",
         /@media \(max-width: 991\.98px\)[\s\S]*?\.ccm-etape\s*\{[^}]*flex:\s*0 0 100%/.test(cssSite)
         && /\.ccm-carousel \.ccm-etape\s*\{[^}]*align-items:\s*center/.test(cssSite)
         && /\.ccm-carousel \.ccm-etape\s*\{[^}]*text-align:\s*center/.test(cssSite)
@@ -524,7 +524,7 @@ async function main() {
     verifier("CP sans données : avertissement affiché", !d2.getElementById("cp-indisponible").hidden);
     verifier("CP sans données : jauges masquées", d2.getElementById("cp-infos").hidden);
     verifier("CP sans données : simulation calculée (moyenne France)",
-        d2.getElementById("impact-net").textContent !== "—");
+        d2.getElementById("impact-net").textContent !== "-");
     dom2.window.close();
 
     const dom3 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0&ro=0&rj=0`);
@@ -537,7 +537,7 @@ async function main() {
     const dom4 = await charger(`${BASE}/commerces/?cp=78700&type=commerceBouche&marge=0&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
     const d4 = dom4.window.document;
     verifier("Marge nulle : ratio masqué, € affiché",
-        d4.getElementById("impact-ratio").hidden && d4.getElementById("impact-net").textContent !== "—");
+        d4.getElementById("impact-ratio").hidden && d4.getElementById("impact-net").textContent !== "-");
     dom4.window.close();
 
     const dom5 = await charger(`${BASE}/commerces/?cp=78700&type=autre&marge=0.3&pass=1000&panier=30&profil=unPeuAisee&attr=8&rr=0.10&ro=0.10&rj=0.10`);
@@ -576,7 +576,7 @@ async function main() {
         String(d6.querySelectorAll("button.sim-scenario").length));
     verifier("Bouton « Boulangerie à Albertville » actif via l'URL (aria-pressed)",
         d6.querySelector('[data-scenario="boulangerie-albertville"]').getAttribute("aria-pressed") === "true");
-    verifier("Commune préconfigurée : 73200 — Albertville",
+    verifier("Commune préconfigurée : 73200 - Albertville",
         d6.getElementById("cp-nom").textContent.includes("73200"),
         d6.getElementById("cp-nom").textContent);
     verifier("Narratif du usecase affiché (mentionne Albertville)",
@@ -602,7 +602,7 @@ async function main() {
     // Clic sur le coiffeur (bouton, plus de radio)
     d6.querySelector('[data-scenario="coiffeur-pessac"]').click();
     await attendre(200);
-    verifier("Clic coiffeur : commune bascule sur 33600 — Pessac",
+    verifier("Clic coiffeur : commune bascule sur 33600 - Pessac",
         d6.getElementById("cp-nom").textContent.includes("33600")
         && d6.getElementById("cp-nom").textContent.includes("Pessac"),
         d6.getElementById("cp-nom").textContent);
@@ -623,7 +623,7 @@ async function main() {
     const d8 = dom8.window.document;
     verifier("Usecase restaurant : bouton actif via l'URL",
         d8.querySelector('[data-scenario="restaurant-lyon"]').getAttribute("aria-pressed") === "true");
-    verifier("Commune préconfigurée : 69001 — Lyon 1er (ménages entre parenthèses)",
+    verifier("Commune préconfigurée : 69001 - Lyon 1er (ménages entre parenthèses)",
         d8.getElementById("cp-nom").textContent.includes("69001")
         && d8.getElementById("cp-nom").textContent.includes("ménages"),
         d8.getElementById("cp-nom").textContent);
@@ -737,7 +737,7 @@ async function main() {
     // Usecase supérette Montreuil
     const domS = await charger(`${BASE}/commerces/?uc=supérette-montreuil`);
     const dS = domS.window.document;
-    verifier("Usecase supérette : bouton actif, commune 93100 — Montreuil",
+    verifier("Usecase supérette : bouton actif, commune 93100 - Montreuil",
         dS.querySelector('[data-scenario="supérette-montreuil"]').getAttribute("aria-pressed") === "true"
         && dS.getElementById("cp-nom").textContent.includes("93100")
         && dS.getElementById("cp-nom").textContent.includes("Montreuil"),
@@ -807,7 +807,7 @@ async function main() {
         !d7.body.textContent.includes("Facteur multiplicatif")
         && !d7.body.textContent.includes("× 20") && !d7.body.textContent.includes("×20"));
     verifier("Intitulé complet de la pénétration affiché",
-        d7.getElementById("attractivite-nom").textContent.includes("Moyenne —"));
+        d7.getElementById("attractivite-nom").textContent.includes("Moyenne -"));
     // Bouger la jauge clientèle -> profil change
     const jaugeProfil = d7.getElementById("profil");
     jaugeProfil.value = "0";
@@ -850,7 +850,7 @@ async function main() {
         && !!dA.querySelector("#particuliers .ccm-prev") && !!dA.querySelector("#particuliers .ccm-next")
         && (dotsA[0].parentElement.compareDocumentPosition(dA.querySelector("#particuliers .ccm-grid")) & F) === F);
     dA.querySelector("#particuliers .ccm-next").click();
-    verifier("Accueil : flèche › fonctionnelle (pastille 2 active) — carrousel.js bien chargé et exécuté",
+    verifier("Accueil : flèche › fonctionnelle (pastille 2 active) - carrousel.js bien chargé et exécuté",
         dA.querySelectorAll("#particuliers .ccm-dot")[1].classList.contains("actif"));
     dA.querySelector("#particuliers .ccm-prev").click();
     verifier("Accueil : flèche ‹ ramène à la pastille 1",

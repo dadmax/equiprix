@@ -1,5 +1,5 @@
 /* ============================================================
-   calculs.js — Logique métier du simulateur commerçants.
+   calculs.js - Logique métier du simulateur commerçants.
    Toutes les valeurs métier proviennent des fichiers JSON
    (data/commerces.json, data/codes-postaux-precalc.json) ;
    rien n'est codé en dur ici.
