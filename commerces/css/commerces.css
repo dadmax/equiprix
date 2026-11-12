@@ -1,0 +1,1158 @@
+/* ============================================================
+   commerces.css - Simulateur commerçants (equiprix.fr/commerces)
+   S'ajoute au style global ../style.css (palette, header, footer).
+
+   Structure : en-tête (titre + scénarios + narratif), puis deux
+   sections - « Votre commerce » (Commune + Activité) et
+   « Simulation » (Vos réductions + Résultats, toggle expert en haut).
+   ============================================================ */
+
+/* Couleurs des catégories equiprix */
+:root {
+    --cat-rouge: #D32F2F;
+    --cat-orange: #F57C00;
+    --cat-jaune: #F9A825;
+    --cat-verte: #388E3C;
+    --cat-eligibles: #6A1B9A;
+    --cat-rouge-fond: #FDECEA;
+    --cat-orange-fond: #FFF3E0;
+    --cat-jaune-fond: #FFF8E1;
+    --cat-verte-fond: #E8F5E9;
+    --cat-eligibles-fond: #F3E5F5;
+    --resultat-positif: #2E7D32;
+    --resultat-negatif: #C62828;
+}
+
+/* ---------- En-tête ---------- */
+.sim-hero {
+    background-color: var(--bg-why);
+    padding: 32px 0 24px;
+    text-align: center;
+}
+
+.sim-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.sim-title {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+/* ---------- Carrousel de scénarios ---------- */
+.sim-scenarios-liste {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* Boutons pilule sans radio native : pastille ✓ discrète, état actif en fond plein */
+.sim-scenario {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid #D0D5DD;
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    background: var(--white);
+    transition: all 0.2s ease;
+}
+
+.sim-scenario:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.sim-scenario .sim-scenario-check {
+    display: none;
+    font-weight: 700;
+}
+
+.sim-scenario.actif {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.sim-scenario.actif .sim-scenario-check {
+    display: inline;
+}
+
+.sim-scenario.actif:hover {
+    color: var(--white);
+}
+
+/* ---------- Narratif ---------- */
+.sim-narratif-bloc {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+@media (max-width: 767px) {
+    .sim-narratif-bloc {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+.sim-narratif {
+    color: var(--dark-gray);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    flex: 1;
+    margin: 0;
+}
+
+.sim-narratif-image {
+    width: 220px;
+    max-width: 40%;
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+}
+
+/* ---------- Sections ---------- */
+.sim-section-haute,
+.sim-section-basse {
+    padding: 24px 0;
+}
+
+.sim-section-basse {
+    background-color: transparent; /* le fond pleine largeur vient du bloc #simulateur */
+    border-top: 1px solid #EAECF0;
+}
+
+/* main n'est plus un conteneur : chaque section de page embarque son propre
+   .sim-container, ce qui permet des fonds pleine largeur (#simulateur, #engagement) */
+
+.sim-section-titre {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.sim-section-basse-entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.sim-section-basse-entete .sim-section-titre {
+    margin-bottom: 0;
+}
+
+/* Les deux sous-sections occupent toute la hauteur disponible (étirées) */
+.sim-deux-colonnes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: stretch; /* hauteurs égales */
+}
+
+@media (min-width: 992px) {
+    .sim-deux-colonnes {
+        grid-template-columns: 1fr 1fr;
+    }
+    /* Section « Votre commerce » : commune max 30 %, activité 70 % */
+    .sim-deux-colonnes-30-70 {
+        grid-template-columns: 30% 1fr;
+    }
+}
+
+.sim-zone {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 16px 20px;
+    height: 100%; /* remplit la hauteur de la grille */
+}
+
+.sim-zone-titre {
+    color: var(--primary-color);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* ---------- Champs ---------- */
+.sim-field {
+    margin-bottom: 12px;
+}
+
+.sim-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--dark-gray);
+}
+
+.sim-input,
+.sim-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D0D5DD;
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--dark-gray);
+    background-color: var(--white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sim-input:focus,
+.sim-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.15);
+}
+
+.sim-help {
+    font-size: 0.8rem;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.sim-fieldset {
+    border: 1px solid #EAECF0;
+    border-radius: var(--border-radius);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+} 
+
+.sim-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 576px) {
+    .sim-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---------- Autocomplétion CP ---------- */
+.sim-autocomplete {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    border: 1px solid #D0D5DD;
+    border-radius: var(--border-radius);
+    background: var(--white);
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.sim-autocomplete li {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.sim-autocomplete li:hover,
+.sim-autocomplete li[aria-selected="true"] {
+    background-color: var(--bg-why);
+}
+
+.sim-autocomplete .cp-code {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.sim-cp-nom {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-top: 8px;
+}
+
+.sim-cp-detail {
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+/* ---------- Barres de population : deux barres verticales côte à côte,
+   alignées par le bas (les barres ont la même hauteur, les titres au-dessus) ---------- */
+.sim-barres-cote-a-cote {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end; /* alignement par le bas */
+    margin-top: 12px;
+}
+
+.sim-barre-verticale-bloc {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* contenu ancré en bas */
+}
+
+.sim-barre-titre {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin: 0 0 6px;
+    /* Jamais rogné : retour à la ligne autorisé, tooltip en complément */
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
+    min-height: 2.1em; /* réserve 2 lignes pour garder les barres alignées */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.sim-barre-verticale {
+    display: flex;
+    flex-direction: column-reverse; /* rouge en bas, verte en haut */
+    width: 100%;
+    max-width: 90px;
+    height: 140px;
+    margin: 0 auto;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #EAECF0;
+}
+
+.sim-seg-v {
+    position: relative; /* ancrage du pourcentage lisible */
+    transition: height 0.3s ease;
+    width: 100%;
+}
+
+.sim-seg-v-rouge { background-color: var(--cat-rouge); }
+.sim-seg-v-orange { background-color: var(--cat-orange); }
+.sim-seg-v-jaune { background-color: var(--cat-jaune); }
+.sim-seg-v-verte { background-color: var(--cat-verte); }
+
+.sim-legend {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 12px;
+    font-size: 0.78rem;
+}
+
+@media (min-width: 576px) {
+    .sim-legend-4col {
+        grid-template-columns: 1fr 1fr;
+    }
+} 
+
+.sim-legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sim-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-dot-rouge { background-color: var(--cat-rouge); }
+.sim-dot-orange { background-color: var(--cat-orange); }
+.sim-dot-jaune { background-color: var(--cat-jaune); }
+.sim-dot-verte { background-color: var(--cat-verte); }
+.sim-dot-eligibles { background-color: var(--cat-eligibles); }
+
+
+.sim-warning {
+    background-color: var(--cat-jaune-fond);
+    border-left: 4px solid var(--cat-jaune);
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 12px;
+}
+
+/* ---------- Cartes type de commerce ---------- */
+.sim-cartes-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.sim-carte-type {
+    border: 2px solid #EAECF0;
+    border-radius: var(--border-radius);
+    background: var(--white);
+    padding: 8px 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.sim-carte-type:hover {
+    border-color: var(--primary-color);
+}
+
+.sim-carte-type[aria-checked="true"] {
+    border-color: var(--primary-color);
+    background-color: var(--bg-why);
+    color: var(--primary-color);
+}
+
+/* ---------- Jauge clientèle (comme la pénétration) ---------- */
+/* styles communs avec .sim-slider / .sim-jauge-reperes / .sim-attractivite-nom */
+
+/* ---------- Jauge attractivité ---------- */
+.sim-slider {
+    width: 100%;
+    accent-color: var(--primary-color);
+}
+
+.sim-jauge-reperes {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: #667085;
+    margin-top: 2px;
+}
+
+.sim-attractivite-nom {
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* ---------- Couloirs réductions ---------- */
+.sim-couloirs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sim-couloir {
+    border-radius: var(--border-radius);
+    padding: 12px 16px;
+    border-left: 6px solid;
+}
+
+/* Catégorie verte : toujours visible, condensée sur une ligne */
+.sim-couloir-verte-ligne {
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+    background-color: var(--cat-verte-fond);
+    border-left: 6px solid var(--cat-verte);
+    border-radius: var(--border-radius);
+    padding: 8px 16px;
+    margin: 10px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sim-help-inline {
+    color: #667085;
+    font-size: 0.78rem;
+}
+
+.sim-couloir-rouge {
+    background-color: var(--cat-rouge-fond);
+    border-left-color: var(--cat-rouge);
+}
+
+.sim-couloir-orange {
+    background-color: var(--cat-orange-fond);
+    border-left-color: var(--cat-orange);
+}
+
+.sim-couloir-jaune {
+    background-color: var(--cat-jaune-fond);
+    border-left-color: var(--cat-jaune);
+}
+
+.sim-couloir-verte {
+    background-color: var(--cat-verte-fond);
+    border-left-color: var(--cat-verte);
+}
+
+.sim-couloir-eligibles {
+    background-color: var(--cat-eligibles-fond);
+    border-left-color: var(--cat-eligibles);
+}
+
+.sim-couloir-titre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    flex-wrap: wrap;
+}
+
+.sim-couloir-plage {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: #667085;
+}
+
+.sim-couloir-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-couloir-rouge .sim-couloir-dot { background-color: var(--cat-rouge); }
+.sim-couloir-orange .sim-couloir-dot { background-color: var(--cat-orange); }
+.sim-couloir-jaune .sim-couloir-dot { background-color: var(--cat-jaune); }
+.sim-couloir-verte .sim-couloir-dot { background-color: var(--cat-verte); }
+.sim-couloir-eligibles .sim-couloir-dot { background-color: var(--cat-eligibles); }
+
+.sim-uplift {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 6px 0;
+}
+
+.sim-couloir-infos {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px 16px;
+    margin: 8px 0 0;
+    font-size: 0.82rem;
+}
+
+@media (min-width: 576px) {
+    .sim-couloir-infos {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.sim-couloir-infos > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    padding: 3px 0;
+}
+
+.sim-couloir-infos dt {
+    color: #667085;
+}
+
+.sim-couloir-infos dd {
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ---------- Résultats ---------- */
+.sim-zone-resultats {
+    position: sticky;
+    top: 80px;
+}
+
+@media (max-width: 991px) {
+    .sim-zone-resultats {
+        position: static;
+    }
+}
+
+.sim-hero-resultat {
+    text-align: center;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    margin-bottom: 12px;
+    background-color: var(--light-gray);
+    transition: background-color 0.3s ease;
+}
+
+.sim-hero-resultat.positif { background-color: var(--cat-verte-fond); }
+.sim-hero-resultat.negatif { background-color: var(--cat-rouge-fond); }
+
+.sim-hero-chiffre {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--dark-gray);
+    margin: 0;
+}
+
+.sim-hero-resultat.positif .sim-hero-chiffre { color: var(--resultat-positif); }
+.sim-hero-resultat.negatif .sim-hero-chiffre { color: var(--resultat-negatif); }
+
+.sim-hero-ratio {
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.sim-hero-resultat.positif .sim-hero-ratio { color: var(--resultat-positif); }
+.sim-hero-resultat.negatif .sim-hero-ratio { color: var(--resultat-negatif); }
+
+.sim-hero-ref {
+    font-size: 0.85rem;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.sim-passages-plus {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 12px;
+}
+
+.sim-recap {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+}
+
+.sim-recap li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #EAECF0;
+    font-size: 0.9rem;
+}
+
+.sim-recap li > span:first-child {
+    flex: 1;
+}
+
+.sim-recap-valeur {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sim-recap li:nth-child(2) .sim-recap-valeur,
+.sim-recap li:nth-child(3) .sim-recap-valeur {
+    color: var(--resultat-negatif);
+}
+
+.sim-recap li:first-child .sim-recap-valeur {
+    color: var(--resultat-positif);
+}
+
+/* Marge supplémentaire négative (réduction > marge) : rouge comme les pertes/frais */
+.sim-recap-valeur.negatif {
+    color: var(--resultat-negatif) !important;
+}
+
+/* Pastille ⓘ */
+.sim-info-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sim-info-btn:hover,
+.sim-info-btn:focus-visible {
+    background-color: var(--bg-why);
+}
+
+/* Infobulle */
+.sim-tooltip {
+    position: absolute;
+    max-width: 320px;
+    background-color: var(--dark-gray);
+    color: var(--white);
+    padding: 10px 14px;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    z-index: 200;
+    pointer-events: none;
+    box-shadow: var(--shadow-hover);
+}
+
+/* Tableau détail par catégorie (visible directement en mode expert) */
+.sim-detail-categories {
+    margin-bottom: 12px;
+}
+
+.sim-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.sim-table th,
+.sim-table td {
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid #EAECF0;
+}
+
+.sim-table th:first-child,
+.sim-table td:first-child {
+    text-align: left;
+}
+
+.sim-table thead th {
+    color: #667085;
+    font-weight: 600;
+}
+
+.sim-table .cat-nom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+/* Suggestion */
+.sim-suggestion {
+    background-color: var(--bg-collectivites);
+    border-radius: var(--border-radius);
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+}
+
+/* Actions : boutons centrés (le « Nous contacter » ne colle pas à gauche) */
+.sim-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.sim-btn-secondaire {
+    background-color: #EAECF0;
+    color: #667085;
+    cursor: not-allowed;
+}
+
+.sim-btn-secondaire:hover {
+    background-color: #EAECF0;
+    transform: none;
+    box-shadow: none;
+}
+
+.sim-sauvegarde-ok {
+    color: var(--resultat-positif);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* ---------- Mode expert ---------- */
+.sim-toggle-expert {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: var(--white);
+    border: 2px solid var(--primary-color);
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin: 0;
+}
+
+.sim-toggle-expert input {
+    accent-color: var(--primary-color);
+}
+
+/* ---------- Sources ---------- */
+.sim-section-sources {
+    padding: 24px 0 40px;
+}
+
+.sim-sources {
+    max-width: 800px;
+    margin: 0 auto 16px;
+    padding-left: 20px;
+    text-align: center;
+    list-style: none;
+}
+
+.sim-sources li {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.sim-sources a {
+    color: var(--primary-color);
+}
+
+.sim-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #667085;
+    font-style: italic;
+}
+
+/* ---------- Accessibilité ---------- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sim-carte-type:focus-visible,
+.sim-scenario:focus-within,
+.sim-radio-profil:focus-within,
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Pourcentage lisible directement sur chaque segment de jauge */
+.sim-seg-val {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+}
+
+/* Actions à droite de l'en-tête « Simulation » : badge + reset + toggle expert */
+.sim-entete-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sim-badge-modifie {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8a5a00;
+    background: #FFF4D6;
+    border: 1px solid #F0D48A;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+.sim-btn-reset {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: var(--white);
+    border: 1.5px solid var(--primary-color);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.sim-btn-reset:hover,
+.sim-btn-reset:focus-visible {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+/* Tableau détail par catégorie : marge suppl. négative en rouge */
+.sim-table td.negatif {
+    color: var(--resultat-negatif);
+    font-weight: 700;
+}
+
+/* ============================================================
+   PAGE POUR LES COMMERÇANTS (au-delà du simulateur)
+   ============================================================ */
+
+/* ---------- En-tête : sous-titre + CTA ---------- */
+.sim-hero {
+    padding: 56px 0 44px;
+}
+
+.sim-hero .sim-title {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 16px;
+}
+
+.sim-hero-sous-titre {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    color: var(--dark-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.sim-hero-cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+a.btn-secondaire,
+button.btn-secondaire {
+    font-family: inherit;
+    display: inline-block;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: var(--white);
+    padding: 10px 22px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-secondaire:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* ---------- Sections de page génériques ---------- */
+.page-section {
+    padding: 56px 0;
+}
+
+/* ---------- Bloc simulateur ---------- */
+.sim-bloc-simulateur {
+    padding-top: 40px;
+    /* fond blanc : le rythme de couleurs est inversé (hero bleu, simulateur blanc,
+       comment-ça-marche bleu, engagement blanc, tarification bleue) */
+}
+
+.sim-bloc-simulateur .sim-scenarios {
+    margin-bottom: 20px;
+}
+
+.sim-bloc-simulateur .sim-narratif-bloc {
+    margin-bottom: 8px;
+}
+
+/* ---------- Sources : <details> replié, à l'intérieur du simulateur ---------- */
+.sim-sources-details {
+    max-width: 800px;
+    margin: 16px auto 0;
+    padding: 0 0 24px;
+    font-size: 0.85rem;
+    color: #667085;
+}
+
+.sim-sources-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    display: inline-block;
+}
+
+.sim-sources-details summary:hover {
+    text-decoration: underline;
+}
+
+.sim-sources-details[open] summary {
+    margin-bottom: 10px;
+}
+
+.sim-sources-details .sim-sources {
+    margin: 0 0 8px;
+    text-align: left;
+}
+
+.sim-sources-details .sim-note {
+    text-align: left;
+}
+
+/* ---------- Comment ça marche ---------- */
+#comment-ca-marche {
+    background-color: var(--bg-why); /* bleu clair pleine largeur */
+}
+
+/* Le carrousel de maquettes (.ccm-carousel/.ccm-grid/.ccm-phone/.ccm-dots/.ccm-arrow)
+   et le cadre « téléphone » sont dans ../style.css (partagés avec l'accueil
+   et /particuliers/) ; le JS est dans ../js/carrousel.js. */
+
+/* ---------- Engagement ---------- */
+.page-engagement {
+    /* fond blanc (rythme inversé) ; le bloc marketing ci-dessous reprend le bleu */
+}
+
+.engagement-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+    max-width: none; /* le bloc Engagement reprend toute la largeur en desktop */
+    margin: 0;
+}
+
+/* Badge « Commerce engagé » retiré de la page : une seule colonne, même en desktop */
+@media (min-width: 992px) {
+    .engagement-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.engagement-stat {
+    font-size: 1.05rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.engagement-stat strong {
+    display: block;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.engagement-texte > p:last-child {
+    line-height: 1.6;
+    color: var(--dark-gray);
+}
+
+/* ---------- Tarification ---------- */
+.page-tarification {
+    background-color: var(--bg-why); /* bleu clair pleine largeur */
+}
+
+.page-tarification .section-intro {
+    margin-bottom: 32px;
+}
+
+/* Grille : gros KPI « 0,50 € » à gauche sur desktop, en premier sur mobile */
+.tar-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+@media (min-width: 992px) {
+    .tar-grid {
+        grid-template-columns: 260px 1fr; /* KPI à gauche, texte à droite */
+        gap: 40px;
+    }
+}
+
+.tar-kpi {
+    text-align: center;
+}
+
+.tar-kpi strong {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.1;
+}
+
+.tar-kpi span {
+    display: block;
+    max-width: 260px;
+    margin: 8px auto 0;
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
+}
+
+.tar-ligne {
+    font-size: 1.02rem;
+    color: var(--dark-gray);
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+/* Bloc marketing « equiprix gère le marketing pour vous » - dans #engagement (fond blanc) */
+.marketing-bloc {
+    background: var(--bg-why);
+    border: 1px solid #D6E8FF;
+    border-radius: var(--border-radius);
+    padding: 24px;
+    max-width: 1000px;
+    margin: 32px auto 0;
+}
+
+.marketing-bloc h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.marketing-bloc p {
+    color: var(--dark-gray);
+    line-height: 1.6;
+}
+
+/* ---------- Flèche du toggle « Sources et données utilisées » ----------
+   Même principe que les accordéons de /particuliers/ : ▾ qui pivote à -90° replié */
+.sim-sources-fleche {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.sim-sources-details:not([open]) .sim-sources-fleche {
+    transform: rotate(-90deg);
+}

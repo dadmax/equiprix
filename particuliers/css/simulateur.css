@@ -1,5 +1,5 @@
 /* ============================================
-   SIMULATEUR NIVEAU DE VIE — /particuliers/
+   SIMULATEUR NIVEAU DE VIE - /particuliers/
    S'ajoute au style global du site (style.css).
    ============================================ */
 
@@ -304,8 +304,8 @@
 /* ---------- JAUGE DE DISTRIBUTION ----------
    La jauge représente la population : 10 % de hauteur = 10 % de la
    population. Les bandes de couleurs marquent les catégories equiprix
-   (rouge 0–20 %, orange 20–40 %, jaune 40–60 % autour de la médiane,
-   verte 60–100 %), les pointillés matérialisent les déciles à leur
+   (rouge 0-20 %, orange 20-40 %, jaune 40-60 % autour de la médiane,
+   verte 60-100 %), les pointillés matérialisent les déciles à leur
    hauteur exacte de percentile. */
 .sim-jauge-wrap {
     position: relative;
@@ -597,6 +597,25 @@
     border-radius: var(--border-radius);
 }
 
+/* La maquette est présentée « dans un mobile » : cadre .ccm-phone (défini dans
+   ../style.css, partagé avec l'accueil et /commerces/). Valeurs explicites ici
+   (cette feuille est chargée après ../style.css) : contour 3,5 %, arrondis 20px */
+.sim-ajustement-cols .ccm-phone {
+    max-width: 280px;
+    margin: 0 auto;
+    padding: 8px;              /* bordure fine, en px fixe (plus fine que 3,5 % de 280px) */
+    border-radius: 20px;       /* vrai arrondi */
+}
+
+.sim-ajustement-phone {
+    padding: 8px;
+    border-radius: 20px;
+}
+
+.sim-ajustement-phone img {
+    border-radius: 12px;
+}
+
 @media (min-width: 992px) {
     /* Grand écran : titre + texte à gauche (largeur plafonnée pour des
        lignes de lecture confortables), maquette à droite. La colonne
@@ -623,6 +642,16 @@
     .sim-ajustement-img {
         flex-shrink: 0;
         align-self: center;
+    }
+
+    /* Sur grand écran, c'est le cadre (et non plus l'img seule) qui est l'item flex.
+       Padding/radius répétés ici pour être sûr qu'ils s'appliquent en desktop. */
+    .sim-ajustement-cols .ccm-phone {
+        flex-shrink: 0;
+        align-self: center;
+        margin: 0;
+        padding: 8px;
+        border-radius: 20px;
     }
 }
 

@@ -630,3 +630,215 @@ body {
         display: none;
     }
 }
+
+/* ============================================
+   MAQUETTES D'APPLI « DANS UN MOBILE » + CARROUSEL
+   (partagé : accueil, /particuliers/, /commerces/)
+   - .ccm-phone : cadre téléphone autour de chaque capture d'écran
+     (contour noir ~3,5 % de la largeur, vrais arrondis de 20px) ;
+   - sur mobile (< 992px) : carrousel horizontal à scroll-snap, une
+     maquette visible + aperçu de la suivante, pastilles AU-DESSUS
+     (visibles sans scroller) et flèches latérales ‹ › ;
+   - sur desktop (>= 992px) : grille de 3 colonnes, pastilles et
+     flèches masquées.
+   JS associé : js/carrousel.js
+   ============================================ */
+.ccm-carousel {
+    position: relative;
+    margin-top: 48px;
+}
+
+.ccm-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 16px -24px 0;     /* le carrousel va jusqu'au bord de l'écran */
+    padding: 4px 24px 12px;   /* marge pour l'ombre + l'aperçu */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;    /* barre masquée : pastilles + flèches + aperçu indiquent la suite */
+}
+
+.ccm-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.ccm-etape {
+    flex: 0 0 80%;            /* 80 % : la maquette suivante dépasse un peu */
+    max-width: 80%;
+    scroll-snap-align: center;
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .ccm-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 maquettes de gauche à droite */
+        gap: 24px;
+        overflow: visible;
+        scroll-snap-type: none;
+        margin: 16px auto 0;
+        padding: 0;
+        max-width: 1000px;
+    }
+
+    .ccm-etape {
+        flex: none;
+        max-width: none;
+    }
+
+    .ccm-dots,
+    .ccm-arrow {
+        display: none;
+    }
+}
+
+/* Cadre « téléphone » : contour noir (padding 3,5 %), vrais arrondis 20px
+   (les captures sont plus hautes que larges, un radius en % serait quasi droit) */
+.ccm-phone {
+    background: #111;
+    padding: 3.5%;
+    border-radius: 20px;
+    max-width: 200px;
+    margin: 0 auto 16px;
+    box-shadow: var(--shadow);
+}
+
+.ccm-phone img {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    border-radius: 12px;      /* coins de l'écran, un peu plus petits que le cadre */
+    background: var(--white);
+    box-shadow: none;
+}
+
+/* Pastilles au-dessus du carrousel : visibles dès l'affichage, même si la
+   maquette est haute (elles indiquent « étape X sur 3 ») */
+.ccm-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 4px;
+}
+
+.ccm-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: #C7D9F2;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.ccm-dot.actif {
+    background: var(--primary-color);
+    transform: scale(1.25);
+}
+
+/* Flèches latérales ‹ › : le visiteur comprend tout de suite qu'il peut faire
+   défiler (même quand les pastilles sont hors écran) */
+.ccm-arrow {
+    position: absolute;
+    top: 295px;                /* ≈ mi-hauteur de la maquette (250px de large, ratio 390×844, padding 3,5 %) */
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    line-height: 1;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ccm-prev { left: 4px; }
+.ccm-next { right: 4px; }
+
+.ccm-dot:focus-visible,
+.ccm-arrow:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
+.ccm-etape h3 {
+    color: var(--primary-color);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.ccm-etape p {
+    color: var(--dark-gray);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+/* Dans un cadre téléphone, l'image remplit le cadre (écrase .maquette-image / .step img) */
+.ccm-phone img.maquette-image {
+    margin: 0;
+    max-width: none;
+}
+
+/* ============================================
+   CORRECTIFS carrousel (placés exprès EN FIN de fichier :
+   une règle de base située après un @media de même spécificité gagnerait
+   sinon la cascade - c'est ce qui affichait pastilles/flèches en desktop)
+   ============================================ */
+/* Desktop (>= 992px) : grille 3 colonnes, pastilles et flèches masquées */
+@media (min-width: 992px) {
+    .ccm-dots,
+    .ccm-arrow {
+        display: none;
+    }
+}
+
+/* Mobile : une seule étape, pleine largeur de la piste (donc bien centrée
+   entre les 24px de padding) + aperçu de la suivante via les flèches/pastilles */
+@media (max-width: 991.98px) {
+    .ccm-etape {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Blocs « étapes » centrés horizontalement (maquette + titre + texte) */
+.ccm-carousel .ccm-etape {
+    align-items: center;
+    text-align: center;
+}
+
+.ccm-etape h3,
+.ccm-etape p {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Accueil : les maquettes des étapes sont alignées en bas (desktop) */
+.step .ccm-phone {
+    margin-top: auto;
+}
+
+/* Mobile : la maquette passe EN HAUT de l'étape (comme sur /commerces/), pour que
+   les flèches ‹ › (top: 295px) tombent bien à mi-hauteur de la maquette sur les
+   deux pages. En desktop, la maquette reste en bas de l'étape (margin-top: auto). */
+@media (max-width: 991.98px) {
+    .ccm-etape .ccm-phone {
+        order: -1;
+    }
+
+    .step .ccm-phone {
+        margin-top: 0; /* sinon le margin-top:auto (alignement bas desktop) la rejette en bas */
+    }
+}

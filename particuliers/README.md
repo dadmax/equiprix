@@ -1,4 +1,4 @@
-# Simulateur de niveau de vie — equiprix.fr/particuliers
+# Simulateur de niveau de vie - equiprix.fr/particuliers
 
 ## Structure
 
@@ -12,7 +12,7 @@ particuliers/
 │   └── app.js                   # Interface : saisie, jauge, mises à jour temps réel
 ├── data/
 │   ├── niveaux-vie-dep-2023.json    # Données servies au navigateur (101 départements + France)
-│   └── source/                     # Fichiers Insee bruts (xlsx/csv) — non servis
+│   └── source/                     # Fichiers Insee bruts (xlsx/csv) - non servis
 └── scripts/
     └── xlsx-to-json.py         # Conversion Insee -> JSON (réutilisable par millésime)
 ```
@@ -40,7 +40,7 @@ Le script reconnaît le xlsx multi-onglets Insee (onglets `FRANCE` et `DEP`),
 un xlsx mono-onglet ou un CSV. Il nettoie les particularités des fichiers
 Insee : lignes d'en-tête, espaces fines insécables (U+00AF / U+202F),
 virgules décimales, sauts de ligne parasites dans les cellules. Il attend
-97 départements (métropole y compris la Corse 2A/2B, plus La Réunion 974 —
+97 départements (métropole y compris la Corse 2A/2B, plus La Réunion 974 -
 champ de la diffusion Filosofi 2023) et affiche un avertissement sinon.
 La ligne France métropolitaine (code `FM`) devient la clé `france` du JSON.
 
@@ -81,7 +81,7 @@ sert automatiquement `particuliers/index.html`).
   D8, D9 de la population choisie (France ou département).
 - **Catégorie equiprix** (rouge / orange / jaune / verte) : toujours calculée
   sur les bornes France, indépendamment du segment de la jauge. Découpage :
-  rouge < D2 (20 % les plus bas), orange D2–D4 (20–40 % les plus bas),
-  jaune D4–D6 (40–60 % les plus bas, autour de la médiane),
+  rouge < D2 (20 % les plus bas), orange D2-D4 (20-40 % les plus bas),
+  jaune D4-D6 (40-60 % les plus bas, autour de la médiane),
   verte >= D6 (40 % les plus hauts). Q1 et Q3 restent dans le JSON sans
   être utilisés par le simulateur.

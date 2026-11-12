@@ -1,0 +1,257 @@
+{
+  "bornesCategories": {
+    "rougeMax": 13200,
+    "orangeMax": 19960,
+    "jauneMax": 26080,
+    "source": "Filosofi 2021, France métropolitaine (D2, D4, D6)"
+  },
+  "revenusCategories": {
+    "rouge": 13200,
+    "orange": 20300,
+    "jaune": 25920,
+    "verte": 37380,
+    "source": "Filosofi 2023 : D1, D3, médiane, D8 (France métropolitaine)"
+  },
+  "partsFranceComparatif": {
+    "rouge": 0.2,
+    "orange": 0.2,
+    "jaune": 0.2,
+    "verte": 0.4,
+    "source": "Définition des catégories equiprix : 20 % les plus bas, 20-40 %, 40-60 %, 40 % les plus hauts"
+  },
+  "profilsClientele": [
+    {
+      "id": "commune",
+      "nom": "Comme la population de la commune",
+      "court": "Comme la commune",
+      "coeffRouge": 1,
+      "coeffOrange": 1,
+      "coeffJaune": 1
+    },
+    {
+      "id": "unPeuAisee",
+      "nom": "Un peu plus aisée que la moyenne",
+      "court": "Un peu plus aisée",
+      "coeffRouge": 0.5,
+      "coeffOrange": 0.75,
+      "coeffJaune": 0.75
+    },
+    {
+      "id": "essentiellementAisee",
+      "nom": "Essentiellement aisée",
+      "court": "Essentiellement aisée",
+      "coeffRouge": 0.25,
+      "coeffOrange": 0.4,
+      "coeffJaune": 0.5
+    }
+  ],
+  "attractivite": [
+    {
+      "id": "tresFaible",
+      "nom": "Très faible - j'attire très peu mes clients potentiels, concurrence énorme",
+      "court": "Très faible",
+      "facteur": 20
+    },
+    {
+      "id": "faible",
+      "nom": "Faible - j'attire une part faible des clients potentiels, forte concurrence",
+      "court": "Faible",
+      "facteur": 12
+    },
+    {
+      "id": "moyenne",
+      "nom": "Moyenne - j'attire une part des clients potentiels, concurrence moyenne",
+      "court": "Moyenne",
+      "facteur": 8
+    },
+    {
+      "id": "forte",
+      "nom": "Forte - j'attire la majorité des clients potentiels, peu de concurrence",
+      "court": "Forte",
+      "facteur": 5
+    },
+    {
+      "id": "tresForte",
+      "nom": "Très forte - j'attire déjà tous mes clients potentiels, concurrence inexistante",
+      "court": "Très forte",
+      "facteur": 2
+    }
+  ],
+  "typesCommerce": {
+    "supermarche": {
+      "nom": "Supermarché",
+      "source": "sondage",
+      "margeDefaut": 0.175,
+      "passagesDefaut": 8000,
+      "panierDefaut": 30
+    },
+    "barRestaurant": {
+      "nom": "Bar / restaurant",
+      "source": "sondage",
+      "margeDefaut": 0.5,
+      "passagesDefaut": 8000,
+      "panierDefaut": 50
+    },
+    "commerceBouche": {
+      "nom": "Commerce de bouche",
+      "source": "sondage",
+      "margeDefaut": 0.3,
+      "passagesDefaut": 1000,
+      "panierDefaut": 30
+    },
+    "autre": {
+      "nom": "Autre commerce",
+      "source": "estimation",
+      "coefPrudence": 0.75,
+      "base": [
+        "barRestaurant",
+        "commerceBouche"
+      ],
+      "margeDefaut": 0.3,
+      "passagesDefaut": 1000,
+      "panierDefaut": 30
+    }
+  },
+  "matriceUplift": {
+    "reductions": [
+      0,
+      0.05,
+      0.08,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "supermarche": [
+      0,
+      0.1536,
+      0.2,
+      0.3276,
+      0.4933,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8
+    ],
+    "barRestaurant": [
+      0,
+      0.03,
+      0.05,
+      0.1414,
+      0.16,
+      0.1828,
+      0.2,
+      0.3,
+      0.35,
+      0.4
+    ],
+    "commerceBouche": [
+      0,
+      0.1429,
+      0.2,
+      0.3,
+      0.431,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7
+    ]
+  },
+  "parametres": {
+    "tauxCapture": 0.1,
+    "fraisServiceParPassage": 0.5,
+    "capFraisServiceMensuel": 100
+  },
+  "textes": {
+    "narratifDefaut": "Utilisez le simulateur ci-dessous pour trouver la tarification solidaire qui améliore la performance de votre enseigne, ou entrez directement dans l'un des cas ci-dessus.",
+    "alertePassages": "Attention : cette nouvelle clientèle doit pouvoir être accueillie sans coût supplémentaire important (ex. recrutement de caissiers, stock supplémentaire). Sinon, adaptez les hypothèses de la simulation.",
+    "sondage": "Sondage equiprix réalisé en septembre 2026 sur 60 ménages français",
+    "legendesCategories": {
+      "rouge": "Rouge - ménages sous ou proches du seuil de pauvreté",
+      "orange": "Orange - ménages modestes",
+      "jaune": "Jaune - classe moyenne",
+      "verte": "Verte - ménages aisés"
+    },
+    "titreBarreSecteur": "Votre secteur",
+    "titreBarreFrance": "France entière (comparatif)",
+    "suggestionMargeFaible": "Votre commerce a une marge commerciale moyenne inférieure à 15 %. Un modèle de réduction sur l’ensemble de vos produits ne produira pas de bons résultats avec la tarification solidaire. Avez-vous pensé à proposer des réductions ciblées sur vos produits à plus forte marge, pour développer la clientèle dessus ?",
+    "suggestionResultatNegatif": "Résultat négatif : deux pistes pour revenir à un solde positif. 1) Modifier le taux de réduction pratiqué. 2) Cibler les réductions sur des produits ou services à forte marge, sur lesquels vous resterez gagnant malgré la réduction.",
+    "labelMarge": "Marge sur produit (%)",
+    "aideMarge": "= (prix de vente HT − coût d’achat HT) / prix de vente HT. Exemple : vendu 10 €, acheté 7 € → marge 30 %."
+  },
+  "useCases": [
+    {
+      "id": "boulangerie-albertville",
+      "nom": "Boulangerie à Albertville",
+      "narratif": "Chez Mme Martin, à Albertville, tout le monde vient chercher son pain. Mais les gâteaux et pâtisseries, plus chers, ne partent qu'auprès des ménages aisés. Résultat : un panier moyen de 30 €, une quarantaine d'achats par mois et une pénétration faible dans le quartier. La marge réelle est de 10 % sur l'ensemble, mais de 40 % sur les gâteaux. Avec equiprix, elle vise à faire revenir chez elle les clients qui achetaient leurs pâtisseries en grande surface : une réduction de 15 % sur les foyers éligibles, appliquée à ces produits plus chers.",
+      "params": {
+        "cp": "73200",
+        "type": "commerceBouche",
+        "marge": 0.4,
+        "passages": 40,
+        "panier": 30,
+        "profil": "essentiellementAisee",
+        "attr": 20,
+        "rr": 0.15,
+        "ro": 0.15,
+        "rj": 0.15
+      }
+    },
+    {
+      "id": "coiffeur-pessac",
+      "nom": "Coiffeur à Pessac",
+      "narratif": "Le salon de M. Diallo, à Pessac, a 30 % de ses créneaux vides. Une coupe tourne autour de 25 €. Il propose 20 % de réduction aux foyers éligibles pour attirer ceux qui allaient dans des salons moins chers, et fidéliser les clients à revenus modestes. Les coupes supplémentaires sont essentiellement de la marge en plus : loyer et matériel déjà payés, il ne reste que l’eau, le nettoyage, l’électricité et le shampoing - environ 90 %. Chaque créneau rempli est donc quasiment du gain net.",
+      "params": {
+        "cp": "33600",
+        "type": "autre",
+        "marge": 0.9,
+        "passages": 280,
+        "panier": 25,
+        "profil": "unPeuAisee",
+        "attr": 8,
+        "rr": 0.2,
+        "ro": 0.2,
+        "rj": 0.2
+      }
+    },
+    {
+      "id": "restaurant-lyon",
+      "nom": "Restaurant à Lyon",
+      "narratif": "Ce restaurant lyonnais du 1er arrondissement sert des repas du midi à 20 €. Le midi, 20 % des tables restent vides. La marge totale du restaurant est faible, mais sur chaque repas supplémentaire vendu, elle se mesure au coût des ingrédients : environ 50 % du prix du repas. Ici, le choix n'est pas la réduction qui rapporte le plus de marge tout de suite, mais une réduction agressive de 30 % - hors alcool, avec un repas par personne - pour faire découvrir la table et fidéliser à long terme.",
+      "params": {
+        "cp": "69001",
+        "type": "barRestaurant",
+        "marge": 0.5,
+        "passages": 600,
+        "panier": 20,
+        "profil": "unPeuAisee",
+        "attr": 8,
+        "rr": 0.3,
+        "ro": 0.3,
+        "rj": 0.3
+      }
+    },
+    {
+      "id": "supérette-montreuil",
+      "nom": "Supérette à Montreuil",
+      "narratif": "Cette supérette de proximité à Montreuil pratique des prix supérieurs à la grande distribution. Sa clientèle est un peu plus aisée que la commune : ceux qui surveillent leur budget groupent leurs achats ailleurs. La concurrence est forte - d’autres supérettes à 150-200 m. Panier moyen 16 €, marge 20 %. Elle applique une réduction modeste de 10 %, uniquement sur les catégories rouge et orange. La clientèle supplémentaire ainsi attirée reste absorbable, même aux pics de caisse, et améliore sa performance économique.",
+      "params": {
+        "cp": "93100",
+        "type": "supermarche",
+        "marge": 0.2,
+        "passages": 20000,
+        "panier": 16,
+        "profil": "unPeuAisee",
+        "attr": 8,
+        "rr": 0.1,
+        "ro": 0.1,
+        "rj": 0
+      }
+    }
+  ]
+}
